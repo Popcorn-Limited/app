@@ -21,10 +21,14 @@ export default function useNetWorth(): {
   Polygon: BigNumber;
   BNB: BigNumber;
   Arbitrum: BigNumber;
+  Optimism: BigNumber;
   totalNetWorth: BigNumber;
+  pop: BigNumber;
+  vesting: BigNumber;
+  deposits: BigNumber;
 } {
   const { address: account } = useAccount();
-  const { Ethereum, Polygon, BNB, Arbitrum } = ChainId;
+  const { Ethereum, Polygon, BNB, Arbitrum, Optimism } = ChainId;
   const useHoldingValue = useCallback(getHoldingValue, []);
 
   const ethereum = useNamedAccounts("1", [
@@ -67,10 +71,10 @@ export default function useNetWorth(): {
     polygonRewardsEscrow,
     polygonPopUsdcArrakisVaultStaking,
   ] = polygon;
-  const bnb = useNamedAccounts("56", ["pop", "rewardsEscrow"]);
-  const [bnbPop, bnbRewardsEscrow] = bnb;
-  const arbitrum = useNamedAccounts("42161", ["pop"]);
-  const [arbPop, arbRewardsEscrow] = arbitrum;
+  const [bnbPop, bnbRewardsEscrow] = useNamedAccounts("56", ["pop", "rewardsEscrow"]);
+  const [arbPop] = useNamedAccounts("42161", ["pop"]);
+  const [opPop, opPopStaking, opRewardsEscrow] = useNamedAccounts("56", ["pop", "popStaking", "rewardsEscrow"]);
+
 
   const { data: popPrice } = usePrice({ address: ethereumPop?.address, chainId: Ethereum });
   const { data: mainnetLpPrice } = usePrice({ address: ethereumPopUsdcArrakisVault?.address, chainId: Ethereum });
@@ -80,6 +84,7 @@ export default function useNetWorth(): {
   const { data: mainnetPopBalance } = useBalanceOf({ address: ethereumPop.address, chainId: Ethereum, account });
   const { data: bnbPopBalance } = useBalanceOf({ address: bnbPop.address, account, chainId: BNB });
   const { data: arbitrumPopBalance } = useBalanceOf({ address: arbPop.address, account, chainId: Arbitrum });
+  const { data: optimismPopBalance } = useBalanceOf({ address: opPop.address, account, chainId: Optimism });
 
   const { data: mainnetEscrowClaimablePop } = useClaimableBalance({
     chainId: Ethereum,
@@ -114,14 +119,14 @@ export default function useNetWorth(): {
     account,
   });
 
-  const { data: arbitrumEscrowClaimablePop } = useClaimableBalance({
+  const { data: optimismEscrowClaimablePop } = useClaimableBalance({
     chainId: Arbitrum,
-    address: arbRewardsEscrow?.address,
+    address: opRewardsEscrow?.address,
     account,
   });
-  const { data: arbitrumEscrowVestingPop } = useEscrowBalance({
+  const { data: optimismEscrowVestingPop } = useEscrowBalance({
     chainId: Arbitrum,
-    address: arbRewardsEscrow?.address,
+    address: opRewardsEscrow?.address,
     account,
   });
 
@@ -155,6 +160,7 @@ export default function useNetWorth(): {
   const polygonPopHoldings = useHoldingValue(polygonPopBalance?.value, popPrice?.value);
   const bnbPopHoldings = useHoldingValue(bnbPopBalance?.value, popPrice?.value);
   const arbitrumPopHoldings = useHoldingValue(arbitrumPopBalance?.value, popPrice?.value);
+  const optimismPopHoldings = useHoldingValue(optimismPopBalance?.value, popPrice?.value);
 
   const { data: ethereumLockedBalances } = useLockedBalances({
     address: ethereumPopStaking?.address,
@@ -183,6 +189,21 @@ export default function useNetWorth(): {
     chainId: Polygon,
   });
   const polygonPopStakingRewardsHoldings = useHoldingValue(earnedPolygonPop?.value, popPrice?.value);
+
+  const { data: optimismLockedBalances } = useLockedBalances({
+    address: opPopStaking?.address,
+    chainId: Optimism,
+    account,
+  });
+  const optimismPopStakingHoldings = useHoldingValue(optimismLockedBalances?.locked, popPrice?.value);
+
+  const { data: earnedOptimismPop } = useClaimableBalance({
+    address: opPopStaking?.address,
+    account,
+    chainId: Optimism,
+  });
+  const optimismPopStakingRewardsHoldings = useHoldingValue(earnedOptimismPop?.value, popPrice?.value);
+
 
   const { data: earnedButterStaking } = useClaimableBalance({
     address: ethereumButterStaking?.address,
@@ -220,8 +241,8 @@ export default function useNetWorth(): {
     bnbEscrowClaimablePop?.value.add(bnbEscrowVestingPop?.value),
     popPrice?.value,
   );
-  const arbitrumEscrowHoldings = useHoldingValue(
-    arbitrumEscrowClaimablePop?.value.add(arbitrumEscrowVestingPop?.value),
+  const optimismEscrowHoldings = useHoldingValue(
+    optimismEscrowClaimablePop?.value.add(optimismEscrowVestingPop?.value),
     popPrice?.value,
   );
 
@@ -254,6 +275,46 @@ export default function useNetWorth(): {
   });
   const threeXStakingHoldings = useHoldingValue(threeXStaking?.value, threeXPrice?.value);
 
+
+  const calculatePopHoldings = () => {
+    return [
+      mainnetPopHoldings,
+      polygonPopHoldings,
+      arbitrumPopHoldings,
+      optimismPopHoldings,
+      bnbPopHoldings,
+    ].reduce((total, num) => total.add(num));
+  };
+
+  const calculateVestingHoldings = () => {
+    return [
+      mainnetEscrowHoldings,
+      polygonEscrowHoldings,
+      bnbEscrowHoldings,
+      optimismEscrowHoldings,
+      polygonPopStakingRewardsHoldings,
+      mainnetPopStakingRewardsHoldings,
+      optimismPopStakingRewardsHoldings,
+      butterStakingRewardsHoldings,
+      threeXStakingRewardsHoldings,
+      mainnetLPStakingRewardsHoldings,
+      polygonLPStakingRewardsHoldings
+    ].reduce((total, num) => total.add(num));
+  }
+
+  const calculateDepositHoldings = () => {
+    return [
+      butterHoldings,
+      threeXHoldings,
+      butterStakingHoldings,
+      threeXStakingHoldings,
+      mainnetPopStakingHoldings,
+      polygonPopStakingHoldings,
+      optimismPopStakingHoldings
+    ].reduce((total, num) => total.add(num));
+  }
+
+
   const calculateEthereumHoldings = (): BigNumber => {
     return [
       mainnetPopHoldings,
@@ -285,7 +346,11 @@ export default function useNetWorth(): {
   };
 
   const calculateArbitrumHoldings = (): BigNumber => {
-    return [arbitrumPopHoldings, arbitrumEscrowHoldings].reduce((total, num) => total.add(num));
+    return [arbitrumPopHoldings].reduce((total, num) => total.add(num));
+  };
+
+  const calculateOptimismHoldings = (): BigNumber => {
+    return [optimismPopHoldings, optimismEscrowHoldings, optimismPopStakingHoldings].reduce((total, num) => total.add(num));
   };
 
   const calculateBnbHoldings = (): BigNumber => {
@@ -298,6 +363,7 @@ export default function useNetWorth(): {
       calculatePolygonHoldings(),
       calculateBnbHoldings(),
       calculateArbitrumHoldings(),
+      calculateOptimismHoldings(),
     ].reduce((total, num) => total.add(num));
   };
 
@@ -306,6 +372,10 @@ export default function useNetWorth(): {
     Polygon: calculatePolygonHoldings(),
     BNB: calculateBnbHoldings(),
     Arbitrum: calculateArbitrumHoldings(),
+    Optimism: calculateOptimismHoldings(),
     totalNetWorth: calculateTotalHoldings(),
+    pop: calculatePopHoldings(),
+    vesting: calculateVestingHoldings(),
+    deposits: calculateDepositHoldings()
   };
 }
