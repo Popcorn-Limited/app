@@ -1,0 +1,4 @@
+{
+  "installCommand": "yarn",
+  "buildCommand": "yarn lerna run --scope={greenfield-app} build"
+}
