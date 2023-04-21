@@ -44,11 +44,10 @@ const Products = () => {
             <Rotable badge="03" label="Make Impact" />
           </span>
           <ul className={`absolute bottom-0 left-0 ${styles.animateWords}`}>
-            <Rotable badge="01" label="Mint" />
-            <Rotable badge="02" label="Stake" />
-            <Rotable badge="03" label="Make Impact" />
-            <Rotable badge="04" label="Do Good" />
-            <Rotable badge="01" label="Mint" />
+            <Rotable badge="01" label="Deposit" />
+            <Rotable badge="02" label="Earn" />
+            <Rotable badge="03" label="Relax" />
+            <Rotable badge="04" label="Create Impact" />
           </ul>
         </span>
       </div>
@@ -71,7 +70,7 @@ const Products = () => {
                   />
                 </svg>
               }
-              description="Single-asset vaults to earn yield on your digital assets"
+              description="Single-asset vaults that earn yield on your crypto"
               stats={[
                 {
                   label: "TVL",
@@ -113,7 +112,7 @@ const Products = () => {
                 />
               </svg>
             }
-            description="Single-asset vaults to earn yield on your digital assets"
+            description="Farm POP for vlPOP to participate in PopcornDAO governance. (POP 2.0 is coming soon)"
             stats={[
               {
                 label: "TVL",
@@ -156,7 +155,7 @@ const Products = () => {
                 />
               </svg>
             }
-            description="Claim and donate a portion of your staked rewards to the good of the public."
+            description="Vaults that fund public goods using 100% of the yield. Do some good with your crypto!"
             stats={[
               {
                 label: "TVL",
