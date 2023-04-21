@@ -36,7 +36,7 @@ const Products = () => {
   } = Tvl({ chainId: Polygon, address: popStakingPolygon?.address });
 
   return (
-    <section className="px-8 grid grid-cols-12 md:gap-8">
+    <section className="px-8 pt-4 pb-24 grid grid-cols-12 md:gap-8">
       <div className="col-span-12 md:col-span-3 flex flex-col justify-between">
         <h6 className="font-medium leading-8 whitespace-nowrap">Our products</h6>
         <span className="relative hidden lg:inline-flex overflow-hidden">
@@ -90,41 +90,6 @@ const Products = () => {
           <Product
             title={
               <Fragment>
-                Vaults for <br className="hidden md:inline" />
-                Good
-              </Fragment>
-            }
-            customContent={
-              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  className="group-hover:fill-[#C391FF]"
-                  d="M15 29.9999C23.2842 29.9999 30 23.2842 30 14.9999C30 6.71567 23.2842 -6.10352e-05 15 -6.10352e-05C6.71572 -6.10352e-05 0 6.71567 0 14.9999C0 23.2842 6.71572 29.9999 15 29.9999Z"
-                  fill="black"
-                />
-                <path
-                  className="group-hover:fill-[#C391FF]"
-                  d="M45 29.9999C53.2842 29.9999 60 23.2842 60 14.9999C60 6.71567 53.2842 -6.10352e-05 45 -6.10352e-05C36.7157 -6.10352e-05 30 6.71567 30 14.9999C30 23.2842 36.7157 29.9999 45 29.9999Z"
-                  fill="black"
-                />
-                <path
-                  className="group-hover:fill-[#C391FF]"
-                  d="M59.9999 29.9999C59.9999 46.5687 46.5687 59.9999 30 59.9999C13.4312 59.9999 0 46.5687 0 29.9999H59.9999Z"
-                  fill="black"
-                />
-              </svg>
-            }
-            description="Claim and donate a portion of your staked rewards to the good of the public."
-            stats={[
-              {
-                label: "TVL",
-                content: <p>Coming soon</p>,
-              },
-            ]}
-            route="/sweet-vaults"
-          />
-          <Product
-            title={
-              <Fragment>
                 Pop <br className="hidden md:inline" />
                 Staking
               </Fragment>
@@ -164,6 +129,41 @@ const Products = () => {
               },
             ]}
             route={`staking`}
+          />
+          <Product
+            title={
+              <Fragment>
+                Vaults for <br className="hidden md:inline" />
+                Good
+              </Fragment>
+            }
+            customContent={
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  className="group-hover:fill-[#C391FF]"
+                  d="M15 29.9999C23.2842 29.9999 30 23.2842 30 14.9999C30 6.71567 23.2842 -6.10352e-05 15 -6.10352e-05C6.71572 -6.10352e-05 0 6.71567 0 14.9999C0 23.2842 6.71572 29.9999 15 29.9999Z"
+                  fill="black"
+                />
+                <path
+                  className="group-hover:fill-[#C391FF]"
+                  d="M45 29.9999C53.2842 29.9999 60 23.2842 60 14.9999C60 6.71567 53.2842 -6.10352e-05 45 -6.10352e-05C36.7157 -6.10352e-05 30 6.71567 30 14.9999C30 23.2842 36.7157 29.9999 45 29.9999Z"
+                  fill="black"
+                />
+                <path
+                  className="group-hover:fill-[#C391FF]"
+                  d="M59.9999 29.9999C59.9999 46.5687 46.5687 59.9999 30 59.9999C13.4312 59.9999 0 46.5687 0 29.9999H59.9999Z"
+                  fill="black"
+                />
+              </svg>
+            }
+            description="Claim and donate a portion of your staked rewards to the good of the public."
+            stats={[
+              {
+                label: "TVL",
+                content: <p>Coming soon</p>,
+              },
+            ]}
+            route="/sweet-vaults"
           />
         </div>
       </div>

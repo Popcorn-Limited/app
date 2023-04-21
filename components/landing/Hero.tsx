@@ -12,7 +12,6 @@ const formatter: Intl.NumberFormat = Intl.NumberFormat("en", {
 });
 
 export default function Hero(): JSX.Element {
-  const { address: account } = useAccount();
   const { totalNetWorth, pop, vesting, deposits } = useNetworth();
   const [tvl, setTvl] = useState<string>("0");
 
@@ -25,14 +24,14 @@ export default function Hero(): JSX.Element {
 
 
   return (
-    <section className="mb-10 pb-6 px-8 bg-[#ebe7d433] border-b border-[#EBE7D4]">
+    <section className="mb-10 pb-6 mx-6 md:mx-8 border-b border-[#EBE7D4]">
       <Link
         href="/portfolio"
         passHref
       >
         <div className="flex flex-row items-center mb-4">
           <p className="uppercase text-primary text-sm">My Portfolio</p>
-          <div className="ml-4">
+          <div className="ml-5">
             <SecondaryActionButton label="" />
           </div>
         </div>

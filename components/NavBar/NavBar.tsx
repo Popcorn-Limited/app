@@ -18,7 +18,7 @@ export default function Navbar(): JSX.Element {
 
   return (
     <>
-      <nav className={`hidden md:flex z-10 font-landing ${pathname === "/" ? "bg-[#ebe7d433]" : "bg-white"}`}>
+      <nav className={`hidden md:flex z-10 font-landing ${pathname === "/" ? "" : "bg-white"}`}>
         <DesktopMenu />
       </nav>
       <nav className="md:hidden w-screen h-full relative">

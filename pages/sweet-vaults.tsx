@@ -74,7 +74,7 @@ const SweetVaults: NextPage = () => {
         stripeColor="#FFA0B4"
         stripeColorMobile="white"
       />
-      <section className="mt-8 mb-10">
+      <section className="mt-8 mb-10 md:px-8">
         <div className="w-full md:w-96 flex px-5 py-1 items-center rounded-lg border border-customLightGray">
           <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
           <input
@@ -86,7 +86,7 @@ const SweetVaults: NextPage = () => {
           />
         </div>
       </section>
-      <section className="flex flex-col gap-8">
+      <section className="flex flex-col gap-8 md:px-8">
         {allVaults.map((vault) => {
           return <SweetVault
             key={`sv-${vault.address}-${vault.chainId}`}
