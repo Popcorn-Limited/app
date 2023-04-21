@@ -6,8 +6,10 @@ import { useNamedAccounts } from "lib/utils";
 import usePrice from "lib/Price/hooks/usePrice";
 import { useBalanceOf } from "lib/Erc20/hooks";
 import { useClaimableBalance } from "lib/PopLocker/hooks/useClaimableBalance";
+import { useClaimableBalance as useClaimableEscrowBalance } from "lib/Escrow/hooks/useClaimableBalance"
 import { useLockedBalances } from "lib/PopLocker/hooks";
 import { useEscrowBalance } from "lib/Escrow/hooks/useEscrowBalance";
+import { useEscrowIds, useEscrows } from "lib/Escrow";
 
 function getHoldingValue(tokenAmount: BigNumber, tokenPrice: BigNumber): BigNumber {
   tokenAmount = tokenAmount?.gt(constants.Zero) ? tokenAmount : constants.Zero;
@@ -86,49 +88,38 @@ export default function useNetWorth(): {
   const { data: arbitrumPopBalance } = useBalanceOf({ address: arbPop.address, account, chainId: Arbitrum });
   const { data: optimismPopBalance } = useBalanceOf({ address: opPop.address, account, chainId: Optimism });
 
-  const { data: mainnetEscrowClaimablePop } = useClaimableBalance({
+  const { data: mainnetEscrows } = useEscrows({
     chainId: Ethereum,
     address: ethereumRewardsEscrow?.address,
     account,
-  });
-  const { data: mainnetEscrowVestingPop } = useEscrowBalance({
-    chainId: Ethereum,
-    address: ethereumRewardsEscrow?.address,
-    account,
-  });
+  })
+  const mainnetEscrowClaimablePop = mainnetEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
+  const mainnetEscrowVestingPop = mainnetEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
 
-  const { data: polygonEscrowClaimablePop } = useClaimableBalance({
+  const { data: polygonEscrows } = useEscrows({
     chainId: Polygon,
     address: polygonRewardsEscrow?.address,
     account,
-  });
-  const { data: polygonEscrowVestingPop } = useEscrowBalance({
-    chainId: Polygon,
-    address: polygonRewardsEscrow?.address,
-    account,
-  });
+  })
+  const polygonEscrowClaimablePop = polygonEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
+  const polygonEscrowVestingPop = polygonEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
 
-  const { data: bnbEscrowClaimablePop } = useClaimableBalance({
+  const { data: optimismEscrows } = useEscrows({
+    chainId: Optimism,
+    address: opRewardsEscrow?.address,
+    account,
+  })
+  const optimismEscrowClaimablePop = optimismEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
+  const optimismEscrowVestingPop = optimismEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
+
+
+  const { data: bnbEscrows } = useEscrows({
     chainId: BNB,
     address: bnbRewardsEscrow?.address,
     account,
-  });
-  const { data: bnbEscrowVestingPop } = useEscrowBalance({
-    chainId: BNB,
-    address: bnbRewardsEscrow?.address,
-    account,
-  });
-
-  const { data: optimismEscrowClaimablePop } = useClaimableBalance({
-    chainId: Arbitrum,
-    address: opRewardsEscrow?.address,
-    account,
-  });
-  const { data: optimismEscrowVestingPop } = useEscrowBalance({
-    chainId: Arbitrum,
-    address: opRewardsEscrow?.address,
-    account,
-  });
+  })
+  const bnbEscrowClaimablePop = bnbEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
+  const bnbEscrowVestingPop = bnbEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
 
   const { data: mainnetLpBalance } = useBalanceOf({
     address: ethereumPopUsdcArrakisVault?.address,
@@ -233,25 +224,25 @@ export default function useNetWorth(): {
   });
   const polygonLPStakingRewardsHoldings = useHoldingValue(earnedPolygonPopUsdcStaking?.value, popPrice?.value);
 
-  const polygonEscrowHoldings = useHoldingValue(
-    polygonEscrowClaimablePop?.value.add(polygonEscrowVestingPop?.value),
-    popPrice?.value,
-  );
-  const bnbEscrowHoldings = useHoldingValue(
-    bnbEscrowClaimablePop?.value.add(bnbEscrowVestingPop?.value),
-    popPrice?.value,
-  );
-  const optimismEscrowHoldings = useHoldingValue(
-    optimismEscrowClaimablePop?.value.add(optimismEscrowVestingPop?.value),
+
+  const mainnetEscrowHoldings = useHoldingValue(
+    constants.Zero.add(mainnetEscrowClaimablePop || "0").add(mainnetEscrowVestingPop || "0"),
     popPrice?.value,
   );
 
-  const mainnetEscrowHoldings = useHoldingValue(
-    BigNumber.from("0")
-      .add(mainnetEscrowClaimablePop?.value || "0")
-      .add(mainnetEscrowVestingPop?.value || "0"),
+  const polygonEscrowHoldings = useHoldingValue(
+    constants.Zero.add(polygonEscrowClaimablePop || "0").add(polygonEscrowVestingPop || "0"),
     popPrice?.value,
   );
+  const bnbEscrowHoldings = useHoldingValue(
+    constants.Zero.add(bnbEscrowClaimablePop || "0").add(bnbEscrowVestingPop || "0"),
+    popPrice?.value,
+  );
+  const optimismEscrowHoldings = useHoldingValue(
+    constants.Zero.add(optimismEscrowClaimablePop || "0").add(optimismEscrowVestingPop || "0"),
+    popPrice?.value,
+  );
+
 
   const { data: butterBalance } = useBalanceOf({ address: ethereumButter?.address, account, chainId: Ethereum });
   const { data: butterPrice } = usePrice({ address: ethereumButter?.address, account, chainId: Ethereum });

@@ -24,32 +24,35 @@ export default function Hero(): JSX.Element {
 
 
   return (
-    <section className="mb-10 pb-6 mx-6 md:mx-8 border-b border-[#EBE7D4]">
+    <section className="mb-10 pb-6 mx-6 sm:mx-8 border-b border-[#EBE7D4]">
       <Link
         href="/portfolio"
         passHref
       >
-        <div className="flex flex-row items-center mb-4">
+        <div className="flex flex-row items-center mb-2 smmd:mb-4">
           <p className="uppercase text-primary text-sm">My Portfolio</p>
           <div className="ml-5">
             <SecondaryActionButton label="" />
           </div>
         </div>
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center space-x-10">
+        <div className="flex flex-col smmd:flex-row smmd:items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
             <StatusWithLabel
               label={"Deposits"}
               content={<p className="text-3xl font-bold text-black">$ {formatter.format(parseInt(formatUnits(deposits)))}</p>}
             />
-            <StatusWithLabel
-              label={"Vesting"}
-              content={<p className="text-3xl font-bold text-black">$ {formatter.format(parseInt(formatUnits(vesting)))}</p>}
-            />
-            <StatusWithLabel
-              label={"POP in Wallet"}
-              content={<p className="text-3xl font-bold text-black">$ {formatter.format(parseInt(formatUnits(pop)))}</p>}
-            />
+            <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
+              <StatusWithLabel
+                label={"Vesting"}
+                content={<p className="text-3xl font-bold text-black">$ {formatter.format(parseInt(formatUnits(vesting)))}</p>}
+              />
+              <StatusWithLabel
+                label={"POP in Wallet"}
+                content={<p className="text-3xl font-bold text-black">$ {formatter.format(parseInt(formatUnits(pop)))}</p>}
+              />
+            </div>
           </div>
+          <p className="uppercase smmd:hidden mt-12 text-primary text-sm mb-2">Platform</p>
           <div className="flex flex-row items-center space-x-10">
             <StatusWithLabel
               label={"Total Locked Value"}

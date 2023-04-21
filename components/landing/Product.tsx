@@ -15,7 +15,7 @@ export default function Product({ title, description, stats, badge, customConten
   return (
     <Link
       href={route}
-      className="group border rounded smmd:w-1/3 xl:w-screen lg:max-w-[21.5rem] relative flex flex-col bg-[#FAF9F4] border-warmGray border-opacity-75 .smmd:items-center gap-6 md:gap-8 p-7"
+      className="group border rounded md:w-1/3 xl:w-screen lg:max-w-[21.5rem] relative flex flex-col bg-[#FAF9F4] border-warmGray border-opacity-75 .smmd:items-center gap-6 md:gap-8 p-7"
     >
       {badge && (
         <img

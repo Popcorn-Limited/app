@@ -53,7 +53,7 @@ const Products = () => {
         </span>
       </div>
       <div className="col-span-12 lg:col-span-9 lg:col-start-4 pt-6">
-        <div className="flex flex-col space-y-8 smmd:space-y-0 smmd:flex-row smmd:space-x-8 xl:justify-between">
+        <div className="flex flex-col space-y-8 md:space-y-0 md:flex-row md:space-x-8 xl:justify-between">
           {displaySweetVaults && (
             <Product
               title={
