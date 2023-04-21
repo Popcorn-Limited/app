@@ -211,19 +211,14 @@ export const PortfolioPage: NextPage = () => {
           .map((token) => {
             const key = getItemKey(token);
             return (
-              <>
-                {token?.chainId}
-                {token?.address}
-                {token?.__alias}
-                <PortfolioClaimableBalance
-                  key={`rewards-${key}`}
-                  account={account}
-                  type="claimable"
-                  networth={networth}
-                  callback={(value) => addToBalances(key, "claimable", Number(token.chainId), value)}
-                  token={token}
-                />
-              </>
+              <PortfolioClaimableBalance
+                key={`rewards-${key}`}
+                account={account}
+                type="claimable"
+                networth={networth}
+                callback={(value) => addToBalances(key, "claimable", Number(token.chainId), value)}
+                token={token}
+              />
             );
           })}
       </PortfolioSection>

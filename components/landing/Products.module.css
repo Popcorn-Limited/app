@@ -1,6 +1,6 @@
 .animateWords {
-  animation: do-rotate 6s infinite;
-  animation-delay: 0.6s;
+  animation: do-rotate 10s infinite;
+  animation-delay: 0.5s;
 }
 
 .animateWords li {
@@ -9,16 +9,16 @@
 
 @keyframes do-rotate {
   0% {
-    transform: translateY(80%);
+    transform: translateY(100%);
   }
   25% {
-    transform: translateY(60%);
+    transform: translateY(75%);
   }
   50% {
-    transform: translateY(40%);
+    transform: translateY(50%);
   }
   75% {
-    transform: translateY(20%);
+    transform: translateY(25%);
   }
   100% {
     transform: translateY(0%);

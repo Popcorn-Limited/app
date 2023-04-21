@@ -47,7 +47,7 @@ const Footer = () => {
       </div>
       <div className="col-span-12 smmd:col-span-6 flex flex-col justify-between order-3 smmd:order-2 mt-12 smmd:mt-0">
         <p className=" text-primaryDark leading-6 order-2 smmd:order-1 mt-8 smmd:mt-0">
-          Popcorn is a multi-chain regenerative yield optimizing protocol.
+          Popcorn is an audited, non-custodial DeFi wealth manager with yield-generating products that simultaneously fund nonprofits and social impact organizations.
         </p>
         <div className="flex justify-between smmd:justify-start smmd:gap-7 order-1 smmd:order-2">
           <a

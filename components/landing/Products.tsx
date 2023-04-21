@@ -47,7 +47,7 @@ const Products = () => {
             <Rotable badge="01" label="Deposit" />
             <Rotable badge="02" label="Earn" />
             <Rotable badge="03" label="Relax" />
-            <Rotable badge="04" label="Create Impact" />
+            <Rotable badge="04" label="Have Impact" />
           </ul>
         </span>
       </div>
