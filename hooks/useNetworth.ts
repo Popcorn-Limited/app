@@ -82,11 +82,11 @@ export default function useNetWorth(): {
   const { data: mainnetLpPrice } = usePrice({ address: ethereumPopUsdcArrakisVault?.address, chainId: Ethereum });
   const { data: polygonLpPrice } = usePrice({ address: polygonPopUsdcArrakisVault?.address, chainId: Polygon });
 
-  const { data: polygonPopBalance } = useBalanceOf({ address: polygonPop.address, chainId: Polygon, account });
-  const { data: mainnetPopBalance } = useBalanceOf({ address: ethereumPop.address, chainId: Ethereum, account });
-  const { data: bnbPopBalance } = useBalanceOf({ address: bnbPop.address, account, chainId: BNB });
-  const { data: arbitrumPopBalance } = useBalanceOf({ address: arbPop.address, account, chainId: Arbitrum });
-  const { data: optimismPopBalance } = useBalanceOf({ address: opPop.address, account, chainId: Optimism });
+  const { data: polygonPopBalance } = useBalanceOf({ address: polygonPop?.address, chainId: Polygon, account });
+  const { data: mainnetPopBalance } = useBalanceOf({ address: ethereumPop?.address, chainId: Ethereum, account });
+  const { data: bnbPopBalance } = useBalanceOf({ address: bnbPop?.address, account, chainId: BNB });
+  const { data: arbitrumPopBalance } = useBalanceOf({ address: arbPop?.address, account, chainId: Arbitrum });
+  const { data: optimismPopBalance } = useBalanceOf({ address: opPop?.address, account, chainId: Optimism });
 
   const { data: mainnetEscrows } = useEscrows({
     chainId: Ethereum,

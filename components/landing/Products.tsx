@@ -47,7 +47,7 @@ const Products = () => {
             <Rotable badge="01" label="Deposit" />
             <Rotable badge="02" label="Earn" />
             <Rotable badge="03" label="Relax" />
-            <Rotable badge="04" label="Have Impact" />
+            <Rotable badge="04" label="Do Good" />
           </ul>
         </span>
       </div>
@@ -70,7 +70,7 @@ const Products = () => {
                   />
                 </svg>
               }
-              description="Single-asset vaults that earn yield on your crypto"
+              description="Single-asset vaults that earn yield on your crypto."
               stats={[
                 {
                   label: "TVL",
@@ -112,7 +112,7 @@ const Products = () => {
                 />
               </svg>
             }
-            description="Farm POP for vlPOP to participate in PopcornDAO governance. (POP 2.0 is coming soon)"
+            description="Farm POP for vlPOP to participate in PopcornDAO governance."
             stats={[
               {
                 label: "TVL",

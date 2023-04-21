@@ -130,7 +130,7 @@ const Footer = () => {
           <p className="text-gray-900 font-medium leading-6 tracking-1">Bug Bounty</p>
           <div className="flex flex-col">
             <Link
-              href="https://immunefi.com/bounty/popcornnetwork"
+              href="https://immunefi.com/bounty/popcorn"
               passHref
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
