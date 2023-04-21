@@ -36,7 +36,7 @@ const Products = () => {
   } = Tvl({ chainId: Polygon, address: popStakingPolygon?.address });
 
   return (
-    <section className="grid grid-cols-12 md:gap-8">
+    <section className="px-8 grid grid-cols-12 md:gap-8">
       <div className="col-span-12 md:col-span-3 flex flex-col justify-between">
         <h6 className="font-medium leading-8 whitespace-nowrap">Our products</h6>
         <span className="relative hidden lg:inline-flex overflow-hidden">

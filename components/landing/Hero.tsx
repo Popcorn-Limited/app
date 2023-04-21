@@ -25,7 +25,7 @@ export default function Hero(): JSX.Element {
 
 
   return (
-    <section className="mb-10 pb-6 bg-[#ebe7d433] border-b border-[#EBE7D4]">
+    <section className="mb-10 pb-6 px-8 bg-[#ebe7d433] border-b border-[#EBE7D4]">
       <Link
         href="/portfolio"
         passHref
