@@ -10,20 +10,14 @@ import SecondaryActionButton from "components/SecondaryActionButton";
 import { Metadata, Tvl } from "lib/Contract";
 import MobileCardSlider from "components/MobileCardSlider";
 import { useChainIdFromUrl } from "hooks/useChainIdFromUrl";
-import { useAccount } from "wagmi";
-import TabSelector from "components/TabSelector";
-import { useState } from "react";
-import AssetInputWithAction from "components/AssetInputWithAction";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 import { useStakingToken } from "lib/Staking/hooks";
-import { constants } from "ethers";
-import StakingTermsAndConditions from "components/StakingTermsAndConditions";
-import { useAllowance } from "lib/Erc20/hooks";
 import NoSSR from "react-no-ssr";
 import { Erc20, Staking } from "lib";
+import MainActionButton from "components/MainActionButton";
+import useExit from "lib/Staking/hooks/useExit";
 
-const TAB_DEPOSIT = "Deposit";
-const TAB_WITHDRAW = "Withdraw";
-const TABS = [TAB_DEPOSIT, TAB_WITHDRAW];
+function noOp() { }
 
 export default function Index(): JSX.Element {
   const chainId = useChainIdFromUrl();
@@ -31,10 +25,14 @@ export default function Index(): JSX.Element {
   const stakingAddress = router.query.id as string;
   const { data: stakingToken } = useStakingToken({ address: stakingAddress, chainId });
   const { address: account } = useAccount();
-  const [activeTab, setActiveTab] = useState(TAB_DEPOSIT);
-  const isDeposit = activeTab === TAB_DEPOSIT;
-  const { data: allowance } = useAllowance({ address: stakingToken, account: stakingAddress, chainId });
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const { write: exit = noOp } = useExit(stakingAddress, chainId);
+  const { chain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
+
+  function handleExit() {
+    if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId))
+    exit();
+  }
 
   return (
     <NoSSR>
@@ -96,43 +94,27 @@ export default function Index(): JSX.Element {
             <div className="flex flex-col md:flex-row mt-10">
               <div className="md:w-1/3 order-2 md:order-1">
                 <div className="p-6 border border-customLightGray rounded-lg mb-12 mt-12 md:mt-0">
-                  <div className="pt-2">
-                    <TabSelector
-                      className="mb-6"
-                      availableTabs={TABS}
-                      activeTab={activeTab}
-                      setActiveTab={setActiveTab}
-                    />
+                  <div className="border-b border-primaryLight">
+                    <p
+                      className={`text-xl md:text-center mb-4 cursor-pointer word-spacing-full sm:word-spacing-normal text-primary font-medium`}
+                    >
+                      Exit
+                    </p>
                   </div>
-                  <AssetInputWithAction
-                    assetAddress={isDeposit ? stakingToken : stakingAddress}
-                    target={stakingAddress}
-                    chainId={chainId}
-                    action={{
-                      label: isDeposit ? "Deposit" : "Withdraw",
-                      abi: ["function stake(uint256 amount) external", "function withdraw(uint256 amount) external"],
-                      functionName: isDeposit ? "stake" : "withdraw",
-                      successMessage: `${isDeposit ? "Deposit" : "Withdraw"} successful!`,
-                    }}
-                    allowance={isDeposit ? allowance?.value : constants.MaxUint256}
-                  >
-                    {({ ActionableComponent }) => (
-                      <div className="mt-6">
-                        {isDeposit ? (
-                          <StakingTermsAndConditions
-                            isDisabled={!isDeposit}
-                            termsAccepted={termsAccepted}
-                            setTermsAccepted={() => setTermsAccepted(() => !termsAccepted)}
-                          />
-                        ) : (
-                          <div className="h-36"></div>
-                        )}
-                        <div className="mx-auto pb-2">
-                          <ActionableComponent />
-                        </div>
-                      </div>
-                    )}
-                  </AssetInputWithAction>
+                  <div className="h-full flex flex-col justify-between">
+                    <div className="mb-8">
+                      <p className="text-primaryDark mt-12 text-xl">We are winding down this staking pool. <br />All your funds are safe and waiting for you.</p>
+                      <p className="text-primaryDark" >
+                        <span className="font-bold text-lg"></span>
+                      </p>
+                      <p className="text-primaryDark mt-4">You will no longer be able to stake new tokens.</p>
+                      <p className="text-primaryDark">
+                        To withdraw your funds and claim your accrued rewards click the button below.
+                        It will withdraw your entire staked balance.
+                      </p>
+                    </div>
+                    <MainActionButton label="Exit and Claim" handleClick={handleExit} />
+                  </div>
                 </div>
               </div>
 
@@ -155,7 +137,12 @@ export default function Index(): JSX.Element {
                           />
                         </div>
                         <p className="text-primary text-2xl leading-6">
-                          <Erc20.BalanceOf chainId={chainId} account={account} address={stakingAddress} />
+                          <Erc20.BalanceOf
+                            chainId={chainId}
+                            account={account}
+                            address={stakingAddress}
+                            render={({ balance, status }) => (<>{status === "success" ? balance?.formatted : "-"}</>)}
+                          />
                           {` ${metadata.symbol}`}
                         </p>
                       </div>
