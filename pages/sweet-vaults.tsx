@@ -11,7 +11,7 @@ import { BigNumber, constants } from "ethers";
 import { useAccount } from "wagmi";
 import { ChainId } from "lib/utils/connectors";
 
-const SUPPORTED_NETWORKS = [
+export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
   ChainId.Ethereum,
   ChainId.Polygon,
