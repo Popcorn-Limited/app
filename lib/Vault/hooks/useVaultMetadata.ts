@@ -16,7 +16,7 @@ const Yearn = {
 
 const BeefyStargateCompounder = {
   name: "Beefy Stargate Compounding",
-  description: "The vault deposits the user\'s Lp Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
+  description: "**Stargate Reinvest** \-  The vault deposits the user\'s Lp Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
 }
 
 
@@ -51,7 +51,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: Yearn,
         strategy: {
           name: "Yearn Strategies",
-          description: `The DAI Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more DAI, and then deposited back into the strategy.`
+          description: `**Compound Folding** \- The DAI Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more DAI, and then deposited back into the strategy.`
         }
       }
     case "0xc1D4a319dD7C44e332Bd54c724433C6067FeDd0D":
