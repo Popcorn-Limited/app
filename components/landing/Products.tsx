@@ -74,7 +74,7 @@ const Products = () => {
               stats={[
                 {
                   label: "TVL",
-                  content: "$3.7m",
+                  content: "New ✨",
                   infoIconProps: {
                     title: "Total Value Locked",
                     content: "The total value of assets held by the underlying smart contracts.",

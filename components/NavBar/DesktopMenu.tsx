@@ -175,8 +175,7 @@ export default function DesktopMenu(): JSX.Element {
                 </div>
                 <div>
                   <p className="text-primary">
-                    Popcorn is an audited, non-custodial DeFi wealth manager with yield-generating products that
-                    simultaneously fund nonprofit and social impact organizations.
+                    Popcorn is an audited, non-custodial DeFi wealth manager with yield-generating products that simultaneously fund nonprofits and social impact organizations.
                   </p>
                   <div className="flex justify-between pb-12 mt-11">
                     <a href="https://twitter.com/Popcorn_DAO">

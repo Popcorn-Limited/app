@@ -16,7 +16,7 @@ const Yearn = {
 
 const BeefyStargateCompounder = {
   name: "Beefy Stargate Compounding",
-  description: "The vault deposits the user\'s stgUSDT in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more stgUSDT. To complete the compounding cycle, the new stgUSDT is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
+  description: "The vault deposits the user\'s Lp Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
 }
 
 

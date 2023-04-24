@@ -15,7 +15,7 @@ const SUPPORTED_NETWORKS = [
   ChainId.ALL,
   ChainId.Ethereum,
   ChainId.Polygon,
-  ChainId.Optimism,
+  // ChainId.Optimism,
   // ChainId.Fantom,
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
 ]
