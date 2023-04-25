@@ -5,3 +5,4 @@ export * from "./synthetix";
 export * from "./convex";
 export * from "./beefy";
 export * from "./multiRewardStaking";
+export * from "./ousd";
