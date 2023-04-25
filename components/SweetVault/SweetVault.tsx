@@ -101,7 +101,7 @@ function SweetVault({ vaultAddress, chainId, searchString, addToTVL, addToDeposi
   }, [totalAssets, price])
 
   // TEMP - filter duplicate vault
-  if (!vaultMetadata || vault?.address === "0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE") return <></>
+  if (!vaultMetadata || ["0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE", "0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF"].includes(vault?.address)) return <></>
   if (searchString === "" ||
     vault?.name.toLowerCase().includes(searchString) ||
     vault?.symbol.toLowerCase().includes(searchString))
