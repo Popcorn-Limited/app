@@ -14,7 +14,10 @@ import MainActionButton from "components/MainActionButton";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { useConsistentRepolling } from "lib/utils";
 
-const BALANCE_ROUNDING = parseUnits("1", 8);
+const safeRound = (bn: BigNumber, decimals = 18) => {
+  const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
+  return Number(formatUnits(bn.div(roundingValue).mul(roundingValue), decimals))
+}
 
 function AssetInputWithAction({
   assetAddress,
@@ -123,7 +126,7 @@ function AssetInputWithAction({
     setInputBalance(validateInput(value).isValid ? (value as any) : 0);
   };
 
-  const handleMaxClick = () => setInputBalance(Number(formatUnits(userBalance?.value.div(BALANCE_ROUNDING).mul(BALANCE_ROUNDING), userBalance.decimals)) || 0);
+  const handleMaxClick = () => setInputBalance(safeRound(userBalance?.value || constants.Zero, userBalance?.decimals));
 
   const errorMessage = useMemo(() => {
     return (inputBalance || 0) > Number(userBalance?.formatted) ? "* Balance not available" : "";
