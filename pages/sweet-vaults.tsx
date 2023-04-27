@@ -10,8 +10,9 @@ import { useState } from "react";
 import { BigNumber, constants } from "ethers";
 import { useAccount } from "wagmi";
 import { ChainId } from "lib/utils/connectors";
+import AllSweetVaultsTVL from "lib/Vault/AllSweetVaultsTVL";
 
-const SUPPORTED_NETWORKS = [
+export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
   ChainId.Ethereum,
   ChainId.Polygon,
@@ -28,7 +29,6 @@ const SweetVaults: NextPage = () => {
   const { address: account } = useAccount()
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS);
   const [searchString, handleSearch] = useState("")
-  const [tvl, setTvl] = useState<Bal>({});
   const [deposit, setDeposit] = useState<Bal>({});
 
   const { data: ethVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined);
@@ -41,16 +41,6 @@ const SweetVaults: NextPage = () => {
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
     ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } })
   ]
-
-
-  const addToTvl = (key: string, value?: BigNumber) => {
-    if (value?.gt(0)) {
-      setTvl((balances) => ({
-        ...balances,
-        [key]: value,
-      }));
-    }
-  };
 
   const addToDeposit = (key: string, value?: BigNumber) => {
     if (value?.gt(0)) {
@@ -66,7 +56,7 @@ const SweetVaults: NextPage = () => {
       <HeroSection
         title="Sweet Vaults"
         description="Deposit your crypto to optimize your yield while funding public goods."
-        info1={{ title: 'TVL', value: `$${formatAndRoundBigNumber(Object.keys(tvl).reduce((total, key) => total.add(tvl[key]), constants.Zero), 18)}` }}
+        info1={{ title: 'TVL', value: <AllSweetVaultsTVL/> }}
         info2={{ title: 'Deposits', value: `$${account ? formatAndRoundBigNumber(Object.keys(deposit).reduce((total, key) => total.add(deposit[key]), constants.Zero), 18) : "-"}` }}
         backgroundColorTailwind="bg-red-400"
         SUPPORTED_NETWORKS={SUPPORTED_NETWORKS}
@@ -93,7 +83,6 @@ const SweetVaults: NextPage = () => {
             chainId={vault.chainId}
             vaultAddress={vault.address}
             searchString={searchString}
-            addToTVL={addToTvl}
             addToDeposit={addToDeposit}
           />;
         })}

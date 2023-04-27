@@ -6,6 +6,7 @@ import Product from "components/landing/Product";
 import { useNamedAccounts } from "lib/utils/hooks";
 import { useFeatures } from "hooks/useFeatures";
 import Tvl from "lib/Contract/Tvl";
+import AllSweetVaultsTVL from "lib/Vault/AllSweetVaultsTVL";
 
 import styles from "./Products.module.css";
 
@@ -34,6 +35,7 @@ const Products = () => {
       data: { value: polygonStakingTVL },
     },
   } = Tvl({ chainId: Polygon, address: popStakingPolygon?.address });
+
 
   return (
     <section className="px-8 pt-4 pb-24 grid grid-cols-12 md:gap-8">
@@ -74,7 +76,7 @@ const Products = () => {
               stats={[
                 {
                   label: "TVL",
-                  content: "New ✨",
+                  content: <AllSweetVaultsTVL />,
                   infoIconProps: {
                     title: "Total Value Locked",
                     content: "The total value of assets held by the underlying smart contracts.",

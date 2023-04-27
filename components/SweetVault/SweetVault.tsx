@@ -44,12 +44,11 @@ function AssetWithName({ vault, token, chainId, protocol }: { vault: FetchTokenR
   </div>
 }
 
-function SweetVault({ vaultAddress, chainId, searchString, addToTVL, addToDeposit }:
+function SweetVault({ vaultAddress, chainId, searchString, addToDeposit }:
   {
     chainId: ChainId;
     vaultAddress: string,
     searchString: string,
-    addToTVL: (key: string, value: BigNumber) => void,
     addToDeposit: (key: string, value: BigNumber) => void
   }
 ) {
@@ -88,17 +87,6 @@ function SweetVault({ vaultAddress, chainId, searchString, addToTVL, addToDeposi
       );
     }
   }, [balance, price, pps])
-
-  useEffect(() => {
-    if (totalAssets && price) {
-      const tvlValue = (Number(price?.value?.toString()) * Number(totalAssets?.value?.toString())) /
-        (10 ** (token?.decimals * 2))
-
-      addToTVL(
-        vaultAddress,
-        parseUnits(tvlValue < 0.01 ? "0" : String(tvlValue)));
-    }
-  }, [totalAssets, price])
 
   // TEMP - filter duplicate vault
   if (!vaultMetadata || ["0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE", "0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF"].includes(vault?.address)) return <></>
