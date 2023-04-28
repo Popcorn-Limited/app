@@ -67,8 +67,8 @@ export const PortfolioPage: NextPage = () => {
     "xPop",
   ]);
   const contractsBnb = useNamedAccounts("56", ["pop", "xPop", "rewardsEscrow"]);
-  const contractsArbitrum = useNamedAccounts("42161", ["pop", "xPop"]);
-  const contractsOp = useNamedAccounts("10", ["pop", "popUsdcArrakisVault"]);
+  const contractsArbitrum = useNamedAccounts("42161", ["pop", "xPop", "rewardsEscrow"]);
+  const contractsOp = useNamedAccounts("10", ["pop", "popUsdcArrakisVault", "popStaking", "rewardsEscrow"]);
 
   const { data: ethVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined);
   const { data: polyVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Polygon) ? ChainId.Polygon : undefined);
