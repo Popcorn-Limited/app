@@ -1,11 +1,11 @@
 export default function DisclaimerPage(): JSX.Element {
   return (
     <div className="space-y-4">
-      <h1 className="text-6xl leading-12">Popcorndao.finance Disclaimer</h1>
+      <h1 className="text-6xl leading-12">Pop.network Disclaimer</h1>
       <h2 className="font-bold underline">Introduction</h2>
       <p>
         Please read this <span className="font-bold">disclaimer</span> carefully before accessing, interacting with, or
-        using popcorndao.finance, consisting of the popcorndao.finance smart contract technology stack and the user
+        using pop.network, consisting of the pop.network smart contract technology stack and the user
         interface for the Popcorn DeFi application, as well as any other application developed in the future (together
         the <span className="font-bold">“Popcorn Software”</span>).
       </p>
@@ -16,20 +16,20 @@ export default function DisclaimerPage(): JSX.Element {
         of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
       </p>
       <h2 className="font-bold underline">
-        No Contractual Relationship to popcorndao.finance / Use of Popcorn Software at Own Risk
+        No Contractual Relationship to pop.network / Use of Popcorn Software at Own Risk
       </h2>
       <p>
         The Popcorn Software runs in a fully decentralized and autonomous manner on the underlying blockchains.
-        popcorndao.finance, as well as any other private individual and/or legal entity, is neither involved in,
+        pop.network, as well as any other private individual and/or legal entity, is neither involved in,
         responsible for nor can in any way influence the operation, running or functioning of the Popcorn Software
         and/or any of the interactions, collaborations or factual relationships between Users and the smart contracts of
-        the Popcorn Software. popcorndao.finance has neither access to nor any other possibility to control and/or
+        the Popcorn Software. pop.network has neither access to nor any other possibility to control and/or
         influence the corresponding transactions, allocations and/or decisions made by the Users and the involved smart
         contracts using the Popcorn Software.
       </p>
       <p>
-        In particular, popcorndao.finance or any other (third) party has not and will not enter into any legal or
-        factual relationship with any User of the Popcorn Software. Consequently, popcorndao.finance is not liable to
+        In particular, pop.network or any other (third) party has not and will not enter into any legal or
+        factual relationship with any User of the Popcorn Software. Consequently, pop.network is not liable to
         any user for damages, including any general, special, incidental, or consequential damages arising out of the
         use, in connection with the use or inability to use the Popcorn Software (including but not limited to loss of
         POP, USDC, USDT, DAI, 3CRV, XEN, 3X, BTR, Arrakis USDC/POP LP, loss of data, business interruption, data being
