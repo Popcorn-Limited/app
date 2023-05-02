@@ -136,7 +136,7 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
                 </div>
               </div>
               <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
-                <p className="font-normal text-primaryLight">vAPR</p>
+                <p className="font-normal text-primaryLight">vAPY</p>
                 <Title as="td" level={2} fontWeight="font-normal">
                   <Apy
                     address={vaultAddress}
@@ -158,7 +158,7 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
                                 content={
                                   <ul className="text-sm">
                                     <li>
-                                      Staking APR:{" "}
+                                      Staking APY:{" "}
                                       {formatAndRoundBigNumber(
                                         HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
                                         18,
@@ -166,7 +166,7 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
                                       %
                                     </li>
                                     <li>
-                                      Vault APR:{" "}
+                                      Vault APY:{" "}
                                       {formatAndRoundBigNumber(
                                         HUNDRED.mul(apy?.data?.value || constants.Zero),
                                         18,
