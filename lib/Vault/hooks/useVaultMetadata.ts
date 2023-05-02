@@ -21,7 +21,17 @@ const BeefyStargateCompounder = {
 
 const BeefyVelodromeCompounder = {
   name: "Beefy Velodrome Compounding",
-  description: `**Velodrome Compounding** \- The vault stakes the user\'s Lp Token in a velodrome gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
+  description: `**Velodrome Compounding** \- The vault stakes the user\'s Lp Token in a Velodrome gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
+}
+
+const BeefyHopCompounder = {
+  name: "Beefy Hop Compounding",
+  description: `**Hop Compounding** \- The vault stakes the user\'s Lp Token in a Hop gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
+}
+
+const hopDai = {
+  name: "DAI LP",
+  description: "DAI is a decentralized stablecoin that aims to maintain the value of one USD. DAI is backed by a mix of multiple cryptocurrencies. Users of the Maker Protocol and MakerDAO can create new DAI by providing collateral to back the value of the newly minted DAI. Liquidations should ensure that the value of minted DAI doesn't fall below its backing. MakerDAO controls which assets can be used to mint DAI and other risk parameters. This DAI LP is a Hop Protocol LP token that is used to facilitate cross-chain bridging. Each DAI LP is backed by DAI in Hop pools on various chains. "
 }
 
 
@@ -86,13 +96,37 @@ function getLocalMetadata(address: string): IpfsMetadata {
       }
     case "0x2F1698D249782dbA192aF2Bab91E5eA621b7C6f7":
       return {
+        token: hopDai,
+        protocol: Beefy,
+        strategy: BeefyHopCompounder,
+        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=optimism"
+      }
+    case "0x36EC2111A68350dBb722B872963F05992dd08E42":
+      return {
         token: {
-          name: "DAI LP",
-          description: "DAI is a decentralized stablecoin that aims to maintain the value of one USD. DAI is backed by a mix of multiple cryptocurrencies. Users of the Maker Protocol and MakerDAO can create new DAI by providing collateral to back the value of the newly minted DAI. Liquidations should ensure that the value of minted DAI doesn't fall below its backing. MakerDAO controls which assets can be used to mint DAI and other risk parameters. This DAI LP is a Hop Protocol LP token that is used to facilitate cross-chain bridging. Each DAI LP is backed by DAI in Hop pools on various chains. "
+          name: "USDC LP",
+          description: "USDC is a centralized stablecoin that aims to maintain the value of one USD. USDC is backed by an equal amount USD in cash reserves and short-term U.S. Treasury bonds in various financial institutions. Each USDC can be redeemed for one USD. Centre consortium creates and manages USDC. This USDC LP is a Hop Protocol LP token that is used to facilitate cross-chain bridging. Each USDC LP is backed by USDC in Hop pools on various chains "
         },
         protocol: Beefy,
-        strategy: BeefyVelodromeCompounder,
-        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=optimism"
+        strategy: BeefyHopCompounder,
+        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=USDC&sourceNetwork=arbitrum"
+      }
+    case "0xfC2193ac4E8145E192bC3d9Db9407A4aE0Dc4DF8":
+      return {
+        token: hopDai,
+        protocol: Beefy,
+        strategy: BeefyHopCompounder,
+        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=arbitrum"
+      }
+    case "0xe64E5e2E58904366A6E24CF1e0aC7922AfCe4332":
+      return {
+        token: {
+          name: "USDT LP",
+          description: "USDT is a centralized stablecoin that aims to maintain the value of one USD. USDT is backed by an equal amount USD in cash reserves, commercial paper, fiduciary deposits, reserve repo notes, and short-term U.S. Treasury bonds in various financial institutions. Each USDT can be redeemed for one USD. Hong Kong-based Tether creates and manages USDT. This USDT LP is a Hop Protocol LP token that is used to facilitate cross-chain bridging. Each USDT LP is backed by USDT in Hop pools on various chains."
+        },
+        protocol: Beefy,
+        strategy: BeefyHopCompounder,
+        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=USDT&sourceNetwork=optimism"
       }
   }
 }

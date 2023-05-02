@@ -1371,6 +1371,24 @@
   "10": {
     "chainId": "10",
     "contracts": {
+      "hopUsdt": {
+        "abi": null,
+        "address": "0xF753A50fc755c6622BBCAa0f59F0522f264F006e",
+        "metadata": {
+          "icons": ["/images/tokens/usdt.webp"],
+          "name": "USDT LP",
+          "symbol": "USDT LP"
+        }
+      },
+      "0xF753A50fc755c6622BBCAa0f59F0522f264F006e": {
+        "abi": null,
+        "address": "0xF753A50fc755c6622BBCAa0f59F0522f264F006e",
+        "metadata": {
+          "icons": ["/images/tokens/usdt.webp"],
+          "name": "USDT LP",
+          "symbol": "USDT LP"
+        }
+      },
       "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d": {
         "abi": null,
         "address": "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d",
@@ -4085,6 +4103,56 @@
   "42161": {
     "chainId": "42161",
     "contracts": {
+      "hopDai": {
+        "abi": null,
+        "address": "0x68f5d998F00bB2460511021741D098c05721d8fF",
+        "metadata": {
+          "icons": ["/images/tokens/dai.webp"],
+          "name": "DAI LP",
+          "priceResolver": "defi_llama",
+          "symbol": "DAI LP"
+        }
+      },
+      "0x68f5d998F00bB2460511021741D098c05721d8fF": {
+        "abi": null,
+        "address": "0x68f5d998F00bB2460511021741D098c05721d8fF",
+        "metadata": {
+          "icons": ["/images/tokens/dai.webp"],
+          "name": "DAI LP",
+          "priceResolver": "defi_llama",
+          "symbol": "DAI LP"
+        }
+      },
+      "hopUsdc": {
+        "abi": null,
+        "address": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71",
+        "metadata": {
+          "icons": ["/images/tokens/usdc.svg"],
+          "name": "USDC LP",
+          "priceResolver": "defi_llama",
+          "symbol": "USDC LP"
+        }
+      },
+      "0xB67c014FA700E69681a673876eb8BAFAA36BFf71": {
+        "abi": null,
+        "address": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71",
+        "metadata": {
+          "icons": ["/images/tokens/usdc.svg"],
+          "name": "USDC LP",
+          "priceResolver": "defi_llama",
+          "symbol": "USDC LP"
+        }
+      },
+      "vaultRegistry": {
+        "abi": null,
+        "address": "0xB205e94D402742B919E851892f7d515592a7A6cC",
+        "metadata": null
+      },
+      "0xB205e94D402742B919E851892f7d515592a7A6cC": {
+        "abi": null,
+        "address": "0xB205e94D402742B919E851892f7d515592a7A6cC",
+        "metadata": null
+      },
       "rewardsEscrow": {
         "abi": null,
         "address": "0x0C0991CB6e1c8456660A49aa200B71de6158b85C",

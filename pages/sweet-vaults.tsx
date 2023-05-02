@@ -16,7 +16,8 @@ export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
   ChainId.Ethereum,
   ChainId.Polygon,
-  // ChainId.Optimism,
+  ChainId.Optimism,
+  ChainId.Arbitrum,
   // ChainId.Fantom,
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
 ]
@@ -35,11 +36,13 @@ const SweetVaults: NextPage = () => {
   const { data: polyVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Polygon) ? ChainId.Polygon : undefined);
   const { data: ftmVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Fantom) ? ChainId.Fantom : undefined);
   const { data: opVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Optimism) ? ChainId.Optimism : undefined);
+  const { data: arbVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined);
   const allVaults = [
     ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
     ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
-    ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } })
+    ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
+    ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } })
   ]
 
   const addToDeposit = (key: string, value?: BigNumber) => {
@@ -56,7 +59,7 @@ const SweetVaults: NextPage = () => {
       <HeroSection
         title="Sweet Vaults"
         description="Deposit your crypto to optimize your yield while funding public goods."
-        info1={{ title: 'TVL', value: <AllSweetVaultsTVL/> }}
+        info1={{ title: 'TVL', value: <AllSweetVaultsTVL /> }}
         info2={{ title: 'Deposits', value: `$${account ? formatAndRoundBigNumber(Object.keys(deposit).reduce((total, key) => total.add(deposit[key]), constants.Zero), 18) : "-"}` }}
         backgroundColorTailwind="bg-red-400"
         SUPPORTED_NETWORKS={SUPPORTED_NETWORKS}
