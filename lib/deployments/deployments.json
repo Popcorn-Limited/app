@@ -1371,6 +1371,24 @@
   "10": {
     "chainId": "10",
     "contracts": {
+      "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d": {
+        "abi": null,
+        "address": "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d",
+        "metadata": {
+          "icons": ["/images/tokens/dola.svg", "/images/tokens/usdc.svg"],
+          "name": "DOLA/USDC LP",
+          "symbol": "DOLA/USDC LP"
+        }
+      },
+      "dolaUsdcLp": {
+        "abi": null,
+        "address": "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d",
+        "metadata": {
+          "icons": ["/images/tokens/dola.svg", "/images/tokens/usdc.svg"],
+          "name": "DOLA/USDC LP",
+          "symbol": "DOLA/USDC LP"
+        }
+      },
       "0xB4CB045C30211377656Ea691F66e44Db2bEf410F": {
         "abi": null,
         "address": "0xB4CB045C30211377656Ea691F66e44Db2bEf410F",
@@ -1381,14 +1399,14 @@
         "address": "0xB4CB045C30211377656Ea691F66e44Db2bEf410F",
         "metadata": null
       },
-      "0x41813a5303597a68c0a780FF37A827b9c7e84397": {
+      "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A": {
         "abi": null,
-        "address": "0x41813a5303597a68c0a780FF37A827b9c7e84397",
+        "address": "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
         "metadata": null
       },
       "vaultRegistry": {
         "abi": null,
-        "address": "0x41813a5303597a68c0a780FF37A827b9c7e84397",
+        "address": "0xdD0d135b5b52B7EDd90a83d4A4112C55a1A6D23A",
         "metadata": null
       },
       "dai": {
@@ -1427,6 +1445,26 @@
           "name": "USDC LP",
           "priceResolver": "defi_llama",
           "symbol": "USDC LP"
+        }
+      },
+      "hopDai": {
+        "abi": null,
+        "address": "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92",
+        "metadata": {
+          "icons": ["/images/tokens/dai.webp"],
+          "name": "DAI LP",
+          "priceResolver": "defi_llama",
+          "symbol": "DAI LP"
+        }
+      },
+      "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92": {
+        "abi": null,
+        "address": "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92",
+        "metadata": {
+          "icons": ["/images/tokens/dai.webp"],
+          "name": "DAI LP",
+          "priceResolver": "defi_llama",
+          "symbol": "DAI LP"
         }
       },
       "0x2AE1231E4CF821Af69982c4D04725CD502D8B53E": {

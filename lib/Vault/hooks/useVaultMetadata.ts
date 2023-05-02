@@ -1,4 +1,4 @@
-import { IpfsClient  } from "lib/utils";
+import { IpfsClient } from "lib/utils";
 import { BigNumber } from "ethers";
 import { useVaultRegistry } from "hooks/vaults";
 import { useEffect, useState } from "react";
@@ -17,6 +17,11 @@ const Yearn = {
 const BeefyStargateCompounder = {
   name: "Beefy Stargate Compounding",
   description: "**Stargate Reinvest** \-  The vault deposits the user\'s Lp Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
+}
+
+const BeefyVelodromeCompounder = {
+  name: "Beefy Velodrome Compounding",
+  description: `**Velodrome Compounding** \- The vault stakes the user\'s Lp Token in a velodrome gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
 }
 
 
@@ -69,8 +74,30 @@ function getLocalMetadata(address: string): IpfsMetadata {
           **Maker Folding** \- Supplies USDC to MakerDAO Peg Stability Module for a USDC-DAI ratio that is then deposited int the Uniswap v2 DAI-USDC liquidity pool. Flashmints are used to mint DAI from MakerDAO to flashlend and fold the position, boosting the APY. Earned tokens are harvested, sold for more USDC, and then deposited back into the strategy.`
         }
       }
+    case "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c":
+      return {
+        token: {
+          name: "DOLA / USDC LP",
+          description: "This is an Liquidity Pool Token for a stable pool on Velodrome. DOLA is a decentralized stablecoin that pegs to the value of 1 USD. Inverse Finance is a decentralized autonomous organization that develops and manages a suite of permissionless and decentralized financial products using blockchain smart contract technology. USDC is a centralized stablecoin that aims to maintain the value of one USD. USDC is backed by an equal amount USD in cash reserves and short-term U.S. Treasury bonds in various financial institutions. Each USDC can be redeemed for one USD. Centre consortium creates and manages USDC."
+        },
+        protocol: Beefy,
+        strategy: BeefyVelodromeCompounder,
+        getTokenUrl: "https://app.velodrome.finance/liquidity/manage?address=0x6c5019d345ec05004a7e7b0623a91a0d9b8d590d"
+      }
+    case "0x2F1698D249782dbA192aF2Bab91E5eA621b7C6f7":
+      return {
+        token: {
+          name: "DAI LP",
+          description: "DAI is a decentralized stablecoin that aims to maintain the value of one USD. DAI is backed by a mix of multiple cryptocurrencies. Users of the Maker Protocol and MakerDAO can create new DAI by providing collateral to back the value of the newly minted DAI. Liquidations should ensure that the value of minted DAI doesn't fall below its backing. MakerDAO controls which assets can be used to mint DAI and other risk parameters. This DAI LP is a Hop Protocol LP token that is used to facilitate cross-chain bridging. Each DAI LP is backed by DAI in Hop pools on various chains. "
+        },
+        protocol: Beefy,
+        strategy: BeefyVelodromeCompounder,
+        getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=optimism"
+      }
   }
 }
+
+
 
 function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
   const [ipfsData, setIpfsData] = useState<IpfsMetadata>();
@@ -93,7 +120,7 @@ function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
 export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
   const registry = useVaultRegistry(chainId);
   const { data } = useContractRead({
-    address: registry.address as Address,
+    address: registry?.address as Address,
     args: [vaultAddress],
     chainId,
     functionName: "getVault",
