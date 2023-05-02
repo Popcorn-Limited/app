@@ -1376,8 +1376,8 @@
         "address": "0xF753A50fc755c6622BBCAa0f59F0522f264F006e",
         "metadata": {
           "icons": ["/images/tokens/usdt.webp"],
-          "name": "USDT LP",
-          "symbol": "USDT LP"
+          "name": "HOP USDT",
+          "symbol": "HOP USDT"
         }
       },
       "0xF753A50fc755c6622BBCAa0f59F0522f264F006e": {
@@ -1385,8 +1385,8 @@
         "address": "0xF753A50fc755c6622BBCAa0f59F0522f264F006e",
         "metadata": {
           "icons": ["/images/tokens/usdt.webp"],
-          "name": "USDT LP",
-          "symbol": "USDT LP"
+          "name": "HOP USDT",
+          "symbol": "HOP USDT"
         }
       },
       "0x6C5019D345Ec05004A7E7B0623A91a0D9B8D590d": {
@@ -1450,9 +1450,9 @@
         "address": "0x2e17b8193566345a2Dd467183526dEdc42d2d5A8",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "HOP USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "HOP USDC"
         }
       },
       "0x2e17b8193566345a2Dd467183526dEdc42d2d5A8": {
@@ -1460,9 +1460,9 @@
         "address": "0x2e17b8193566345a2Dd467183526dEdc42d2d5A8",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "HOP USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "HOP USDC"
         }
       },
       "hopDai": {
@@ -1470,9 +1470,9 @@
         "address": "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92",
         "metadata": {
           "icons": ["/images/tokens/dai.webp"],
-          "name": "DAI LP",
+          "name": "HOP DAI",
           "priceResolver": "defi_llama",
-          "symbol": "DAI LP"
+          "symbol": "HOP DAI"
         }
       },
       "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92": {
@@ -1480,9 +1480,9 @@
         "address": "0x22D63A26c730d49e5Eab461E4f5De1D8BdF89C92",
         "metadata": {
           "icons": ["/images/tokens/dai.webp"],
-          "name": "DAI LP",
+          "name": "HOP DAI",
           "priceResolver": "defi_llama",
-          "symbol": "DAI LP"
+          "symbol": "HOP DAI"
         }
       },
       "0x2AE1231E4CF821Af69982c4D04725CD502D8B53E": {
@@ -3066,9 +3066,9 @@
         "address": "0x1205f31718499dbf1fca446663b532ef87481fe1",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "STG USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "STG USDC"
         }
       },
       "stgUsdc": {
@@ -3076,9 +3076,9 @@
         "address": "0x1205f31718499dbf1fca446663b532ef87481fe1",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "STG USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "STG USDC"
         }
       },
       "0x29e38769f23701a2e4a8ef0492e19da4604be62c": {
@@ -3086,8 +3086,8 @@
         "address": "0x29e38769f23701a2e4a8ef0492e19da4604be62c",
         "metadata": {
           "icons": ["/images/tokens/usdt.webp"],
-          "name": "USDT LP",
-          "symbol": "USDT LP"
+          "name": "STG USDT",
+          "symbol": "STG USDT"
         }
       },
       "stgUsdt": {
@@ -3095,8 +3095,8 @@
         "address": "0x29e38769f23701a2e4a8ef0492e19da4604be62c",
         "metadata": {
           "icons": ["/images/tokens/usdt.webp"],
-          "name": "USDT LP",
-          "symbol": "USDT LP"
+          "name": "STG USDT",
+          "symbol": "STG USDT"
         }
       },
       "0x078927eF642319963a976008A7B1161059b7E77a": {
@@ -4108,9 +4108,9 @@
         "address": "0x68f5d998F00bB2460511021741D098c05721d8fF",
         "metadata": {
           "icons": ["/images/tokens/dai.webp"],
-          "name": "DAI LP",
+          "name": "HOP DAI",
           "priceResolver": "defi_llama",
-          "symbol": "DAI LP"
+          "symbol": "HOP DAI"
         }
       },
       "0x68f5d998F00bB2460511021741D098c05721d8fF": {
@@ -4118,9 +4118,9 @@
         "address": "0x68f5d998F00bB2460511021741D098c05721d8fF",
         "metadata": {
           "icons": ["/images/tokens/dai.webp"],
-          "name": "DAI LP",
+          "name": "HOP DAI",
           "priceResolver": "defi_llama",
-          "symbol": "DAI LP"
+          "symbol": "HOP DAI"
         }
       },
       "hopUsdc": {
@@ -4128,9 +4128,9 @@
         "address": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "HOP USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "HOP USDC"
         }
       },
       "0xB67c014FA700E69681a673876eb8BAFAA36BFf71": {
@@ -4138,9 +4138,9 @@
         "address": "0xB67c014FA700E69681a673876eb8BAFAA36BFf71",
         "metadata": {
           "icons": ["/images/tokens/usdc.svg"],
-          "name": "USDC LP",
+          "name": "HOP USDC",
           "priceResolver": "defi_llama",
-          "symbol": "USDC LP"
+          "symbol": "HOP USDC"
         }
       },
       "vaultRegistry": {
