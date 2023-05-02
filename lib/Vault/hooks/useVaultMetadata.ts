@@ -79,6 +79,16 @@ function getLocalMetadata(address: string): IpfsMetadata {
         strategy: StrategyMetadata.beefyHopCompounder,
         getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=USDT&sourceNetwork=optimism"
       }
+    case "0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c":
+      return {
+        token: TokenMetadata.ousd,
+        protocol: ProtocolMetadata.ousd,
+        strategy: {
+          name: "Yearn Compound Folding",
+          description: `**Morpho Lending** \- Morpho adds a peer-to-peer layer on top of Compound and Aave allowing lenders and borrowers to be matched more efficiently with better interest rates. When no matching opportunity exists, funds flow directly through to the underlying protocol. OUSD supplies stablecoins to three of Morpho’s Compound markets to earn interest. Additional yield is generated from protocol token incentives, including both COMP (regularly sold for USDT) and MORPHO (currently locked).
+          **Convex Compounding** \- Convex allows liquidity providers and stakers to earn greater rewards from Curve, a stablecoin-centric automated market maker (AMM). OUSD earns trading fees and protocol token incentives (both CRV and CVX). This strategy employs base pools and metapools, including the Origin Dollar factory pool, which enables OUSD to safely leverage its own deposits to multiply returns and maintain the pool’s balance.`
+        }
+      }
   }
 }
 

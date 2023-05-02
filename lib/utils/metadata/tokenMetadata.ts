@@ -16,6 +16,10 @@ const baseMetadata = {
   dola: {
     name: "DOLA",
     description: "DOLA is a decentralized stablecoin that pegs to the value of 1 USD. Inverse Finance is a decentralized autonomous organization that develops and manages a suite of permissionless and decentralized financial products using blockchain smart contract technology."
+  },
+  ousd: {
+    name: "OUSD",
+    description: "OUSD is a decentralized stablecoin backed 1:1 by other dollar based stablecoins. Currently these are DAI, USDC and USDT. OUSD can always be redeemed against one of these token. OUSD is managed by Origin Protocol who create and manage smart contracts to create yield on the underlying stablecoins. Each time new yield gets generated it gets distributed to OUSD holders by minting and distributing new OUSD."
   }
 };
 
@@ -35,6 +39,7 @@ const TokenMetadata = {
   usdc: baseMetadata.usdc,
   dai: baseMetadata.dai,
   dola: baseMetadata.dola,
+  ousd: baseMetadata.ousd,
   stgUsdt: {
     name: "STG USDT",
     description: baseMetadata.usdt.description + addExoticMetadata("stargate", baseMetadata.usdt.name)

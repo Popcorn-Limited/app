@@ -2,6 +2,26 @@
   "1": {
     "chainId": "1",
     "contracts": {
+      "ousd": {
+        "abi": null,
+        "address": "0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86",
+        "metadata": {
+          "icons": ["/images/tokens/ousd.webp"],
+          "name": "OUSD",
+          "priceResolver": "defi_llama",
+          "symbol": "OUSD"
+        }
+      },
+      "0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86": {
+        "abi": null,
+        "address": "0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86",
+        "metadata": {
+          "icons": ["/images/tokens/ousd.webp"],
+          "name": "OUSD",
+          "priceResolver": "defi_llama",
+          "symbol": "OUSD"
+        }
+      },
       "0x007318Dc89B314b47609C684260CfbfbcD412864": {
         "abi": null,
         "address": "0x007318Dc89B314b47609C684260CfbfbcD412864",
