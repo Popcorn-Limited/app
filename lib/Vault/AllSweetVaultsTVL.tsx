@@ -1,11 +1,11 @@
 import type { BigNumberWithFormatted } from "lib/types"
 
-import { SUPPORTED_NETWORKS } from "pages/sweet-vaults"
 import { useAllVaults } from "hooks/vaults"
 import { ChainId, formatNumber } from "lib/utils"
 import { usePrice } from "lib/Price"
 import useVaultTokenAddress from "hooks/useVaultTokenAddress"
 import { useTotalAssets } from "./hooks"
+import { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaults"
 
 const DIRTY_TVL_STORE: Record<string, number> = {}
 

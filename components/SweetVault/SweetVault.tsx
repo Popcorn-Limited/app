@@ -31,7 +31,7 @@ const VAULT_APY_RESOLVER = {
   "Yearn": "yearnAsset"
 }
 
-const HIDDEN_VAULTS = ["0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE", "0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF", "0xbCbD8ef4E2B3471C74fe2a760843e427e3ee165A", "0xb4bA0B340a1Ab76d3d92a66123390599743E314d",
+const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c" // Dola / USDC LP
 ]
 
@@ -48,11 +48,12 @@ function AssetWithName({ vault, token, chainId, protocol }: { vault: FetchTokenR
   </div>
 }
 
-function SweetVault({ vaultAddress, chainId, searchString, addToDeposit }:
+function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposit }:
   {
     chainId: ChainId;
     vaultAddress: string,
     searchString: string,
+    deployer?: string,
     addToDeposit: (key: string, value: BigNumber) => void
   }
 ) {
@@ -60,6 +61,7 @@ function SweetVault({ vaultAddress, chainId, searchString, addToDeposit }:
   const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
   const { data: token } = useVaultToken(vaultAddress, chainId);
   const vaultMetadata = useVaultMetadata(vaultAddress, chainId);
+  const isDeployer = deployer ? vaultMetadata?.creator === deployer : true;
   const usesStaking = vaultMetadata?.staking?.toLowerCase() !== constants.AddressZero.toLowerCase();
 
   const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
@@ -80,7 +82,7 @@ function SweetVault({ vaultAddress, chainId, searchString, addToDeposit }:
   }, [balance, totalAssets, totalSupply, price])
 
   useEffect(() => {
-    if (price && balance && pps > 0) {
+    if (isDeployer && price && balance && pps > 0) {
       const assetBal = pps * Number(balance?.value?.toString());
       const depositValue = (Number(price?.value?.toString()) * assetBal) /
         (10 ** (token?.decimals * 2))
@@ -93,7 +95,7 @@ function SweetVault({ vaultAddress, chainId, searchString, addToDeposit }:
   }, [balance, price, pps])
 
   // TEMP - filter duplicate vault
-  if (!vaultMetadata || HIDDEN_VAULTS.includes(vault?.address)) return <></>
+  if (!vaultMetadata || !isDeployer || HIDDEN_VAULTS.includes(vault?.address)) return <></>
   if (searchString === "" ||
     vault?.name.toLowerCase().includes(searchString) ||
     vault?.symbol.toLowerCase().includes(searchString))
