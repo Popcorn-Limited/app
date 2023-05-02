@@ -16,17 +16,17 @@ const Yearn = {
 
 const BeefyStargateCompounder = {
   name: "Beefy Stargate Compounding",
-  description: "**Stargate Reinvest** \-  The vault deposits the user\'s Lp Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
+  description: "**Stargate Reinvest** \-  The vault deposits the user\'s LP Token in a Stargate farm, earning the platform\'s governance token. Earned token is swapped for more LP Token. To complete the compounding cycle, the new LP Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.",
 }
 
 const BeefyVelodromeCompounder = {
   name: "Beefy Velodrome Compounding",
-  description: `**Velodrome Compounding** \- The vault stakes the user\'s Lp Token in a Velodrome gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
+  description: `**Velodrome Compounding** \- The vault stakes the user\'s LP Token in a Velodrome gauge, earning the platform\'s governance token. Earned token is swapped for more LP Token. To complete the compounding cycle, the new LP Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
 }
 
 const BeefyHopCompounder = {
   name: "Beefy Hop Compounding",
-  description: `**Hop Compounding** \- The vault stakes the user\'s Lp Token in a Hop gauge, earning the platform\'s governance token. Earned token is swapped for more Lp Token. To complete the compounding cycle, the new Lp Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
+  description: `**Hop Compounding** \- The vault stakes the user\'s LP Token in a Hop gauge, earning the platform\'s governance token. Earned token is swapped for more LP Token. To complete the compounding cycle, the new LP Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
 }
 
 const hopDai = {
@@ -233,11 +233,11 @@ export type VaultMetadata = {
   metadataCID: string;
   /** @notice Metadata pulled from IPFS*/
   metadata?: IpfsMetadata;
-  /** @notice OPTIONAL - If the asset is an Lp Token these are its underlying assets*/
+  /** @notice OPTIONAL - If the asset is an LP Token these are its underlying assets*/
   swapTokenAddresses: [Address, Address, Address, Address, Address, Address, Address, Address];
-  /** @notice OPTIONAL - If the asset is an Lp Token its the pool address*/
+  /** @notice OPTIONAL - If the asset is an LP Token its the pool address*/
   swapAddress: Address;
-  /** @notice OPTIONAL - If the asset is an Lp Token this is the identifier of the exchange (1 = curve)*/
+  /** @notice OPTIONAL - If the asset is an LP Token this is the identifier of the exchange (1 = curve)*/
   exchange: BigNumber;
 };
 
