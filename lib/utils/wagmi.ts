@@ -22,7 +22,7 @@ export const useConsistentRepolling = <T extends UseContractReadReturn = UseCont
   );
 
   useEffect(() => {
-    console.debug(`POLLING_TIME_OUT::${POLLING_TIME_OUT}`);
+    console.info(`POLLING_TIME_OUT::${POLLING_TIME_OUT}`);
 
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
