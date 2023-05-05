@@ -42,13 +42,13 @@ export default function HeroSection({ title, description, info1, info2, backgrou
           <div className="col-span-5 md:col-span-3" />
           <div className="col-span-5 md:col-span-3">
             <p className="leading-6 text-base font-light md:font-normal">{info1.title}</p>
-            <div className="text-3xl font-light md:font-medium">
+            <div className="text-3xl font-light md:font-medium whitespace-nowrap">
               {info1.value}
             </div>
           </div>
           <div className="col-span-5 md:col-span-3">
             <p className="leading-6 text-base font-light md:font-normal">{info2.title}</p>
-            <div className="text-3xl font-light md:font-medium">
+            <div className="text-3xl font-light md:font-medium whitespace-nowrap">
               {info2.value}
             </div>
           </div>
