@@ -8,6 +8,9 @@ import { ChainId } from "lib/utils";
 const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c" // Dola / USDC LP
   , "0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c" // OUSD
+  , "0x8f4446a0857ca6E1f53E7a19a63631F9367bA97D" //ankrBnb / BNB
+  , "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2" // OHM / DAI
+  , "0xFd136eF035Cf18E8F2573CaEbb3c4554635DC4F5" // LUSD / USDC
 ]
 
 const PopSweetVaults: NextPage = () => {
@@ -18,13 +21,15 @@ const PopSweetVaults: NextPage = () => {
   const { data: ftmVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Fantom) ? ChainId.Fantom : undefined);
   const { data: opVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Optimism) ? ChainId.Optimism : undefined);
   const { data: arbVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined);
+  //const { data: bscVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.BNB) ? ChainId.BNB : undefined);
 
   const allVaults = [
     ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
     ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
     ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
-    ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } })
+    ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
+    //...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
   ]
 
 
