@@ -15,20 +15,31 @@ export const useAllSweetVaults = () => {
   const { data: opVaults = [] } = useAllVaults(
     SUPPORTED_NETWORKS.includes(ChainId.Optimism) ? ChainId.Optimism : undefined
   )
+  const { data: arbVaults = [] } = useAllVaults(
+    SUPPORTED_NETWORKS.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined
+  )
 
   const ALL_VAULTS = [
-    ...ethVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Ethereum }
-    }),
-    ...polyVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Polygon }
-    }),
-    ...ftmVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Fantom }
-    }),
-    ...opVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Optimism }
-    }),
+    ...ethVaults.map((address) => ({
+      address,
+      chainId: ChainId.Ethereum,
+    })),
+    ...polyVaults.map((address) => ({
+      address,
+      chainId: ChainId.Polygon,
+    })),
+    ...ftmVaults.map((address) => ({
+      address,
+      chainId: ChainId.Fantom,
+    })),
+    ...opVaults.map((address) => ({
+      address,
+      chainId: ChainId.Optimism,
+    })),
+    ...arbVaults.map((address) => ({
+      address,
+      chainId: ChainId.Arbitrum,
+    })),
   ]
 
   return ALL_VAULTS

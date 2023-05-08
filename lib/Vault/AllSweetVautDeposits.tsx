@@ -103,7 +103,8 @@ export function AccountDeposits({
 
   const pricePerShare = Number(
     totalAssets?.value?.gt(0)
-      ? (totalAssets.value._hex as any) / ((totalSupply.value._hex as any) || 0)
+      ? (totalAssets.value._hex as any) /
+          ((totalSupply?.value._hex as any) || 0)
       : 0
   )
 
