@@ -17,12 +17,13 @@ import { FetchTokenResult } from "wagmi/dist/actions";
 import { NetworkSticker } from "components/NetworkSticker";
 import { useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
 import { usePrice } from "lib/Price";
-import { parseUnits } from "ethers/lib/utils.js";
 import { useTotalAssets } from "lib/Vault/hooks";
 import { formatNumber } from "lib/utils/formatBigNumber";
 import RightArrowIcon from "components/SVGIcons/RightArrowIcon";
 import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
+import { SweetVaultTVL } from "lib/Vault/AllSweetVaultsTVL";
+import { AccountDeposits } from "lib/Vault/AllSweetVautDeposits";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -46,15 +47,17 @@ function AssetWithName({ vault, token, chainId, protocol }: { vault: FetchTokenR
   </div>
 }
 
-function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposit }:
-  {
-    chainId: ChainId;
-    vaultAddress: string,
-    searchString: string,
-    deployer?: string,
-    addToDeposit: (key: string, value: BigNumber) => void
-  }
-) {
+function SweetVault({
+  vaultAddress,
+  chainId,
+  searchString,
+  deployer,
+}: {
+  chainId: ChainId
+  vaultAddress: string
+  searchString: string
+  deployer?: string
+}) {
   const { address: account } = useAccount();
   const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
   const { data: token } = useVaultToken(vaultAddress, chainId);
@@ -78,19 +81,6 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
       setPps(Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString()));
     }
   }, [balance, totalAssets, totalSupply, price])
-
-  useEffect(() => {
-    if (isDeployer && price && balance && pps > 0) {
-      const assetBal = pps * Number(balance?.value?.toString());
-      const depositValue = (Number(price?.value?.toString()) * assetBal) /
-        (10 ** (token?.decimals * 2))
-
-      addToDeposit(
-        vaultAddress,
-        parseUnits(depositValue < 0.01 ? "0" : String(depositValue))
-      );
-    }
-  }, [balance, price, pps])
 
   // TEMP - filter duplicate vault
   if (!vaultMetadata || !isDeployer) return <></>
@@ -124,9 +114,15 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
                 <p className="text-primaryLight font-normal">Your Deposit</p>
                 <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
                   <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                    {account ?
-                      formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
-                      : "-"}
+                    <AccountDeposits
+                      vaultAddress={vaultAddress}
+                      chainId={chainId}
+                      account={account}
+                    >
+                      {(deposits) => (
+                        <>{account ? formatNumber(deposits) : "-"}</>
+                      )}
+                    </AccountDeposits>
                   </Title>
                   <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol || "ETH"}</span>
                 </div>
@@ -185,7 +181,9 @@ function SweetVault({ vaultAddress, chainId, searchString, deployer, addToDeposi
               <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
                 <p className="leading-6 text-primaryLight">TVL</p>
                 <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-                  $ {formatNumber((Number(price?.value?.toString()) * Number(totalAssets?.value?.toString())) / (10 ** (token?.decimals * 2)))}
+                  <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
+                    {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
+                  </SweetVaultTVL>
                 </Title>
               </div>
 

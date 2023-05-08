@@ -1,11 +1,9 @@
 import type { BigNumberWithFormatted } from "lib/types"
 
-import { useAllVaults } from "hooks/vaults"
-import { ChainId, formatNumber } from "lib/utils"
+import { formatNumber } from "lib/utils"
 import { usePrice } from "lib/Price"
 import useVaultTokenAddress from "hooks/useVaultTokenAddress"
-import { useTotalAssets } from "./hooks"
-import { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaults"
+import { useAllSweetVaults, useTotalAssets } from "./hooks"
 
 const DIRTY_TVL_STORE: Record<string, number> = {}
 
@@ -14,43 +12,16 @@ function AllSweetVaultsTVL({
 }: {
   render?: (tvl: number) => JSX.Element
 }) {
-  const { data: ethVaults = [] } = useAllVaults(
-    SUPPORTED_NETWORKS.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined
-  )
-  const { data: polyVaults = [] } = useAllVaults(
-    SUPPORTED_NETWORKS.includes(ChainId.Polygon) ? ChainId.Polygon : undefined
-  )
-  const { data: ftmVaults = [] } = useAllVaults(
-    SUPPORTED_NETWORKS.includes(ChainId.Fantom) ? ChainId.Fantom : undefined
-  )
-  const { data: opVaults = [] } = useAllVaults(
-    SUPPORTED_NETWORKS.includes(ChainId.Optimism) ? ChainId.Optimism : undefined
-  )
-
-  const ALL_VAULTS = [
-    ...ethVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Ethereum }
-    }),
-    ...polyVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Polygon }
-    }),
-    ...ftmVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Fantom }
-    }),
-    ...opVaults.map((vault) => {
-      return { address: vault, chainId: ChainId.Optimism }
-    }),
-  ]
-
+  const allSweetVaults = useAllSweetVaults()
   const allTVL = Object.keys(DIRTY_TVL_STORE).reduce((tvl, vaultAddy) => {
     return tvl + DIRTY_TVL_STORE[vaultAddy]
   }, 0)
 
   return (
     <>
-      {ALL_VAULTS.map(({ address, chainId }) => {
+      {allSweetVaults.map(({ address, chainId }) => {
         return (
-          <ProxyTVL
+          <SweetVaultTVL
             vaultAddress={address}
             chainId={chainId}
             key={`tvl-for-${address}`}
@@ -59,15 +30,15 @@ function AllSweetVaultsTVL({
               DIRTY_TVL_STORE[address] = tvl || 0
               return null
             }}
-          </ProxyTVL>
+          </SweetVaultTVL>
         )
       })}
-      {render ? render(allTVL) : formatNumber(allTVL)}
+      {render ? render(allTVL) : `$ ${formatNumber(allTVL)}`}
     </>
   )
 }
 
-function ProxyTVL({
+export function SweetVaultTVL({
   vaultAddress,
   chainId,
   children,
@@ -78,7 +49,7 @@ function ProxyTVL({
 }) {
   const { data: vaultTokenAddr } = useVaultTokenAddress(vaultAddress, chainId)
 
-  const { data: yearnPrice } = usePrice({
+  const { data: vaultPrice } = usePrice({
     address: vaultAddress,
     chainId,
   })
@@ -94,11 +65,11 @@ function ProxyTVL({
   })
 
   const price: BigNumberWithFormatted & { decimals?: number } =
-    yearnPrice?.value.gt(0) ? yearnPrice : tokenPrice
+    vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
 
   return children(
     (Number((price?.formatted as any) || 0) * Number(totalAssets?.value || 0)) /
-      10 ** (price?.decimals || 18)
+    10 ** (price?.decimals || 18)
   )
 }
 

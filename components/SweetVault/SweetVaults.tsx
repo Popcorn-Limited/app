@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { BigNumber, constants } from "ethers";
 import { useAccount } from "wagmi";
 import NoSSR from "react-no-ssr";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useAllVaults } from "../../hooks/vaults";
 import SweetVault from "./SweetVault";
-import { formatAndRoundBigNumber } from "../../lib/utils";
 import HeroSection from "../HeroSection";
 import { ChainId } from "../../lib/utils/connectors";
 import AllSweetVaultsTVL from "../../lib/Vault/AllSweetVaultsTVL";
+import AllSweetVaultDeposits from "lib/Vault/AllSweetVautDeposits";
 
 export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
@@ -20,31 +18,28 @@ export const SUPPORTED_NETWORKS = [
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
 ]
 
-interface Bal {
-  [key: string]: BigNumber;
-}
-
-export default function SweetVaults({ vaults, selectNetwork, deployer }: { vaults, selectNetwork, deployer?: string }) {
+export default function SweetVaults({
+  vaults,
+  selectNetwork,
+  deployer,
+}: {
+  vaults
+  selectNetwork
+  deployer?: string
+}) {
   const { address: account } = useAccount()
   const [searchString, handleSearch] = useState("")
-  const [deposit, setDeposit] = useState<Bal>({});
-
-  const addToDeposit = (key: string, value?: BigNumber) => {
-    if (value?.gt(0)) {
-      setDeposit((balances) => ({
-        ...balances,
-        [key]: value,
-      }));
-    }
-  };
 
   return (
     <NoSSR>
       <HeroSection
         title="Sweet Vaults"
         description="Deposit your crypto to optimize your yield while funding public goods."
-        info1={{ title: 'TVL', value: <AllSweetVaultsTVL /> }}
-        info2={{ title: 'Deposits', value: `$${account ? formatAndRoundBigNumber(Object.keys(deposit).reduce((total, key) => total.add(deposit[key]), constants.Zero), 18) : "-"}` }}
+        info1={{ title: "TVL", value: <AllSweetVaultsTVL /> }}
+        info2={{
+          title: "Deposits",
+          value: <AllSweetVaultDeposits account={account} />,
+        }}
         backgroundColorTailwind="bg-red-400"
         SUPPORTED_NETWORKS={SUPPORTED_NETWORKS}
         selectNetwork={selectNetwork}
@@ -65,16 +60,17 @@ export default function SweetVaults({ vaults, selectNetwork, deployer }: { vault
       </section>
       <section className="flex flex-col gap-8 md:px-8">
         {vaults.map((vault) => {
-          return <SweetVault
-            key={`sv-${vault.address}-${vault.chainId}`}
-            chainId={vault.chainId}
-            vaultAddress={vault.address}
-            searchString={searchString}
-            addToDeposit={addToDeposit}
-            deployer={deployer}
-          />;
+          return (
+            <SweetVault
+              key={`sv-${vault.address}-${vault.chainId}`}
+              chainId={vault.chainId}
+              vaultAddress={vault.address}
+              searchString={searchString}
+              deployer={deployer}
+            />
+          )
         })}
       </section>
     </NoSSR>
-  );
-};
+  )
+}
