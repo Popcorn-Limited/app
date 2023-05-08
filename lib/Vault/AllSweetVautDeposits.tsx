@@ -59,7 +59,7 @@ export function AccountDeposits({
 }) {
   const { data: vaultTokenAddr } = useVaultTokenAddress(vaultAddress, chainId)
 
-  const { data: yearnPrice } = usePrice({
+  const { data: vaultPrice } = usePrice({
     address: vaultAddress,
     chainId,
   })
@@ -99,7 +99,7 @@ export function AccountDeposits({
   const depositBalance = isStaking ? stakedBalance : vaultBalance
 
   const price: BigNumberWithFormatted & { decimals?: number } =
-    yearnPrice?.value.gt(0) ? yearnPrice : tokenPrice
+    vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
 
   const pricePerShare = Number(
     totalAssets?.value?.gt(0)

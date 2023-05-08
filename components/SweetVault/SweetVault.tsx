@@ -119,7 +119,6 @@ function SweetVault({
                 <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
                   <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
                     <AccountDeposits
-                      forceTokenPrice={1} // Render 1:1 price, override resolver
                       vaultAddress={vaultAddress}
                       chainId={chainId}
                       account={account}
@@ -187,7 +186,7 @@ function SweetVault({
                 <p className="leading-6 text-primaryLight">TVL</p>
                 <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
                   <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
-                    {(tvl) => <>{account ? `$ ${formatNumber(tvl)}` : "-"}</>}
+                    {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
                   </SweetVaultTVL>
                 </Title>
               </div>

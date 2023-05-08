@@ -49,7 +49,7 @@ export function SweetVaultTVL({
 }) {
   const { data: vaultTokenAddr } = useVaultTokenAddress(vaultAddress, chainId)
 
-  const { data: yearnPrice } = usePrice({
+  const { data: vaultPrice } = usePrice({
     address: vaultAddress,
     chainId,
   })
@@ -65,11 +65,11 @@ export function SweetVaultTVL({
   })
 
   const price: BigNumberWithFormatted & { decimals?: number } =
-    yearnPrice?.value.gt(0) ? yearnPrice : tokenPrice
+    vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
 
   return children(
     (Number((price?.formatted as any) || 0) * Number(totalAssets?.value || 0)) /
-      10 ** (price?.decimals || 18)
+    10 ** (price?.decimals || 18)
   )
 }
 
