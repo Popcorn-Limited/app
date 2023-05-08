@@ -58,50 +58,70 @@ const TokenMetadata = {
   ousd: baseMetadata.ousd,
   stgUsdt: {
     name: "STG USDT",
-    description: baseMetadata.usdt.description + " " + addMetadata("stargate", baseMetadata.usdt.name)
+    description: `${baseMetadata.usdt.description}
+    ----
+    ${addMetadata("stargate", baseMetadata.usdt.name)}`
   },
   stgUsdc: {
     name: "STG USDC",
-    description: baseMetadata.usdc.description + " " + addMetadata("stargate", baseMetadata.usdc.name)
+    description: `${baseMetadata.usdc.description}
+    ----
+    ${addMetadata("stargate", baseMetadata.usdc.name)}`
   },
   stgDai: {
     name: "STG DAI",
-    description: baseMetadata.dai.description + " " + addMetadata("stargate", baseMetadata.dai.name)
+    description: `${baseMetadata.dai.description}
+    ----
+    ${addMetadata("stargate", baseMetadata.dai.name)}`
   },
   hopUsdt: {
     name: "HOP USDT",
-    description: baseMetadata.usdt.description + " " + addMetadata("hop", baseMetadata.usdt.name)
+    description: `${baseMetadata.usdt.description}
+    ----
+    ${addMetadata("hop", baseMetadata.usdt.name)}`
   },
   hopUsdc: {
     name: "HOP USDC",
-    description: baseMetadata.usdc.description + " " + addMetadata("hop", baseMetadata.usdc.name)
+    description: `${baseMetadata.usdc.description}
+    ----
+    ${addMetadata("hop", baseMetadata.usdc.name)}`
   },
   hopDai: {
     name: "HOP DAI",
-    description: baseMetadata.dai.description + " " + addMetadata("hop", baseMetadata.dai.name)
+    description: `${baseMetadata.dai.description}
+    ----
+    ${addMetadata("hop", baseMetadata.dai.name)}`
   },
   dolaUsdcVeloLp: {
     name: "DOLA / USDC LP",
     description: `${baseMetadata.dola.description} 
+    ----
     ${baseMetadata.usdc.description} 
+    ----
     ${addMetadata("stableLp", "Velodrome")}`
   },
   lusdUsdcLp: {
     name: "LUSD / USDC LP",
     description: `${baseMetadata.lusd.description}
+    ----
     ${baseMetadata.usdc.description}
+    ----
     ${addMetadata("stableLp", "Velodrome")}`
   },
   ankrBnbBnbEllipsisLp: {
     name: "ankrBNB / BNB LP",
     description: `${baseMetadata.ankrBnb.description}
+    ----
     ${baseMetadata.bnb.description}
+    ----
     ${addMetadata("stableLp", "Ellipsis")}`
   },
   ohmDaiBalancerLp: {
     name: "OHM / DAI LP",
     description: `${baseMetadata.ohm.description}
+    ----
     ${baseMetadata.dai.description}
+    ----
     ${addMetadata("stableLp", "Balancer")}`
   }
 }
