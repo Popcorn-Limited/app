@@ -30,13 +30,9 @@ const HUNDRED = constants.Zero.add(100);
 const VAULT_APY_RESOLVER = {
   "Beefy": "beefy",
   "Yearn": "yearnAsset",
-  "Origin": "ousd"
+  "Origin": "ousd",
+  "Flux": "llama"
 }
-
-const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
-  "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c" // Dola / USDC LP
-  ,"0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c" // OUSD
-]
 
 function AssetWithName({ vault, token, chainId, protocol }: { vault: FetchTokenResult; token: FetchTokenResult, chainId: ChainId, protocol: string }) {
   return <div className="flex items-center gap-4">
@@ -87,7 +83,7 @@ function SweetVault({
   }, [balance, totalAssets, totalSupply, price])
 
   // TEMP - filter duplicate vault
-  if (!vaultMetadata || !isDeployer || HIDDEN_VAULTS.includes(vault?.address)) return <></>
+  if (!vaultMetadata || !isDeployer) return <></>
   if (searchString === "" ||
     vault?.name.toLowerCase().includes(searchString) ||
     vault?.symbol.toLowerCase().includes(searchString))

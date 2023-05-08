@@ -11,7 +11,11 @@ const ProtocolMetadata = {
   },
   ousd: {
     name: "Origin",
-    description:""
+    description: ""
+  },
+  flux: {
+    name: "Flux",
+    description: "Flux Finance is a decentralized lending protocol built by the Ondo Finance team. The protocol is a fork of Compound V2 which allows accredited investors to borrow against on-chain US Treasuries."
   }
 }
 

@@ -35,14 +35,8 @@ function getLocalMetadata(address: string): IpfsMetadata {
     case "0xc1D4a319dD7C44e332Bd54c724433C6067FeDd0D":
       return {
         token: TokenMetadata.usdc,
-        protocol: ProtocolMetadata.yearn,
-        strategy: {
-          name: "Yearn Compound Folding",
-          description: `**Compound Folding** \- Supplies and borrows USDC on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more USDC, and then deposited back into the strategy. 
-          **Idle Finance Reinvest** \- Supplies USDC to Idle Finance to earn IDLE and COMP. Earned tokens are harvested, sold for more USDC, and then deposited back into the strategy.
-          **Angle Reinvest** \- Provides USDC liquidity to Angle Protocol for sanTokens that are staked to earn ANGLE. Earned tokens are harvested, sold for more USDC, and deposited back into the strategy.
-          **Maker Folding** \- Supplies USDC to MakerDAO Peg Stability Module for a USDC-DAI ratio that is then deposited int the Uniswap v2 DAI-USDC liquidity pool. Flashmints are used to mint DAI from MakerDAO to flashlend and fold the position, boosting the APY. Earned tokens are harvested, sold for more USDC, and then deposited back into the strategy.`
-        }
+        protocol: ProtocolMetadata.flux,
+        strategy: StrategyMetadata.fluxLending
       }
     case "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c":
       return {
@@ -111,6 +105,7 @@ function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
 
   return ipfsData;
 }
+
 
 export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
   const registry = useVaultRegistry(chainId);
