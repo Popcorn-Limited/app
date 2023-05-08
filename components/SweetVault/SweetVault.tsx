@@ -94,6 +94,7 @@ function SweetVault({
             <nav className="flex items-center justify-between mb-8 select-none">
               <AssetWithName vault={vault} token={token} chainId={chainId} protocol={vaultMetadata?.metadata?.protocol?.name} />
               <AnimatedChevron className="hidden md:flex" />
+              <p>{vault?.address}</p>
             </nav>
             <div className="flex flex-row flex-wrap items-center mt-0 md:mt-6 justify-between">
               <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">

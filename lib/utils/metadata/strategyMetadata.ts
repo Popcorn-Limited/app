@@ -21,6 +21,10 @@ const StrategyMetadata = {
   fluxLending: {
     name: "Flux Lending",
     description: "Supplies assets into Flux Finance to earn lending interest. These assets get borrowed by accredited investors which supply on-chain US Treasuries as collateral."
+  },
+  yearnDaiCompoundFolding: {
+    name: "Yearn Strategies",
+    description: `**Compound Folding** \- The DAI Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more DAI, and then deposited back into the strategy.`
   }
 }
 

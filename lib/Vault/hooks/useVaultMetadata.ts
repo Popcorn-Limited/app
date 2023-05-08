@@ -26,11 +26,8 @@ function getLocalMetadata(address: string): IpfsMetadata {
     case "0x5d344226578DC100b2001DA251A4b154df58194f":
       return {
         token: TokenMetadata.dai,
-        protocol: ProtocolMetadata.yearn,
-        strategy: {
-          name: "Yearn Strategies",
-          description: `**Compound Folding** \- The DAI Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more DAI, and then deposited back into the strategy.`
-        }
+        protocol: ProtocolMetadata.flux,
+        strategy: StrategyMetadata.fluxLending
       }
     case "0xc1D4a319dD7C44e332Bd54c724433C6067FeDd0D":
       return {
