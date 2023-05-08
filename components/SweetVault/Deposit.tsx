@@ -48,8 +48,7 @@ function Deposit({
           };
         }}
         allowance={allowance?.value}
-        // Show the correct link for this vault for testing
-        getTokenUrl={vault === "0xb4bA0B340a1Ab76d3d92a66123390599743E314d" ? "https://app.hop.exchange/#/pool/deposit?token=USDC&sourceNetwork=optimism" : getTokenUrl}
+        getTokenUrl={getTokenUrl}
       >
         {({ ActionableComponent, data }) => {
           return (

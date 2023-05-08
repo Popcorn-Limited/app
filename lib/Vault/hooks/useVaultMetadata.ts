@@ -106,12 +106,11 @@ function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
   return ipfsData;
 }
 
-const EXPERIMENTAL_VAULTS = ["0xbCbD8ef4E2B3471C74fe2a760843e427e3ee165A", "0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE", "0xb4bA0B340a1Ab76d3d92a66123390599743E314d"]
 
 export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
   const registry = useVaultRegistry(chainId);
   const { data } = useContractRead({
-    address: EXPERIMENTAL_VAULTS.includes(vaultAddress) ? "0x41813a5303597a68c0a780FF37A827b9c7e84397" : registry?.address as Address,
+    address: registry?.address as Address,
     args: [vaultAddress],
     chainId,
     functionName: "getVault",

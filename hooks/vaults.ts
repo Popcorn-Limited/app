@@ -81,12 +81,3 @@ export const useAllVaults = (chainId?: ChainId, config?: ContractWriteArgs) => {
     ...config,
   });
 };
-
-export const useTestingOpVaults = () => {
-  return useTypedReadCall<string[]>({
-    address: "0x41813a5303597a68c0a780FF37A827b9c7e84397",
-    abi: ["function getRegisteredAddresses() external view returns (address[])"],
-    functionName: "getRegisteredAddresses",
-    chainId: 10
-  });
-};
