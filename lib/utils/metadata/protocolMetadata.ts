@@ -11,7 +11,7 @@ const ProtocolMetadata = {
   },
   ousd: {
     name: "Origin",
-    description: ""
+    description: "The Origin Protocol. As described above in the OUSD section."
   },
   flux: {
     name: "Flux",

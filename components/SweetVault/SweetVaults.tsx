@@ -14,6 +14,7 @@ export const SUPPORTED_NETWORKS = [
   ChainId.Polygon,
   ChainId.Optimism,
   ChainId.Arbitrum,
+  ChainId.BNB,
   // ChainId.Fantom,
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
 ]

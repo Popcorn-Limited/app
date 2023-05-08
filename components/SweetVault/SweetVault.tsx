@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
-import { Address, useAccount, useBalance, useContractRead, useToken } from "wagmi";
-import { BigNumber, constants } from "ethers";
+import { Address, useAccount, useToken } from "wagmi";
+import { constants } from "ethers";
 
-import { BalanceOf, TotalSupply, ValueOfBalance } from "lib/Erc20";
+import { BalanceOf } from "lib/Erc20";
 import useVaultToken from "hooks/useVaultToken";
 
 import { ChainId, formatAndRoundBigNumber } from "lib/utils";

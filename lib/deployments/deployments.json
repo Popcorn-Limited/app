@@ -2,6 +2,24 @@
   "1": {
     "chainId": "1",
     "contracts": {
+      "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9": {
+        "abi": null,
+        "address": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
+        "metadata": {
+          "icons": ["/images/tokens/ohm.png", "/images/tokens/dai.webp"],
+          "name": "OHM/DAI LP",
+          "symbol": "OHM/DAI LP"
+        }
+      },
+      "ohmDaiLp": {
+        "abi": null,
+        "address": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
+        "metadata": {
+          "icons": ["/images/tokens/ohm.png", "/images/tokens/dai.webp"],
+          "name": "OHM/DAI LP",
+          "symbol": "OHM/DAI LP"
+        }
+      },
       "ousd": {
         "abi": null,
         "address": "0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86",
@@ -1391,6 +1409,24 @@
   "10": {
     "chainId": "10",
     "contracts": {
+      "lusdUsdcLp": {
+        "abi": null,
+        "address": "0x207AddB05C548F262219f6bFC6e11c02d0f7fDbe",
+        "metadata": {
+          "icons": ["/images/tokens/lusd.webp","/images/tokens/usdt.webp"],
+          "name": "LUSD/USDC LP",
+          "symbol": "LUSD/USDC LP"
+        }
+      },
+      "0x207AddB05C548F262219f6bFC6e11c02d0f7fDbe": {
+        "abi": null,
+        "address": "0x207AddB05C548F262219f6bFC6e11c02d0f7fDbe",
+        "metadata": {
+          "icons": ["/images/tokens/lusd.webp","/images/tokens/usdc.svg"],
+          "name": "LUSD/USDC LP",
+          "symbol": "LUSD/USDC LP"
+        }
+      },
       "hopUsdt": {
         "abi": null,
         "address": "0xF753A50fc755c6622BBCAa0f59F0522f264F006e",
@@ -4483,9 +4519,32 @@
   "56": {
     "chainId": "56",
     "contracts": {
-      "": {
+      "0x53B07f1075cAbF87dC1329e44872F8fd8d7d84C9": {
         "abi": null,
-        "address": "",
+        "address": "0x53B07f1075cAbF87dC1329e44872F8fd8d7d84C9",
+        "metadata": {
+          "icons": ["/images/tokens/ankrBnb.svg", "/images/tokens/bnb.png"],
+          "name": "ankrBNB/BNB LP",
+          "symbol": "ankrBNB/BNB LP"
+        }
+      },
+      "ankBnbBnbLp": {
+        "abi": null,
+        "address": "0x53B07f1075cAbF87dC1329e44872F8fd8d7d84C9",
+        "metadata": {
+          "icons": ["/images/tokens/ankrBnb.svg", "/images/tokens/bnb.png"],
+          "name": "ankrBNB/BNB LP",
+          "symbol": "ankrBNB/BNB LP"
+        }
+      },
+      "vaultRegistry": {
+        "abi": null,
+        "address": "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
+        "metadata": null
+      },
+      "0x25172C73958064f9ABc757ffc63EB859D7dc2219": {
+        "abi": null,
+        "address": "0x25172C73958064f9ABc757ffc63EB859D7dc2219",
         "metadata": null
       },
       "0x0C0991CB6e1c8456660A49aa200B71de6158b85C": {

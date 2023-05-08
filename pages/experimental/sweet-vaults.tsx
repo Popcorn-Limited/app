@@ -14,6 +14,7 @@ const PopSweetVaults: NextPage = () => {
   const { data: ftmVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Fantom) ? ChainId.Fantom : undefined);
   const { data: opVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Optimism) ? ChainId.Optimism : undefined);
   const { data: arbVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined);
+  const { data: bscVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.BNB) ? ChainId.BNB : undefined);
 
   const allVaults = [
     ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
@@ -21,6 +22,7 @@ const PopSweetVaults: NextPage = () => {
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
     ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
     ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
+    ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
   ]
 
   return <SweetVaults vaults={allVaults} selectNetwork={selectNetwork} />

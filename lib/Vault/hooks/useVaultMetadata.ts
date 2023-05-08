@@ -74,11 +74,29 @@ function getLocalMetadata(address: string): IpfsMetadata {
       return {
         token: TokenMetadata.ousd,
         protocol: ProtocolMetadata.ousd,
-        strategy: {
-          name: "Yearn Compound Folding",
-          description: `**Morpho Lending** \- Morpho adds a peer-to-peer layer on top of Compound and Aave allowing lenders and borrowers to be matched more efficiently with better interest rates. When no matching opportunity exists, funds flow directly through to the underlying protocol. OUSD supplies stablecoins to three of Morpho’s Compound markets to earn interest. Additional yield is generated from protocol token incentives, including both COMP (regularly sold for USDT) and MORPHO (currently locked).
-          **Convex Compounding** \- Convex allows liquidity providers and stakers to earn greater rewards from Curve, a stablecoin-centric automated market maker (AMM). OUSD earns trading fees and protocol token incentives (both CRV and CVX). This strategy employs base pools and metapools, including the Origin Dollar factory pool, which enables OUSD to safely leverage its own deposits to multiply returns and maintain the pool’s balance.`
-        }
+        strategy: StrategyMetadata.ousd,
+        getTokenUrl: "https://app.ousd.com/"
+      }
+    case "0x8f4446a0857ca6E1f53E7a19a63631F9367bA97D":
+      return {
+        token: TokenMetadata.ankrBnbBnbEllipsisLp,
+        protocol: ProtocolMetadata.beefy,
+        strategy: StrategyMetadata.beefyEllipsisCompounder,
+        getTokenUrl: "https://ellipsis.finance/pool/0x440bA409d402e25b95aC852E386445aF12E802a0"
+      }
+    case "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2":
+      return {
+        token: TokenMetadata.ohmDaiBalancerLp,
+        protocol: ProtocolMetadata.beefy,
+        strategy: StrategyMetadata.beefyBalancerCompounder,
+        getTokenUrl: "https://app.balancer.fi/#/ethereum/pool/0x76fcf0e8c7ff37a47a799fa2cd4c13cde0d981c90002000000000000000003d2/add-liquidity"
+      }
+    case "0xFd136eF035Cf18E8F2573CaEbb3c4554635DC4F5":
+      return {
+        token: TokenMetadata.lusdUsdcLp,
+        protocol: ProtocolMetadata.beefy,
+        strategy: StrategyMetadata.beefyVelodromeCompounder,
+        getTokenUrl: "https://app.velodrome.finance/liquidity/manage?address=0x207addb05c548f262219f6bfc6e11c02d0f7fdbe"
       }
   }
 }
