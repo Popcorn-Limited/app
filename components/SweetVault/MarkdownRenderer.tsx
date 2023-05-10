@@ -1,8 +1,8 @@
-import MarkedReact from "marked-react";
+import MarkedReact from "marked-react"
 
 function MarkdownRenderer({ content = "" }) {
   const formattedContent = content
-    .replace("---", "\n\n---\n")
+    .replace(/---/g, "\n\n---\n")
     .replace(/ {3,}/g, "")
 
   // Enforce `---` to be in a solo line
@@ -35,7 +35,7 @@ function MarkdownRenderer({ content = "" }) {
     >
       {formattedContent}
     </MarkedReact>
-  );
+  )
 }
 
-export default MarkdownRenderer;
+export default MarkdownRenderer
