@@ -39,7 +39,10 @@ const baseMetadata = {
   },
 };
 
-function addMetadata(key: string, symbol: string): string {
+function addMetadata(
+  key: "stargate" | "hop" | "stableLp",
+  symbol: string
+): string {
   switch (key) {
     case "stargate":
       return `This ${symbol} LP is a Stargate LP token that is used to facilitate cross-chain bridging. Each ${symbol} LP is backed by ${symbol} in Stargate pools on various chains.`
@@ -94,9 +97,9 @@ const TokenMetadata = {
   },
   dolaUsdcVeloLp: {
     name: "DOLA / USDC LP",
-    description: `${baseMetadata.dola.description} 
+    description: `${baseMetadata.dola.description}
     ----
-    ${baseMetadata.usdc.description} 
+    ${baseMetadata.usdc.description}
     ----
     ${addMetadata("stableLp", "Velodrome")}`
   },
