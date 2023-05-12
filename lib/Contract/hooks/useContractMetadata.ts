@@ -35,7 +35,6 @@ export const useContractMetadata: Pop.Hook<ContractMetadata> = ({ chainId, addre
     chainId: Number(chainId),
     address: address as any,
     scopeKey: `contract-metadata:${chainId}:${address}`,
-    keepPreviousData: true,
     enabled: Boolean(address && chainId),
   });
 

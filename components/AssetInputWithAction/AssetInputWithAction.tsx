@@ -12,7 +12,8 @@ import { useContractMetadata } from "lib/Contract";
 import useMainAction from "./internals/useMainAction";
 import MainActionButton from "components/MainActionButton";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
-import { useConsistentRepolling } from "lib/utils";
+import { ChainId, useConsistentRepolling } from "lib/utils";
+import { useSpendableBalance } from "lib/POP";
 
 const safeRound = (bn: BigNumber, decimals = 18) => {
   const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
@@ -51,16 +52,23 @@ function AssetInputWithAction({
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const [inputBalance, setInputBalance] = useState<number>();
-  const { data: metadata } = useContractMetadata({ chainId, assetAddress });
+  const { data: metadata } = useContractMetadata({ chainId, address: assetAddress });
   const { data: asset } = useToken({ chainId, address: assetAddress as Address });
-  const { data: userBalance } = useConsistentRepolling(
+  const { data: tokenBalance } = useConsistentRepolling(
     useBalance({
       chainId,
       address: account,
-      enabled: Boolean(account && assetAddress),
+      enabled: Boolean(account && assetAddress && metadata?.name !== "Popcorn"),
       token: assetAddress as any,
     }),
   );
+  const { data: popBalance } = useSpendableBalance({
+    chainId,
+    address: assetAddress,
+    account,
+    enabled: Boolean(chainId === ChainId.Ethereum && account && metadata?.name === "Popcorn"),
+  });
+  const userBalance = chainId === ChainId.Ethereum && metadata?.name === "Popcorn" ? popBalance : tokenBalance;
 
   const formattedInputBalance = useMemo(() => {
     return utils.parseUnits(validateInput(inputBalance || "0").formatted, asset?.decimals);
