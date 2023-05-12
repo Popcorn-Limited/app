@@ -82,7 +82,6 @@ function SweetVault({
     }
   }, [balance, totalAssets, totalSupply, price])
 
-  // TEMP - filter duplicate vault
   if (!vaultMetadata || !isDeployer) return <></>
   if (searchString === "" ||
     vault?.name.toLowerCase().includes(searchString) ||
