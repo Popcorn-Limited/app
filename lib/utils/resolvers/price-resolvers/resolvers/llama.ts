@@ -10,7 +10,6 @@ export const defi_llama: PriceResolver = async (address: string, chainId: number
   const parsed = await result.json();
   const token = parsed.coins[`${chainString}:${address}`];
 
-
   return token?.price && token?.decimals
     ? {
       value: BigNumber.from(Number(token?.price * (10 ** token?.decimals)).toFixed(0)),

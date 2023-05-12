@@ -113,15 +113,9 @@ function SweetVault({
                 <p className="text-primaryLight font-normal">Your Deposit</p>
                 <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
                   <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                    <AccountDeposits
-                      vaultAddress={vaultAddress}
-                      chainId={chainId}
-                      account={account}
-                    >
-                      {(deposits) => (
-                        <>{account ? formatNumber(deposits) : "-"}</>
-                      )}
-                    </AccountDeposits>
+                    {account ?
+                      formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
+                      : "-"}
                   </Title>
                   <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol || "ETH"}</span>
                 </div>

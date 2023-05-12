@@ -82,7 +82,7 @@ export const networkMap = {
   [ChainId.Localhost]: "Localhost",
   [ChainId.RemoteFork]: "RemoteFork",
   [ChainId.Optimism]: "Optimism",
-  [ChainId.BNB]: "BNB",
+  [ChainId.BNB]: "Bsc",
   [ChainId.Fantom]: "Fantom",
   [ChainId.ALL]: "All Networks",
 };
