@@ -49,7 +49,7 @@ function addMetadata(
     case "hop":
       return `This ${symbol} LP is a Hop LP token that is used to facilitate cross-chain bridging. Each ${symbol} LP is backed by ${symbol} in Hop pools on various chains.`
     case "stableLp":
-      return `This is an Liquidity Pool Token for a stable pool on ${symbol}. Both assets are pegged to each other. It contains an equal amount of included assets.`
+      return `This is a Liquidity Pool Token for a stable pool on ${symbol}. Both assets are pegged to each other. It contains an equal amount of included assets.`
   }
 }
 
