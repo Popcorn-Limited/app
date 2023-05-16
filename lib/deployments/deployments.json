@@ -1413,7 +1413,7 @@
         "abi": null,
         "address": "0x207AddB05C548F262219f6bFC6e11c02d0f7fDbe",
         "metadata": {
-          "icons": ["/images/tokens/lusd.webp","/images/tokens/usdt.webp"],
+          "icons": ["/images/tokens/lusd.webp", "/images/tokens/usdt.webp"],
           "name": "LUSD/USDC LP",
           "symbol": "LUSD/USDC LP"
         }
@@ -1422,7 +1422,7 @@
         "abi": null,
         "address": "0x207AddB05C548F262219f6bFC6e11c02d0f7fDbe",
         "metadata": {
-          "icons": ["/images/tokens/lusd.webp","/images/tokens/usdc.svg"],
+          "icons": ["/images/tokens/lusd.webp", "/images/tokens/usdc.svg"],
           "name": "LUSD/USDC LP",
           "symbol": "LUSD/USDC LP"
         }

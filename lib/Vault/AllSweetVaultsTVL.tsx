@@ -68,7 +68,7 @@ export function SweetVaultTVL({
     vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
 
   return children(
-    (Number((price?.formatted as any) || 0) * Number(totalAssets?.value || 0)) /
+    ((Number((price?.value as any) || 0) / 10 ** (price?.decimals || 18)) * Number(totalAssets?.value || 0)) /
     10 ** (price?.decimals || 18)
   )
 }
