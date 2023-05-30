@@ -18,7 +18,7 @@ const StrategyBaseMetadata = {
     description: `OUSD integrates with Aave and Compound to automate yield on over-collateralized loans.
     ----
     The OUSD protocol also routes USDT, USDC, and DAI to highly-performing liquidity pools as determined by trading volume and rewards tokens (e.g. Curve rewards CRV tokens to liquidity providers). Yields are then passed on to OUSD holders.
-    ---- 
+    ---
     In addition to collecting interest from lending and fees from market making, the protocol automatically claims and converts bonus incentives that are being distributed by DeFi protocols.`
   }
 }
