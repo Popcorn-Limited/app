@@ -5,9 +5,7 @@ import { useAllVaults } from "hooks/vaults";
 import { ChainId } from "lib/utils";
 
 
-const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
-  ,"0xFd136eF035Cf18E8F2573CaEbb3c4554635DC4F5" // LUSD / USDC
-]
+const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF"]
 
 const PopSweetVaults: NextPage = () => {
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS);
