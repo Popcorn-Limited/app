@@ -1,4 +1,7 @@
-const StrategyBaseMetadata = {
+export type StrategyMetadata = { [key: string]: { name: string, description: string } }
+
+
+const StrategyBaseMetadata: StrategyMetadata = {
   yearnUsdcStrategies: {
     name: "Yearn Compound Folding",
     description: `**Compound Folding** \- Supplies and borrows USDC on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint DAI from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more USDC, and then deposited back into the strategy.
@@ -20,7 +23,12 @@ const StrategyBaseMetadata = {
     The OUSD protocol also routes USDT, USDC, and DAI to highly-performing liquidity pools as determined by trading volume and rewards tokens (e.g. Curve rewards CRV tokens to liquidity providers). Yields are then passed on to OUSD holders.
     ---
     In addition to collecting interest from lending and fees from market making, the protocol automatically claims and converts bonus incentives that are being distributed by DeFi protocols.`
-  }
+  },
+  stYCrv: {
+    name: "Staked yCRV",
+    description: "Accepts yCRV to earn a continuous share of Curve Finance fees and Curve DAO voting bribes. Earned 3Crv (Curve\'s 3pool LP token) fees and rewards are harvested, swapped for more yCRV which is deposited back into the strategy. Swap happens either via market-buy or mint, depending which is more capital efficient."
+  },
+
 }
 
 function addMetadata(key: string, symbol: string): string {
@@ -33,7 +41,7 @@ function addMetadata(key: string, symbol: string): string {
 }
 
 
-const StrategyMetadata = {
+const StrategyMetadata: StrategyMetadata = {
   beefyStargateCompounder: {
     name: "Beefy Stargate Compounding",
     description: addMetadata("lpCompounding", "Stargate")
@@ -46,7 +54,7 @@ const StrategyMetadata = {
     name: "Beefy Velodrome Compounder",
     description: addMetadata("lpCompounding", "Velodrome")
   },
-  beefyBalancerCompounder: {
+  beefyAuraCompounder: {
     name: "Beefy Aura Compounder",
     description: addMetadata("lpCompounding", "Aura")
   },
@@ -56,6 +64,15 @@ const StrategyMetadata = {
   },
   ousd: StrategyBaseMetadata.ousd,
   fluxLending: StrategyBaseMetadata.fluxLending,
+  stYCrv: StrategyBaseMetadata.stYCrv,
+  yearnAuraCompounder: {
+    name: "Yearn Aura Compounder",
+    description: addMetadata("lpCompounding", "Aura")
+  },
+  yearnConvexCompounder: {
+    name: "Yearn Convex Compounder",
+    description: addMetadata("lpCompounding", "Convex")
+  }
 }
 
 export default StrategyMetadata;

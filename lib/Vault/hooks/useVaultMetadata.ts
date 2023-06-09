@@ -88,7 +88,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
       return {
         token: TokenMetadata.ohmDaiBalancerLp,
         protocol: ProtocolMetadata.beefy,
-        strategy: StrategyMetadata.beefyBalancerCompounder,
+        strategy: StrategyMetadata.beefyAuraCompounder,
         getTokenUrl: "https://app.balancer.fi/#/ethereum/pool/0x76fcf0e8c7ff37a47a799fa2cd4c13cde0d981c90002000000000000000003d2/add-liquidity"
       }
     case "0xFd136eF035Cf18E8F2573CaEbb3c4554635DC4F5":
@@ -97,6 +97,34 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyVelodromeCompounder,
         getTokenUrl: "https://app.velodrome.finance/liquidity/manage?address=0x207addb05c548f262219f6bfc6e11c02d0f7fdbe"
+      }
+    case "0x759281a408A48bfe2029D259c23D7E848A7EA1bC":
+      return {
+        token: TokenMetadata.yCrv,
+        protocol: ProtocolMetadata.yearn,
+        strategy: StrategyMetadata.stYCrv,
+        getTokenUrl: "https://yearn.finance/ycrv"
+      }
+    case "0x9E237F8A3319b47934468e0b74F0D5219a967aB8":
+      return {
+        token: TokenMetadata.bbAvUsd,
+        protocol: ProtocolMetadata.yearn,
+        strategy: StrategyMetadata.yearnAuraCompounder,
+        getTokenUrl: "https://app.balancer.fi/#/ethereum/pool/0xfebb0bbf162e64fb9d0dfe186e517d84c395f016000000000000000000000502/add-liquidity"
+      }
+    case "0xF1649eC625Aca15831237D29cd09F3c71a5cca63":
+      return {
+        token: TokenMetadata.crvStEthLp,
+        protocol: ProtocolMetadata.yearn,
+        strategy: StrategyMetadata.yearnConvexCompounder,
+        getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-v2-303/deposit"
+      }
+    case "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567":
+      return {
+        token: TokenMetadata.crvOhmFraxLp,
+        protocol: ProtocolMetadata.yearn,
+        strategy: StrategyMetadata.yearnConvexCompounder,
+        getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-crypto-158/deposit"
       }
   }
 }

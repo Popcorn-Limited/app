@@ -2,6 +2,92 @@
   "1": {
     "chainId": "1",
     "contracts": {
+      "0xA13a9247ea42D743238089903570127DdA72fE44": {
+        "abi": null,
+        "address": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
+        "metadata": {
+          "icons": [
+            "https://yearn.finance/_next/image?url=https%3A%2F%2Fassets.smold.app%2Fapi%2Ftoken%2F1%2F0xA13a9247ea42D743238089903570127DdA72fE44%2Flogo-128.png&w=96&q=75"
+          ],
+          "name": "Balancer Boosted USD",
+          "symbol": "bbUSD LP"
+        }
+      },
+      "bbAvUsd": {
+        "abi": null,
+        "address": "0xA13a9247ea42D743238089903570127DdA72fE44",
+        "metadata": {
+          "icons": [
+            "https://yearn.finance/_next/image?url=https%3A%2F%2Fassets.smold.app%2Fapi%2Ftoken%2F1%2F0xA13a9247ea42D743238089903570127DdA72fE44%2Flogo-128.png&w=96&q=75"
+          ],
+          "name": "Balancer Boosted USD",
+          "symbol": "bbUSD LP"
+        }
+      },
+      "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b": {
+        "abi": null,
+        "address": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
+        "metadata": {
+          "icons": ["https://etherscan.io/token/images/yearncrvnew_32.png"],
+          "name": "yCRV",
+          "symbol": "yCRV"
+        }
+      },
+      "yCRV": {
+        "abi": null,
+        "address": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
+        "metadata": {
+          "icons": ["https://etherscan.io/token/images/yearncrvnew_32.png"],
+          "name": "yCRV",
+          "symbol": "yCRV"
+        }
+      },
+      "0x5271045F7B73c17825A7A7aee6917eE46b0B7520": {
+        "abi": null,
+        "address": "0x5271045F7B73c17825A7A7aee6917eE46b0B7520",
+        "metadata": {
+          "icons": [
+            "/images/tokens/ohm.png",
+            "https://cdn.furucombo.app/assets/img/token/FRAX.png"
+          ],
+          "name": "OHM/FRAX LP",
+          "symbol": "OHM/FRAX LP"
+        }
+      },
+      "crvOhmFraxLp": {
+        "abi": null,
+        "address": "0x5271045F7B73c17825A7A7aee6917eE46b0B7520",
+        "metadata": {
+          "icons": [
+            "/images/tokens/ohm.png",
+            "https://cdn.furucombo.app/assets/img/token/FRAX.png"
+          ],
+          "name": "OHM/FRAX LP",
+          "symbol": "OHM/FRAX LP"
+        }
+      },
+      "0x21E27a5E5513D6e65C4f830167390997aA84843a": {
+        "abi": null,
+        "address": "0x21E27a5E5513D6e65C4f830167390997aA84843a",
+        "metadata": {
+          "icons": [
+            "https://yearn.finance/_next/image?url=https%3A%2F%2Fassets.smold.app%2Fapi%2Ftoken%2F1%2F0x06325440D014e39736583c165C2963BA99fAf14E%2Flogo-128.png&w=96&q=75"
+          ],
+          "name": "Staked ETH LP",
+          "symbol": "stEth2 LP"
+        }
+      },
+      "crvStEthLp": {
+        "abi": null,
+        "address": "0x21E27a5E5513D6e65C4f830167390997aA84843a",
+        "metadata": {
+          "icons": [
+            "https://yearn.finance/_next/image?url=https%3A%2F%2Fassets.smold.app%2Fapi%2Ftoken%2F1%2F0x06325440D014e39736583c165C2963BA99fAf14E%2Flogo-128.png&w=96&q=75"
+          ],
+          "name": "Staked ETH LP",
+          "symbol": "stEth2 LP"
+        }
+      },
       "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9": {
         "abi": null,
         "address": "0x76FCf0e8C7Ff37A47a799FA2cd4c13cDe0D981C9",
