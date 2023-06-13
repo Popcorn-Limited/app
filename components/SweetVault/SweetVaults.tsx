@@ -7,6 +7,8 @@ import HeroSection from "../HeroSection";
 import { ChainId } from "../../lib/utils/connectors";
 import AllSweetVaultsTVL from "../../lib/Vault/AllSweetVaultsTVL";
 import AllSweetVaultDeposits from "lib/Vault/AllSweetVautDeposits";
+import { VaultTag } from "lib/Vault/hooks";
+import { Tabs } from "components/Tabs";
 
 export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
@@ -19,6 +21,8 @@ export const SUPPORTED_NETWORKS = [
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
 ]
 
+const TAGS = Object.keys(VaultTag).map(key => VaultTag[key])
+
 export default function SweetVaults({
   vaults,
   selectNetwork,
@@ -29,7 +33,8 @@ export default function SweetVaults({
   deployer?: string
 }) {
   const { address: account } = useAccount()
-  const [searchString, handleSearch] = useState("")
+  const [searchString, handleSearch] = useState("");
+  const [selectedTags, setSelectedTags] = useState(TAGS)
 
   return (
     <NoSSR>
@@ -47,7 +52,7 @@ export default function SweetVaults({
         stripeColor="#FFA0B4"
         stripeColorMobile="white"
       />
-      <section className="mt-8 mb-10 md:px-8">
+      <section className="mt-8 mb-10 md:px-8 flex flex-row items-center">
         <div className="w-full md:w-96 flex px-5 py-1 items-center rounded-lg border border-customLightGray">
           <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
           <input
@@ -58,6 +63,9 @@ export default function SweetVaults({
             defaultValue={searchString}
           />
         </div>
+        <div className="flex flex-row space-x-1 ml-8">
+          <Tabs available={Object.keys(VaultTag).map(key => VaultTag[key])} active={[selectedTags, setSelectedTags]} />
+        </div>
       </section>
       <section className="flex flex-col gap-8 md:px-8">
         {vaults.map((vault) => {
@@ -67,7 +75,9 @@ export default function SweetVaults({
               chainId={vault.chainId}
               vaultAddress={vault.address}
               searchString={searchString}
+              selectedTags={selectedTags.length === TAGS.length ? [] : selectedTags}
               deployer={deployer}
+
             />
           )
         })}
