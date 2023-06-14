@@ -24,7 +24,7 @@ import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 import useVaultMetadata, { VaultMetadata, VaultTag } from "lib/Vault/hooks/useVaultMetadata";
 
 import { SweetVaultTVL } from "lib/Vault/AllSweetVaultsTVL";
-import { AccountDeposits } from "lib/Vault/AllSweetVautDeposits";
+import useAdapterToken from "hooks/useAdapter";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -59,7 +59,7 @@ function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vau
       <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
     </div>
     <Title level={2} as="span" className="text-gray-900 mt-1">
-      {vault?.metadata?.name || token?.name}
+      {vault?.metadata?.name || vault?.metadata?.token?.name || token?.name}
     </Title>
     <div className="bg-red-500 bg-opacity-[15%] py-1 px-3 text-gray-800 rounded-md">{vault?.metadata?.protocol?.name}</div>
     {vault?.metadata?.tags && vault?.metadata?.tags.length > 0 &&
@@ -86,7 +86,8 @@ function SweetVault({
   const { address: account } = useAccount();
   const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
   const { data: token } = useVaultToken(vaultAddress, chainId);
-  const vaultMetadata = useVaultMetadata(vaultAddress, chainId);
+  const { data: adapter } = useAdapterToken(vaultAddress, chainId);
+  const vaultMetadata = useVaultMetadata(vaultAddress, token, adapter, chainId);
   const isDeployer = deployer ? vaultMetadata?.creator === deployer : true;
   const usesStaking = vaultMetadata?.staking?.toLowerCase() !== constants.AddressZero.toLowerCase();
 
@@ -109,7 +110,7 @@ function SweetVault({
 
   if (!vaultMetadata || !isDeployer) return <></>
   if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString)) return <></>
-  if(selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(tag))) return <></>
+  if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(tag))) return <></>
   return (
     <Accordion
       header={
@@ -130,7 +131,7 @@ function SweetVault({
                     render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, token?.decimals) : "-"}</>}
                   />
                 </Title>
-                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol || "ETH"}</span>
+                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol}</span>
               </p>
             </div>
             <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
@@ -141,7 +142,7 @@ function SweetVault({
                     formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
                     : "-"}
                 </Title>
-                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol || "ETH"}</span>
+                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{token?.symbol}</span>
               </div>
             </div>
             <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
@@ -156,7 +157,7 @@ function SweetVault({
                       <Apy
                         address={vaultMetadata.staking}
                         resolver={"multiRewardStaking"}
-                        render={(stakingApy) => (
+                        render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value)  > 0) ? (
                           <section className="flex items-center gap-1 text-primary">
                             {formatAndRoundBigNumber(
                               HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
@@ -186,7 +187,7 @@ function SweetVault({
                               }
                             />
                           </section>
-                        )}
+                        ) : <p>New ✨</p>}
                         chainId={chainId}
                       />
                     );
@@ -249,7 +250,7 @@ function SweetVault({
                 <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
               </div>
               <div className="mt-8">
-                <MarkdownRenderer content={`# Strategy \n${vaultMetadata?.metadata?.strategy?.description}`} />
+                <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
               </div>
             </section>
           </Accordion>
@@ -274,7 +275,6 @@ function SweetVault({
       </div>
     </Accordion>
   )
-  return <></>
 }
 
 export default SweetVault;

@@ -17,12 +17,18 @@ const StrategyBaseMetadata: StrategyMetadata = {
     description: "Supplies assets into Flux Finance to earn lending interest. These assets get borrowed by accredited investors which supply on-chain US Treasuries as collateral."
   },
   ousd: {
-    name: "Ousd",
+    name: "OUSD",
     description: `OUSD integrates with Aave and Compound to automate yield on over-collateralized loans.
     ----
     The OUSD protocol also routes USDT, USDC, and DAI to highly-performing liquidity pools as determined by trading volume and rewards tokens (e.g. Curve rewards CRV tokens to liquidity providers). Yields are then passed on to OUSD holders.
     ---
     In addition to collecting interest from lending and fees from market making, the protocol automatically claims and converts bonus incentives that are being distributed by DeFi protocols.`
+  },
+  oeth: {
+    name: "OETH",
+    description: `OETH integrates with various Liquid Staking Provider to optimize interest earned by staking Ether.
+    ----
+    The OETH protocol also utilizes Curve and Convex Finance to earn trading fees and additional rewards on ETH / OETH. It automatically claims and converts bonus incentives that are being distributed by these protocols.`
   },
   stYCrv: {
     name: "Staked yCRV",
@@ -31,12 +37,20 @@ const StrategyBaseMetadata: StrategyMetadata = {
 
 }
 
-function addMetadata(key: string, symbol: string): string {
+export function addGenericStrategyDescription(key: string, symbol: string): string {
   switch (key) {
     case "lpCompounding":
       return `**${symbol} LP-Compounding** \- The vault stakes the user\'s LP Token in a ${symbol} gauge, earning the platform\'s governance token. Earned token is swapped for more LP Token. To complete the compounding cycle, the new LP Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
     case "compoundFolding":
       return `**Compound Folding** \- The ${symbol} Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint ${symbol} from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more ${symbol}, and then deposited back into the strategy.`
+    case "lending":
+      return `**Lending** \- The vault supplies assets into ${symbol} to earn lending interest.`
+    case "automatedAssetStrategy":
+      return `**Automated Asset Strategy** \- The vault supplies assets into ${symbol} to earn yield on their automated asset strategies.`
+    case "seniorTranche":
+      return `**Senior Tranche** \- The vault supplies assets into a senior tranche of ${symbol}. Senior tranches offer stable returns with built-in coverage but reduced upside.`
+    case "juniorTranche":
+      return `**Junior Tranche** \- The vault supplies assets into a junior tranche of ${symbol}. Junior tranches offer higher returns but with higher risk since they minize the risk of the corresponding senior Tranche.`
   }
 }
 
@@ -44,34 +58,34 @@ function addMetadata(key: string, symbol: string): string {
 const StrategyMetadata: StrategyMetadata = {
   beefyStargateCompounder: {
     name: "Beefy Stargate Compounding",
-    description: addMetadata("lpCompounding", "Stargate")
+    description: addGenericStrategyDescription("lpCompounding", "Stargate")
   },
   beefyHopCompounder: {
     name: "Beefy Hop Compounder",
-    description: addMetadata("lpCompounding", "Hop")
+    description: addGenericStrategyDescription("lpCompounding", "Hop")
   },
   beefyVelodromeCompounder: {
     name: "Beefy Velodrome Compounder",
-    description: addMetadata("lpCompounding", "Velodrome")
+    description: addGenericStrategyDescription("lpCompounding", "Velodrome")
   },
   beefyAuraCompounder: {
     name: "Beefy Aura Compounder",
-    description: addMetadata("lpCompounding", "Aura")
+    description: addGenericStrategyDescription("lpCompounding", "Aura")
   },
   beefyEllipsisCompounder: {
     name: "Beefy Ellipsis Compounder",
-    description: addMetadata("lpCompounding", "Ellipsis")
+    description: addGenericStrategyDescription("lpCompounding", "Ellipsis")
   },
   ousd: StrategyBaseMetadata.ousd,
   fluxLending: StrategyBaseMetadata.fluxLending,
   stYCrv: StrategyBaseMetadata.stYCrv,
   yearnAuraCompounder: {
     name: "Yearn Aura Compounder",
-    description: addMetadata("lpCompounding", "Aura")
+    description: addGenericStrategyDescription("lpCompounding", "Aura")
   },
   yearnConvexCompounder: {
     name: "Yearn Convex Compounder",
-    description: addMetadata("lpCompounding", "Convex")
+    description: addGenericStrategyDescription("lpCompounding", "Convex")
   }
 }
 

@@ -3,9 +3,10 @@ import { BigNumber } from "ethers";
 import { useVaultRegistry } from "hooks/vaults";
 import { useEffect, useState } from "react";
 import { Address, useContractRead } from "wagmi";
-import TokenMetadata from "lib/utils/metadata/tokenMetadata";
+import TokenMetadata, { addLpMetadata } from "lib/utils/metadata/tokenMetadata";
 import ProtocolMetadata from "lib/utils/metadata/protocolMetadata";
-import StrategyMetadata from "lib/utils/metadata/strategyMetadata";
+import StrategyMetadata, { addGenericStrategyDescription } from "lib/utils/metadata/strategyMetadata";
+import { Description } from "@headlessui/react/dist/components/description/description";
 
 function getLocalMetadata(address: string): IpfsMetadata {
   switch (address) {
@@ -82,7 +83,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
     case "0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c":
       return {
         token: TokenMetadata.ousd,
-        protocol: ProtocolMetadata.ousd,
+        protocol: ProtocolMetadata.origin,
         strategy: StrategyMetadata.ousd,
         getTokenUrl: "https://app.ousd.com/",
         tags: [VaultTag.stable, VaultTag.singleAsset]
@@ -142,7 +143,65 @@ function getLocalMetadata(address: string): IpfsMetadata {
         getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-crypto-158/deposit",
         tags: [VaultTag.stable, VaultTag.lpToken]
       }
+    default:
+      return {
+        token: { name: "Token", description: "Not found" },
+        protocol: { name: "Protocol", description: "Not found" },
+        strategy: { name: "Strategy", description: "Not found" },
+      }
   }
+}
+
+
+function getFactoryMetadata(adapter, token, ipfsMetadata): IpfsMetadata {
+  if (adapter?.name?.includes("Stargate")) {
+    ipfsMetadata.protocol = ProtocolMetadata.stargate;
+    ipfsMetadata.token = { name: `STG-${token.symbol.slice(2)}`, description: addLpMetadata("stargate", token.symbol.slice(2)) }
+    ipfsMetadata.strategy = { name: "Stargate Compounding", description: addGenericStrategyDescription("lpCompounding", "Stargate") }
+    ipfsMetadata.getTokenUrl = `https://stargate.finance/pool/${token.symbol.slice(2)}-ETH/add`;
+  } else if (adapter?.name?.includes("Convex")) {
+    ipfsMetadata.protocol = ProtocolMetadata.convex;
+    ipfsMetadata.token = { name: `STG-${token.symbol.slice(2)}`, description: addLpMetadata("stableLp", "curve") }
+    ipfsMetadata.strategy = { name: "Convex Compounding", description: addGenericStrategyDescription("lpCompounding", "Convex") }
+    ipfsMetadata.getTokenUrl = `https://curve.fi/#/ethereum/pools`;
+  } else if (adapter?.name?.includes("Aave")) {
+    ipfsMetadata.protocol = ProtocolMetadata.aave;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Aave Lending", description: addGenericStrategyDescription("lending", "Aave") }
+  } else if (adapter?.name?.includes("Compound")) {
+    ipfsMetadata.protocol = ProtocolMetadata.compound;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Compound Lending", description: addGenericStrategyDescription("lending", "Compound") }
+  } else if (adapter?.name?.includes("Flux")) {
+    ipfsMetadata.protocol = ProtocolMetadata.flux;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = StrategyMetadata.fluxLending;
+  } else if (adapter?.name?.includes("Beefy")) {
+    ipfsMetadata.protocol = ProtocolMetadata.beefy;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Beefy Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Beefy") }
+  } else if (adapter?.name?.includes("Yearn")) {
+    ipfsMetadata.protocol = ProtocolMetadata.yearn;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Yearn Vault", description: addGenericStrategyDescription("automatedAssetStrategy", "Yearn") }
+  } else if (adapter?.name?.includes("Idle")) {
+    ipfsMetadata.protocol = ProtocolMetadata.idle;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = adapter?.name?.includes("Senior") ?
+      { name: "Senior Tranche", description: addGenericStrategyDescription("seniorTranche", "Idle") } :
+      { name: "Junior Tranche", description: addGenericStrategyDescription("juniorTranche", "Idle") }
+  } else if (adapter?.name?.includes("Origin")) {
+    ipfsMetadata.protocol = ProtocolMetadata.origin;
+    if (adapter?.name?.includes("Ether")) {
+      ipfsMetadata.token = TokenMetadata.oeth
+      ipfsMetadata.strategy = StrategyMetadata.oeth
+    } else {
+      ipfsMetadata.token = TokenMetadata.ousd
+      ipfsMetadata.strategy = StrategyMetadata.ousd
+    }
+  }
+
+  return ipfsMetadata;
 }
 
 
@@ -154,7 +213,7 @@ function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
     if (address) {
       let newIpfsData = getLocalMetadata(address);
 
-      if (cid) {
+      if (cid && cid !== "cid") {
         IpfsClient.get<IpfsMetadata>(cid).then(res => {
           newIpfsData = { ...newIpfsData, name: res.name, tags: res.tags }
         })
@@ -169,7 +228,7 @@ function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
 }
 
 
-export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
+export default function useVaultMetadata(vaultAddress, token, adapter, chainId): VaultMetadata {
   const registry = useVaultRegistry(chainId);
   const { data } = useContractRead({
     address: registry?.address as Address,
@@ -234,7 +293,10 @@ export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
       "type": "function"
     }],
   });
-  const ipfsMetadata = useGetIpfsMetadata(vaultAddress, data?.metadataCID);
+  let ipfsMetadata = useGetIpfsMetadata(vaultAddress, data?.metadataCID);
+  if (ipfsMetadata?.protocol?.name === "Protocol") {
+    ipfsMetadata = getFactoryMetadata(adapter, token, ipfsMetadata);
+  }
 
   return { ...data, metadata: ipfsMetadata } as VaultMetadata;
 }
