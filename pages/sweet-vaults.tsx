@@ -3,7 +3,6 @@ import SweetVaults, { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaul
 import useNetworkFilter from "hooks/useNetworkFilter";
 import { useAllVaults } from "hooks/vaults";
 import { ChainId } from "lib/utils";
-import { Contract, ethers } from "ethers";
 
 
 const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
@@ -35,11 +34,14 @@ const PopSweetVaults: NextPage = () => {
     ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
   ]
 
-  return <SweetVaults
-    vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
-    selectNetwork={selectNetwork}
-    deployer="0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"
-  />
+  return (
+    <SweetVaults
+      vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
+      selectNetwork={selectNetwork}
+      tags={[]}
+      deployer="0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"
+    />
+  )
 };
 
 export default PopSweetVaults;

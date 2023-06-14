@@ -38,11 +38,6 @@ const VAULT_APY_RESOLVER = {
 function getTagColor(tag: VaultTag): string {
   switch (tag) {
     case VaultTag.lsd:
-    case VaultTag.stable:
-      return "bg-amber-500 text-gray-800";
-    case VaultTag.leverage:
-    case VaultTag.compounding:
-      return "bg-emerald-500 text-gray-800";
     default:
       return "bg-teal-500 text-gray-800";
   }
@@ -62,11 +57,11 @@ function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vau
       {vault?.metadata?.name || vault?.metadata?.token?.name || token?.name}
     </Title>
     <div className="bg-red-500 bg-opacity-[15%] py-1 px-3 text-gray-800 rounded-md">{vault?.metadata?.protocol?.name}</div>
-    {vault?.metadata?.tags && vault?.metadata?.tags.length > 0 &&
+    {/* {vault?.metadata?.tags && vault?.metadata?.tags.length > 0 &&
       <>
         {vault?.metadata?.tags.map((tag) => <TagBatch key={tag} tag={tag} />)}
       </>
-    }
+    } */}
   </div>
 }
 
@@ -80,7 +75,7 @@ function SweetVault({
   chainId: ChainId
   vaultAddress: string
   searchString: string
-  selectedTags: VaultTag[]
+  selectedTags: string[]
   deployer?: string
 }) {
   const { address: account } = useAccount();
@@ -110,7 +105,7 @@ function SweetVault({
 
   if (!vaultMetadata || !isDeployer) return <></>
   if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString)) return <></>
-  if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(tag))) return <></>
+  if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (
     <Accordion
       header={
@@ -157,7 +152,7 @@ function SweetVault({
                       <Apy
                         address={vaultMetadata.staking}
                         resolver={"multiRewardStaking"}
-                        render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value)  > 0) ? (
+                        render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
                           <section className="flex items-center gap-1 text-primary">
                             {formatAndRoundBigNumber(
                               HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
@@ -187,7 +182,8 @@ function SweetVault({
                               }
                             />
                           </section>
-                        ) : <p>New ✨</p>}
+                        ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
+                        }
                         chainId={chainId}
                       />
                     );

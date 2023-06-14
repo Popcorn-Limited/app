@@ -18,23 +18,23 @@ export const SUPPORTED_NETWORKS = [
   ChainId.Arbitrum,
   ChainId.BNB,
   // ChainId.Fantom,
-  ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
+  ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Localhost] : [])
 ]
-
-const TAGS = Object.keys(VaultTag).map(key => VaultTag[key])
 
 export default function SweetVaults({
   vaults,
   selectNetwork,
+  tags,
   deployer,
 }: {
   vaults
-  selectNetwork
+  selectNetwork,
+  tags: string[]
   deployer?: string
 }) {
   const { address: account } = useAccount()
   const [searchString, handleSearch] = useState("");
-  const [selectedTags, setSelectedTags] = useState(TAGS)
+  const [selectedTags, setSelectedTags] = useState(tags)
 
   return (
     <NoSSR>
@@ -64,7 +64,7 @@ export default function SweetVaults({
           />
         </div>
         <div className="flex flex-row space-x-1 ml-8">
-          <Tabs available={Object.keys(VaultTag).map(key => VaultTag[key])} active={[selectedTags, setSelectedTags]} />
+          {tags.length > 0 && <Tabs available={tags} active={[selectedTags, setSelectedTags]} />}
         </div>
       </section>
       <section className="flex flex-col gap-8 md:px-8">
@@ -75,7 +75,7 @@ export default function SweetVaults({
               chainId={vault.chainId}
               vaultAddress={vault.address}
               searchString={searchString}
-              selectedTags={selectedTags.length === TAGS.length ? [] : selectedTags}
+              selectedTags={selectedTags.length === tags.length ? [] : selectedTags}
               deployer={deployer}
 
             />

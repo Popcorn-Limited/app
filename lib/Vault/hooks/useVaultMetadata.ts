@@ -16,7 +16,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyStargateCompounder,
         getTokenUrl: "https://stargate.finance/pool/usdt-matic/add",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0xB38b9522005ffBb0e297c17A8e2a3f11C6433e8C":
       return {
@@ -24,21 +23,18 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyStargateCompounder,
         getTokenUrl: "https://stargate.finance/pool/usdc-matic/add",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0x5d344226578DC100b2001DA251A4b154df58194f":
       return {
         token: TokenMetadata.dai,
         protocol: ProtocolMetadata.flux,
         strategy: StrategyMetadata.fluxLending,
-        tags: [VaultTag.stable, VaultTag.singleAsset, VaultTag.blueChip]
       }
     case "0xc1D4a319dD7C44e332Bd54c724433C6067FeDd0D":
       return {
         token: TokenMetadata.usdc,
         protocol: ProtocolMetadata.flux,
         strategy: StrategyMetadata.fluxLending,
-        tags: [VaultTag.stable, VaultTag.singleAsset, VaultTag.blueChip]
       }
     case "0xC2241a5B22Af50b2bb4C4960C23Ed1c8DB7f4D6c":
       return {
@@ -46,7 +42,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyVelodromeCompounder,
         getTokenUrl: "https://app.velodrome.finance/liquidity/manage?address=0x6c5019d345ec05004a7e7b0623a91a0d9b8d590d",
-        tags: [VaultTag.stable, VaultTag.lpToken]
       }
     case "0x2F1698D249782dbA192aF2Bab91E5eA621b7C6f7":
       return {
@@ -54,7 +49,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyHopCompounder,
         getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=optimism",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0x36EC2111A68350dBb722B872963F05992dd08E42":
       return {
@@ -62,7 +56,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyHopCompounder,
         getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=USDC&sourceNetwork=arbitrum",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0xfC2193ac4E8145E192bC3d9Db9407A4aE0Dc4DF8":
       return {
@@ -70,7 +63,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyHopCompounder,
         getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=DAI&sourceNetwork=arbitrum",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0xe64E5e2E58904366A6E24CF1e0aC7922AfCe4332":
       return {
@@ -78,7 +70,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyHopCompounder,
         getTokenUrl: "https://app.hop.exchange/#/pool/deposit?token=USDT&sourceNetwork=optimism",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c":
       return {
@@ -86,7 +77,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.origin,
         strategy: StrategyMetadata.ousd,
         getTokenUrl: "https://app.ousd.com/",
-        tags: [VaultTag.stable, VaultTag.singleAsset]
       }
     case "0x8f4446a0857ca6E1f53E7a19a63631F9367bA97D":
       return {
@@ -94,7 +84,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyEllipsisCompounder,
         getTokenUrl: "https://ellipsis.finance/pool/0x440bA409d402e25b95aC852E386445aF12E802a0",
-        tags: [VaultTag.lsd, VaultTag.lpToken]
       }
     case "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2":
       return {
@@ -102,7 +91,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyAuraCompounder,
         getTokenUrl: "https://app.balancer.fi/#/ethereum/pool/0x76fcf0e8c7ff37a47a799fa2cd4c13cde0d981c90002000000000000000003d2/add-liquidity",
-        tags: [VaultTag.stable, VaultTag.lpToken]
       }
     case "0xFd136eF035Cf18E8F2573CaEbb3c4554635DC4F5":
       return {
@@ -110,7 +98,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.beefy,
         strategy: StrategyMetadata.beefyVelodromeCompounder,
         getTokenUrl: "https://app.velodrome.finance/liquidity/manage?address=0x207addb05c548f262219f6bfc6e11c02d0f7fdbe",
-        tags: [VaultTag.stable, VaultTag.lpToken]
       }
     case "0x759281a408A48bfe2029D259c23D7E848A7EA1bC":
       return {
@@ -118,7 +105,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.yearn,
         strategy: StrategyMetadata.stYCrv,
         getTokenUrl: "https://yearn.finance/ycrv",
-        tags: [VaultTag.singleAsset]
       }
     case "0x9E237F8A3319b47934468e0b74F0D5219a967aB8":
       return {
@@ -133,7 +119,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.yearn,
         strategy: StrategyMetadata.yearnConvexCompounder,
         getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-v2-303/deposit",
-        tags: [VaultTag.lsd, VaultTag.lpToken]
       }
     case "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567":
       return {
@@ -141,7 +126,6 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.yearn,
         strategy: StrategyMetadata.yearnConvexCompounder,
         getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-crypto-158/deposit",
-        tags: [VaultTag.stable, VaultTag.lpToken]
       }
     default:
       return {
@@ -205,20 +189,23 @@ function getFactoryMetadata(adapter, token, ipfsMetadata): IpfsMetadata {
 }
 
 
+async function getIpfsData(address, adapter, token, cid) {
+  let newIpfsData = getLocalMetadata(address);
+  if (newIpfsData?.protocol?.name === "Protocol") newIpfsData = getFactoryMetadata(adapter, token, newIpfsData);
 
-function useGetIpfsMetadata(address: string, cid?: string): IpfsMetadata {
+  if (cid && cid !== "cid") {
+    const res = await IpfsClient.get<IpfsMetadata>(cid);
+    newIpfsData = { ...newIpfsData, name: res.name, tags: res.tags }
+  }
+  return newIpfsData;
+}
+
+function useGetIpfsMetadata(address: string, adapter, token, cid?: string): IpfsMetadata {
   const [ipfsData, setIpfsData] = useState<IpfsMetadata>();
 
   useEffect(() => {
     if (address) {
-      let newIpfsData = getLocalMetadata(address);
-
-      if (cid && cid !== "cid") {
-        IpfsClient.get<IpfsMetadata>(cid).then(res => {
-          newIpfsData = { ...newIpfsData, name: res.name, tags: res.tags }
-        })
-      }
-      setIpfsData(newIpfsData)
+      getIpfsData(address, adapter, token, cid).then(res => setIpfsData(res))
     }
   },
     [address, cid]
@@ -293,10 +280,7 @@ export default function useVaultMetadata(vaultAddress, token, adapter, chainId):
       "type": "function"
     }],
   });
-  let ipfsMetadata = useGetIpfsMetadata(vaultAddress, data?.metadataCID);
-  if (ipfsMetadata?.protocol?.name === "Protocol") {
-    ipfsMetadata = getFactoryMetadata(adapter, token, ipfsMetadata);
-  }
+  let ipfsMetadata = useGetIpfsMetadata(vaultAddress, adapter, token, data?.metadataCID);
 
   return { ...data, metadata: ipfsMetadata } as VaultMetadata;
 }
@@ -340,12 +324,9 @@ export type IpfsMetadata = {
 }
 
 export enum VaultTag {
-  stable = "Stablecoin",
+  deltaNeutral = "Delta Neutral",
   lsd = "LSD",
-  correlated = "Correlated",
-  blueChip = "Blue Chip",
-  singleAsset = "Single Asset",
-  lpToken = "LP Token",
-  compounding = "Compounding",
-  leverage = "Leverage",
+  degen = "Full Degen",
+  decentralized = "Decentralization Maxi",
+  wildcard = "Wildcard",
 }
