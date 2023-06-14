@@ -7,8 +7,22 @@ export interface TabsProps {
 
 export const Tabs: FC<TabsProps> = ({ available, active }) => {
   const [activeTabs, setActiveTabs] = active;
-
   const allSelected = activeTabs.length === available.length;
+
+  function handleSelect(tab: string) {
+    let newTabs = allSelected ? [] : [...activeTabs];
+    if (newTabs.includes(tab)) {
+      newTabs = newTabs.filter((t) => t !== tab);
+      if (newTabs.length === 0) {
+        newTabs = available;
+      }
+    } else {
+      newTabs.push(tab);
+    }
+
+    setActiveTabs(newTabs);
+  }
+
   return (
     <div className="flex gap-4">
       <Tab isActive={allSelected} onClick={() => setActiveTabs(available)}>
@@ -18,7 +32,7 @@ export const Tabs: FC<TabsProps> = ({ available, active }) => {
         <Tab
           key={`tab-item-${tab}`}
           isActive={!allSelected && activeTabs.includes(tab)}
-          onClick={() => setActiveTabs([tab])}
+          onClick={() => handleSelect(tab)}
         >
           {tab}
         </Tab>

@@ -1814,14 +1814,14 @@
   "1337": {
     "chainId": "1337",
     "contracts": {
-      "0x7036124464a2d2447516309169322c8498ac51e3": {
+      "0x007318Dc89B314b47609C684260CfbfbcD412864": {
         "abi": null,
-        "address": "0x7036124464a2d2447516309169322c8498ac51e3",
+        "address": "0x007318Dc89B314b47609C684260CfbfbcD412864",
         "metadata": null
       },
       "vaultRegistry": {
         "abi": null,
-        "address": "0x7036124464a2d2447516309169322c8498ac51e3",
+        "address": "0x007318Dc89B314b47609C684260CfbfbcD412864",
         "metadata": null
       },
       "0x5c932424acbfab036969b3b9d94ba9ecbae7565d": {

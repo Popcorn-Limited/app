@@ -22,8 +22,7 @@ export const useConsistentRepolling = <T extends UseContractReadReturn = UseCont
   );
 
   useEffect(() => {
-    console.info(`POLLING_TIME_OUT::${POLLING_TIME_OUT}`);
-
+    // console.info(`POLLING_TIME_OUT::${POLLING_TIME_OUT}`);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       if (wagmiReadCall.internal.failureCount < MAX_RETRY_COUNT) {

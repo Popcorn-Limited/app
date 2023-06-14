@@ -22,6 +22,10 @@ const baseMetadata: TokenMetadata = {
     name: "OUSD",
     description: "Origin Dollar (OUSD) is a decentralized stablecoin backed 1:1 by other dollar based stablecoins. Currently these are DAI, USDC and USDT. OUSD can always be redeemed against one of these token. The token is specially designed to offer competitive yields which are are converted to OUSD automatically and accumulate in users\' wallets. OUSD aims to provide users with earning opportunities across DeFi by deploying user capital in diversified yield-earning strategies that rebalance overtime. OUSD is managed by Origin Protocol who create and manage smart contracts to create yield on the underlying stablecoins."
   },
+  oeth: {
+    name: "OETH",
+    description: "Origin Ether (OETH) is a derivative of Ether backed 1:1 by a basket of Ether and other forms of staked Ether. Currently these are stETH, rETH, stfrxETH and ETH. OETH can always be redeemed against one of these token. The token is specially designed to offer competitive yields which are are converted to OETH automatically and accumulate in users\' wallets. OETH aims to provide users with earning opportunities across DeFi by deploying user capital in diversified yield-earning strategies that rebalance overtime. OETH is managed by Origin Protocol who create and manage smart contracts to create yield on the underlying stablecoins."
+  },
   frax: {
     name: "FRAX",
     description: "FRAX is is a decentralized stablecoin that pegs to the value of 1 USD. FRAX can be minted by locking USDC and burning FXS in a proportion determined by the protocol's collateral ratio."
@@ -60,7 +64,7 @@ const baseMetadata: TokenMetadata = {
   }
 };
 
-function addMetadata(
+export function addLpMetadata(
   key: "stargate" | "hop" | "stableLp",
   symbol: string
 ): string {
@@ -84,37 +88,37 @@ const TokenMetadata: TokenMetadata = {
     name: "STG USDT",
     description: `${baseMetadata.usdt.description}
     ----
-    ${addMetadata("stargate", baseMetadata.usdt.name)}`
+    ${addLpMetadata("stargate", baseMetadata.usdt.name)}`
   },
   stgUsdc: {
     name: "STG USDC",
     description: `${baseMetadata.usdc.description}
     ----
-    ${addMetadata("stargate", baseMetadata.usdc.name)}`
+    ${addLpMetadata("stargate", baseMetadata.usdc.name)}`
   },
   stgDai: {
     name: "STG DAI",
     description: `${baseMetadata.dai.description}
     ----
-    ${addMetadata("stargate", baseMetadata.dai.name)}`
+    ${addLpMetadata("stargate", baseMetadata.dai.name)}`
   },
   hopUsdt: {
     name: "HOP USDT",
     description: `${baseMetadata.usdt.description}
     ----
-    ${addMetadata("hop", baseMetadata.usdt.name)}`
+    ${addLpMetadata("hop", baseMetadata.usdt.name)}`
   },
   hopUsdc: {
     name: "HOP USDC",
     description: `${baseMetadata.usdc.description}
     ----
-    ${addMetadata("hop", baseMetadata.usdc.name)}`
+    ${addLpMetadata("hop", baseMetadata.usdc.name)}`
   },
   hopDai: {
     name: "HOP DAI",
     description: `${baseMetadata.dai.description}
     ----
-    ${addMetadata("hop", baseMetadata.dai.name)}`
+    ${addLpMetadata("hop", baseMetadata.dai.name)}`
   },
   dolaUsdcVeloLp: {
     name: "DOLA / USDC LP",
@@ -122,7 +126,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.usdc.description}
     ----
-    ${addMetadata("stableLp", "Velodrome")}`
+    ${addLpMetadata("stableLp", "Velodrome")}`
   },
   lusdUsdcLp: {
     name: "LUSD / USDC LP",
@@ -130,7 +134,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.usdc.description}
     ----
-    ${addMetadata("stableLp", "Velodrome")}`
+    ${addLpMetadata("stableLp", "Velodrome")}`
   },
   ankrBnbBnbEllipsisLp: {
     name: "ankrBNB / BNB LP",
@@ -138,7 +142,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.bnb.description}
     ----
-    ${addMetadata("stableLp", "Ellipsis")}`
+    ${addLpMetadata("stableLp", "Ellipsis")}`
   },
   ohmDaiBalancerLp: {
     name: "OHM / DAI LP",
@@ -146,7 +150,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.dai.description}
     ----
-    ${addMetadata("stableLp", "Balancer")}`
+    ${addLpMetadata("stableLp", "Balancer")}`
   },
   yCrv: baseMetadata.yCrv,
   bbAvUsd: baseMetadata.bbAvUsd,
@@ -156,7 +160,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.stEth.description}
     ----
-    ${addMetadata("stableLp", "Curve")}`
+    ${addLpMetadata("stableLp", "Curve")}`
   },
   crvOhmFraxLp: {
     name: "Curve OHM-FRAX LP",
@@ -164,7 +168,7 @@ const TokenMetadata: TokenMetadata = {
     ----
     ${baseMetadata.frax.description}
     ----
-    ${addMetadata("stableLp", "Curve")}`
+    ${addLpMetadata("stableLp", "Curve")}`
   }
 }
 
