@@ -57,13 +57,13 @@ const Footer = () => {
           >
             <TwitterIcon color={twitterColor} size={iconSize} />
           </a>
-          <a
+          {/* <a
             href="https://discord.gg/w9zeRTSZsq"
             onMouseEnter={() => onHoverIcon(setDiscordColor)}
             onMouseLeave={() => onLeaveIcon(setDiscordColor)}
           >
             <DiscordIcon color={discordColor} size={iconSize} />
-          </a>
+          </a> */}
           <a
             href="https://t.me/popcorndaochat"
             onMouseEnter={() => onHoverIcon(setTelegramColor)}

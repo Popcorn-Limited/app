@@ -221,9 +221,9 @@ export const MobileMenu: React.FC = () => {
                         <a href="https://twitter.com/Popcorn_DAO">
                           <TwitterIcon color={"#645F4B"} size={"30"} />
                         </a>
-                        <a href="https://discord.gg/w9zeRTSZsq">
+                        {/* <a href="https://discord.gg/w9zeRTSZsq">
                           <DiscordIcon color={"#645F4B"} size={"30"} />
-                        </a>
+                        </a> */}
                         <a href="https://t.me/popcorndaochat">
                           <TelegramIcon color={"#645F4B"} size={"30"} />
                         </a>
