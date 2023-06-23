@@ -127,6 +127,34 @@ function getLocalMetadata(address: string): IpfsMetadata {
         strategy: StrategyMetadata.yearnConvexCompounder,
         getTokenUrl: "https://curve.fi/#/ethereum/pools/factory-crypto-158/deposit",
       }
+    case "0x30D6a7B8c985d5dd7B9823d3B6Ae2726c8FFf81F":
+      return {
+        token: TokenMetadata.dai,
+        protocol: ProtocolMetadata.idle,
+        strategy: { name: "Senior Tranche", description: addGenericStrategyDescription("seniorTranche", "Idle") },
+        name: "DAI Senior Yield Tranche"
+      }
+    case "0x6cE9c05E159F8C4910490D8e8F7a63e95E6CEcAF":
+      return {
+        token: TokenMetadata.dai,
+        protocol: ProtocolMetadata.idle,
+        strategy: { name: "Junior Tranche", description: addGenericStrategyDescription("juniorTranche", "Idle") },
+        name: "DAI Junior Yield Tranche"
+      }
+    case "0xcdc3CbF94114406a0b59aDA090807838369ced2b":
+      return {
+        token: TokenMetadata.usdc,
+        protocol: ProtocolMetadata.idle,
+        strategy: { name: "Senior Tranche", description: addGenericStrategyDescription("seniorTranche", "Idle") },
+        name: "USDC Senior Yield Tranche"
+      }
+    case "0x52Aef3ea0D3F93766D255A1bb0aA7F1C4885E622":
+      return {
+        token: TokenMetadata.usdc,
+        protocol: ProtocolMetadata.idle,
+        strategy: { name: "Junior Tranche", description: addGenericStrategyDescription("juniorTranche", "Idle") },
+        name: "USDC Junior Yield Tranche"
+      }
     default:
       return {
         token: { name: "Token", description: "Not found" },

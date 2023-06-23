@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { ChainId } from "lib/utils/connectors";
-import { synthetix, set_token, yearn, yearnAsset, convex, beefy, multiRewardStaking, ousd, llama } from "./resolvers";
+import { synthetix, set_token, yearn, yearnAsset, convex, beefy, multiRewardStaking, ousd, llama, idle } from "./resolvers";
 
 export type ApyResolver = (
   address: string,
@@ -20,6 +20,7 @@ export const ApyResolvers = {
   multiRewardStaking,
   ousd,
   llama,
+  idle,
   default: synthetix,
 };
 
