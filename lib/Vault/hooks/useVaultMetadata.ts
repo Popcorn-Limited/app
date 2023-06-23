@@ -131,14 +131,28 @@ function getLocalMetadata(address: string): IpfsMetadata {
       return {
         token: TokenMetadata.dai,
         protocol: ProtocolMetadata.idle,
-        strategy: { name: "Senior Tranche", description: addGenericStrategyDescription("seniorTranche", "Idle") },
+        strategy: {
+          name: "Senior Tranche",
+          description: `In this vault, DAI are deposited into **Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/)**, leveraging [MakerDAO's Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29). 
+
+          On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques. 
+          
+          This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
+        },
         name: "DAI Senior Yield Tranche"
       }
     case "0x6cE9c05E159F8C4910490D8e8F7a63e95E6CEcAF":
       return {
         token: TokenMetadata.dai,
         protocol: ProtocolMetadata.idle,
-        strategy: { name: "Junior Tranche", description: addGenericStrategyDescription("juniorTranche", "Idle") },
+        strategy: {
+          name: "Junior Tranche",
+          description: `In this vault, DAI are deposited into **Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/)**, leveraging [MakerDAO's Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29). 
+
+          On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques. 
+          
+          This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
+        },
         name: "DAI Junior Yield Tranche"
       }
     case "0xcdc3CbF94114406a0b59aDA090807838369ced2b":
@@ -154,6 +168,34 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.idle,
         strategy: { name: "Junior Tranche", description: addGenericStrategyDescription("juniorTranche", "Idle") },
         name: "USDC Junior Yield Tranche"
+      }
+    case "0x11E10B12e8DbF7aE44EE50873c09e5C7c3e01385":
+      return {
+        token: TokenMetadata.usdt,
+        protocol: ProtocolMetadata.idle,
+        strategy: {
+          name: "Senior Tranche",
+          description: `In this vault, USDT are deposited into **Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)’s borrowing pool from** [Fasanara Digital](https://www.fasanara.com/). 
+
+          On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Fasanara Digital was started in 2019 as part of Fasanara Capital, a top-tier hedge fund specialized in alternative credit & fintech strategies, counting +$4b AUM across different funds. 
+          
+          This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
+        },
+        name: "USDT Senior Yield Tranche"
+      }
+    case "0x3D04Aade5388962C9A4f83B636a3a8ED63ea5b4D":
+      return {
+        token: TokenMetadata.usdt,
+        protocol: ProtocolMetadata.idle,
+        strategy: {
+          name: "Junior Tranche",
+          description: `In this vault, USDT are deposited into **Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)’s borrowing pool from** [Fasanara Digital](https://www.fasanara.com/). . 
+
+          On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Fasanara Digital was started in 2019 as part of Fasanara Capital, a top-tier hedge fund specialized in alternative credit & fintech strategies, counting +$4b AUM across different funds. 
+          
+          This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
+        },
+        name: "USDT Junior Yield Tranche"
       }
     default:
       return {
