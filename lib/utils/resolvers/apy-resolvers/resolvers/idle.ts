@@ -1,12 +1,17 @@
 
 
 import { BigNumber, Contract } from "ethers";
+import { parseUnits } from "ethers/lib/utils.js";
 
 export const idle = async (address, chainId, rpc): Promise<{ value: BigNumber; decimals: number }> => {
   const cdo = new Contract(tranches[address].cdo, ["function getApr(address) view returns (uint256)"], rpc);
   const apr = await cdo.getApr(tranches[address].tranch)
 
-  return { value: BigNumber.from(String(Number(apr) / 100)), decimals: 18 }
+  const apr2apy = (apr) => {
+    return (1 + (Number(apr) / 1e20) / 365) ** 365 - 1;
+  }
+
+  return { value: parseUnits(String(apr2apy(apr))), decimals: 18 }
 };
 
 const tranches = {
