@@ -5,8 +5,8 @@ import { ChainId } from "lib/utils/connectors";
 import Product from "components/landing/Product";
 import { useNamedAccounts } from "lib/utils/hooks";
 import { useFeatures } from "hooks/useFeatures";
-import Tvl from "lib/Contract/Tvl";
 import AllSweetVaultsTVL from "lib/Vault/AllSweetVaultsTVL";
+import usePopLockerTvl from "lib/PopLocker/hooks/usePopLockerTvl";
 
 import styles from "./Products.module.css";
 
@@ -16,26 +16,19 @@ const NumberFormatter = Intl.NumberFormat("en", {
 });
 
 const Products = () => {
-  const { Ethereum, Polygon } = ChainId;
+  const { Ethereum, Polygon, Optimism } = ChainId;
 
   const [popStaking] = useNamedAccounts("1", ["popStaking"]);
   const [popStakingPolygon] = useNamedAccounts("137", ["popStaking"]);
+  const [popStakingOptimism] = useNamedAccounts("10", ["popStaking"]);
 
   const {
     features: { sweetVaults: displaySweetVaults },
   } = useFeatures();
 
-  const {
-    props: {
-      data: { value: mainnetStakingTVL },
-    },
-  } = Tvl({ chainId: Ethereum, address: popStaking?.address });
-  const {
-    props: {
-      data: { value: polygonStakingTVL },
-    },
-  } = Tvl({ chainId: Polygon, address: popStakingPolygon?.address });
-
+  const { data: ethStakingTVL } = usePopLockerTvl({ chainId: Ethereum, address: popStaking?.address });
+  const { data: polyStakingTVL } = usePopLockerTvl({ chainId: Polygon, address: popStakingPolygon?.address });
+  const { data: opStakingTVL } = usePopLockerTvl({ chainId: Optimism, address: popStakingOptimism?.address });
 
   return (
     <section className="px-8 pt-4 pb-24 grid grid-cols-12 md:gap-8">
@@ -119,8 +112,8 @@ const Products = () => {
               {
                 label: "TVL",
                 content:
-                  mainnetStakingTVL && polygonStakingTVL
-                    ? `$${NumberFormatter.format(parseInt(formatUnits(mainnetStakingTVL.add(polygonStakingTVL))))}`
+                  ethStakingTVL && polyStakingTVL && opStakingTVL
+                    ? `$${NumberFormatter.format(parseInt(formatUnits(ethStakingTVL?.value?.add(polyStakingTVL.value).add(opStakingTVL.value))))}`
                     : "$0",
                 infoIconProps: {
                   title: "Total Value Locked",
