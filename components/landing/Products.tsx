@@ -114,7 +114,12 @@ const Products = () => {
                 label: "TVL",
                 content:
                   ethStakingTVL && polyStakingTVL && opStakingTVL
-                    ? `$${NumberFormatter.format(parseInt(formatUnits((ethStakingTVL?.value || constants.Zero).add(polyStakingTVL?.value).add(opStakingTVL?.value))))}`
+                    ? `$${NumberFormatter.format(
+                      parseInt(
+                        formatUnits(
+                          constants.Zero.add(ethStakingTVL?.value || constants.Zero).add(
+                            polyStakingTVL?.value || constants.Zero).add(
+                              opStakingTVL?.value || constants.Zero))))}`
                     : "$0",
                 infoIconProps: {
                   title: "Total Value Locked",
