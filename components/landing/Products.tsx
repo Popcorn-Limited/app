@@ -9,6 +9,7 @@ import AllSweetVaultsTVL from "lib/Vault/AllSweetVaultsTVL";
 import usePopLockerTvl from "lib/PopLocker/hooks/usePopLockerTvl";
 
 import styles from "./Products.module.css";
+import { constants } from "ethers";
 
 const NumberFormatter = Intl.NumberFormat("en", {
   //@ts-ignore
@@ -113,7 +114,7 @@ const Products = () => {
                 label: "TVL",
                 content:
                   ethStakingTVL && polyStakingTVL && opStakingTVL
-                    ? `$${NumberFormatter.format(parseInt(formatUnits(ethStakingTVL?.value?.add(polyStakingTVL.value).add(opStakingTVL.value))))}`
+                    ? `$${NumberFormatter.format(parseInt(formatUnits((ethStakingTVL?.value || constants.Zero).add(polyStakingTVL?.value).add(opStakingTVL?.value))))}`
                     : "$0",
                 infoIconProps: {
                   title: "Total Value Locked",
