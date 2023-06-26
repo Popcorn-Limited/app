@@ -105,7 +105,7 @@ function SweetVault({
   }, [balance, totalAssets, totalSupply, price])
 
   if (!vaultMetadata || !isDeployer) return <></>
-  if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString)) return <></>
+  if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString) && !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (
     <Accordion
