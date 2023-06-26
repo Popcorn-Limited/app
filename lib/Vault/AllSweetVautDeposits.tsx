@@ -87,7 +87,8 @@ export function AccountDeposits({
     if (balance && totalAssets && totalSupply && price
       && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
       const pps = Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString())
-      setValue((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)));
+      const bal = (pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals))
+      setValue(bal);
     }
   }, [balance, totalAssets, totalSupply, price])
 
