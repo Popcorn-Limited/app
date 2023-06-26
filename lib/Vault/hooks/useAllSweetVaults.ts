@@ -18,6 +18,11 @@ export const useAllSweetVaults = () => {
   const { data: arbVaults = [] } = useAllVaults(
     SUPPORTED_NETWORKS.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined
   )
+  const { data: bscVaults = [] } = useAllVaults(
+    SUPPORTED_NETWORKS.includes(ChainId.BNB) ? ChainId.BNB : undefined
+  );
+
+
 
   const ALL_VAULTS = [
     ...ethVaults.map((address) => ({
@@ -39,6 +44,10 @@ export const useAllSweetVaults = () => {
     ...arbVaults.map((address) => ({
       address,
       chainId: ChainId.Arbitrum,
+    })),
+    ...bscVaults.map((address) => ({
+      address,
+      chainId: ChainId.BNB,
     })),
   ]
 

@@ -7,6 +7,8 @@ import useVaultMetadata from "./hooks/useVaultMetadata"
 import { useBalanceOf, useTotalSupply } from "lib/Erc20/hooks"
 import { usePrice } from "lib/Price"
 import { useTotalAssets, useAllSweetVaults } from "./hooks"
+import { useEffect, useState } from "react"
+import useVaultToken from "hooks/useVaultToken"
 
 const DIRTY_STORE: Record<string, number> = {}
 
@@ -57,15 +59,10 @@ export function AccountDeposits({
   account: string
   children: (n: number) => JSX.Element
 }) {
-  const { data: vaultTokenAddr } = useVaultTokenAddress(vaultAddress, chainId)
+  const { data: token } = useVaultToken(vaultAddress, chainId);
 
-  const { data: vaultPrice } = usePrice({
-    address: vaultAddress,
-    chainId,
-  })
-
-  const { data: tokenPrice } = usePrice({
-    address: vaultTokenAddr,
+  const { data: price } = usePrice({
+    address: token?.address,
     chainId,
   })
 
@@ -73,50 +70,28 @@ export function AccountDeposits({
     address: vaultAddress,
     chainId,
   })
-
   const { data: totalSupply } = useTotalSupply({
     address: vaultAddress,
     chainId,
   })
 
-  const vaultMetadata = useVaultMetadata(vaultAddress, chainId)
-
-  const isStaking =
-    vaultMetadata?.staking?.toLowerCase() !==
-    constants.AddressZero.toLowerCase()
-
-  const { data: vaultBalance } = useBalanceOf({
+  const { data: balance } = useBalanceOf({
     address: vaultAddress,
     chainId,
     account,
   })
-  const { data: stakedBalance } = useBalanceOf({
-    address: vaultMetadata?.staking,
-    chainId,
-    account,
-  })
 
-  const depositBalance = isStaking ? stakedBalance : vaultBalance
+  const [value, setValue] = useState<number>(0);
 
-  const price: BigNumberWithFormatted & { decimals?: number } =
-    vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
+  useEffect(() => {
+    if (balance && totalAssets && totalSupply && price
+      && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
+      const pps = Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString())
+      setValue((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)));
+    }
+  }, [balance, totalAssets, totalSupply, price])
 
-  const pricePerShare = Number(
-    totalAssets?.value?.gt(0)
-      ? (totalAssets.value._hex as any) /
-          ((totalSupply?.value._hex as any) || 0)
-      : 0
-  )
-
-  const pricedDeposits =
-    pricePerShare * ((depositBalance as any)?.value?._hex || 0)
-
-  const parsedTokenPrice =
-    forceTokenPrice || Number((price?.formatted as any) || 0)
-
-  return children(
-    (parsedTokenPrice * pricedDeposits) / 10 ** (price?.decimals || 18)
-  )
+  return children(value)
 }
 
 export default AllSweetVaultDeposits
