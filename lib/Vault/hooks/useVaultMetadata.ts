@@ -161,7 +161,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.idle,
         strategy: {
           name: "Senior Tranche",
-          description: `In this vault, USDC is deposited into Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from Portofino Technologies, leveraging MakerDAO's Peg Stability Module.
+          description: `In this vault, USDC is deposited into Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from Portofino Technologies.
           ---
           On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques.
           ---
@@ -175,7 +175,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.idle,
         strategy: {
           name: "Junior Tranche",
-          description: `In this vault, USDC is deposited into Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from Portofino Technologies, leveraging MakerDAO's Peg Stability Module.
+          description: `In this vault, USDC is deposited into Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from Portofino Technologies.
           ---
           On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques.
           ---
