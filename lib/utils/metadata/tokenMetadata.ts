@@ -84,6 +84,7 @@ const TokenMetadata: TokenMetadata = {
   dai: baseMetadata.dai,
   dola: baseMetadata.dola,
   ousd: baseMetadata.ousd,
+  oeth: baseMetadata.oeth,
   stgUsdt: {
     name: "STG USDT",
     description: `${baseMetadata.usdt.description}

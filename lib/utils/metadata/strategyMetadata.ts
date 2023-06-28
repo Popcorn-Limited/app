@@ -77,6 +77,7 @@ const StrategyMetadata: StrategyMetadata = {
     description: addGenericStrategyDescription("lpCompounding", "Ellipsis")
   },
   ousd: StrategyBaseMetadata.ousd,
+  oeth:StrategyBaseMetadata.oeth,
   fluxLending: StrategyBaseMetadata.fluxLending,
   stYCrv: StrategyBaseMetadata.stYCrv,
   yearnAuraCompounder: {

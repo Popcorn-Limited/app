@@ -2,6 +2,28 @@
   "1": {
     "chainId": "1",
     "contracts": {
+      "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3": {
+        "abi": null,
+        "address": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
+        "metadata": {
+          "icons": [
+            "https://app.oeth.com/images/currency/oeth-icon-small.svg"
+          ],
+          "name": "Origin Ether",
+          "symbol": "oETH"
+        }
+      },
+      "oEth": {
+        "abi": null,
+        "address": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
+        "metadata": {
+          "icons": [
+            "https://app.oeth.com/images/currency/oeth-icon-small.svg"
+          ],
+          "name": "Origin Ether",
+          "symbol": "oETH"
+        }
+      },
       "0xA13a9247ea42D743238089903570127DdA72fE44": {
         "abi": null,
         "address": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
