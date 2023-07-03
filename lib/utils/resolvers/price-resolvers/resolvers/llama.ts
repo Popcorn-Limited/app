@@ -1,5 +1,5 @@
 import { networkMap } from "lib/utils";
-import { BigNumber, constants } from "ethers";
+import { constants } from "ethers";
 import { PriceResolver } from "../types";
 import { parseUnits } from "ethers/lib/utils.js";
 
@@ -23,7 +23,7 @@ export const defi_llama: PriceResolver = async (address: string, chainId: number
 
   return token?.price && token?.decimals
     ? {
-      value: BigNumber.from(Number(token?.price * (10 ** token?.decimals)).toFixed(0)),
+      value: parseUnits(token?.price.toFixed(token?.decimals), token?.decimals),
       decimals: token.decimals,
     }
     : { value: constants.Zero, decimals: 0 };
