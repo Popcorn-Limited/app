@@ -181,7 +181,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
         },
-        name: "USDC Senior Yield Tranche"
+        name: "USDC Junior Yield Tranche"
       }
     case "0x11E10B12e8DbF7aE44EE50873c09e5C7c3e01385":
       return {
