@@ -133,10 +133,17 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.idle,
         strategy: {
           name: "Senior Tranche",
-          description: `In this vault, DAI are deposited into **Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/)**, leveraging [MakerDAO's Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29). 
+          description: `Idle is a decentralized yield automation protocol that aims to step up DeFi by reimagining how risk and yield are managed. This vault is connected to [Yield Tranches](https://docs.idle.finance/products/yield-tranches) (YTs): an innovative DeFi primitive that segments yields and risks to appeal to a diverse range of users, offering two risk-return profiles, Senior and Junior. Senior YTs withhold part of their yield in exchange for funds coverage, given by the Junior class’ liquidity. This way, Senior holders benefit from built-in protection on deposits. That yield is routed to the Junior side in exchange for first-loss liquidity to cover Senior funds.
+ 
           ---
+          All Idle strategies feature automatically compounded interest and no lock-up periods. 
+          ---
+          STRATEGIES
+          
+          In this vault, USDC are deposited into Idle’s Senior YT based on [Clearpool](https://clearpool.finance/)%E2%80%99s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/). 
+          
           On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques. 
-          ---
+          
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
         },
         name: "DAI Senior Yield Tranche"
@@ -147,8 +154,14 @@ function getLocalMetadata(address: string): IpfsMetadata {
         protocol: ProtocolMetadata.idle,
         strategy: {
           name: "Junior Tranche",
-          description: `In this vault, DAI are deposited into **Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)’s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/)**, leveraging [MakerDAO's Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29). 
+          description: `Idle is a decentralized yield automation protocol that aims to step up DeFi by reimagining how risk and yield are managed. This vault is connected to [Yield Tranches](https://docs.idle.finance/products/yield-tranches) (YTs): an innovative DeFi primitive that segments yields and risks to appeal to a diverse range of users, offering two risk-return profiles, Senior and Junior. Senior YTs withhold part of their yield in exchange for funds coverage, given by the Junior class’ liquidity. That yield is routed to the Junior side in exchange for first-loss liquidity to cover Senior funds. This way, **Junior holders can benefit from boosted returns**.
+          
+          All Yield Tranches feature automatically compounded interest and no lock-up periods.
           ---
+          STRATEGIES
+          
+          In this vault, USDC are deposited into Idle’s Junior YT based on [Clearpool](https://clearpool.finance/)%E2%80%99s USDC borrowing pool from [Portofino Technologies](https://www.portofino.tech/).
+          
           On Clearpool, institutional borrowers can create permissionless, single-borrower liquidity pools and compete for uncollateralized liquidity from the DeFi ecosystem. Portofino Technologies is a High Frequency Trading Market Maker that uses the borrowed funds as trading capital, providing superior returns thanks to its advanced machine learning & stochastic control techniques. 
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
@@ -181,7 +194,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
         },
-        name: "USDC Senior Yield Tranche"
+        name: "USDC Junior Yield Tranche"
       }
     case "0x11E10B12e8DbF7aE44EE50873c09e5C7c3e01385":
       return {
