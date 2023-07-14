@@ -15,5 +15,10 @@ export const useProductLinks = () => {
       url: "/staking",
       currentlySelected: router?.pathname === "/staking",
     },
+    {
+      title: "3X | Butter",
+      url: "/set-token",
+      currentlySelected: router?.pathname === "/set-token",
+    },
   ];
 };

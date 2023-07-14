@@ -5,8 +5,8 @@ import Link from "next/link";
 export interface ProductProps {
   title: JSX.Element;
   description: string;
-  stats: StatusWithLabelProps[];
   route: string;
+  stats?: StatusWithLabelProps[];
   customContent?: JSX.Element;
   badge?: string;
 }
@@ -33,7 +33,7 @@ export default function Product({ title, description, stats, badge, customConten
 
       <div className="flex flex-grow items-center justify-end w-full my-8">{customContent}</div>
       <div className="flex justify-between w-full">
-        {stats.map((stat, i) =>
+        {stats && stats.map((stat, i) =>
           <StatusWithLabel key={i} content={stat.content} label={stat.label} infoIconProps={stat.infoIconProps} />
         )}
       </div>
