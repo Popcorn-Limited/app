@@ -19,8 +19,6 @@ export const defi_llama: PriceResolver = async (address: string, chainId: number
   const parsed = await result.json();
   const token = parsed.coins[`${chainString}:${address}`];
 
-  if (address === "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3") return { value: parseUnits(token?.price), decimals: 18 }
-
   return token?.price && token?.decimals
     ? {
       value: parseUnits(token?.price.toFixed(token?.decimals), token?.decimals),
