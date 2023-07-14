@@ -8,9 +8,9 @@ import { useAccount, useSignMessage } from "wagmi";
 const getShortTerms = (timestamp) => {
   return `Welcome to Popcorn!
 
-Please read the disclaimer carefully before accessing, interacting with, or using the popcorndao.finance, consisting of the popcorndao.finance smart contract technology stack and the user interface for the Popcorn DeFi application, as well as any other application developed in the future (together the “Popcorn Software”). 
+Please read the disclaimer carefully before accessing, interacting with, or using the pop.network, consisting of the pop.network smart contract technology stack and the user interface for the Popcorn DeFi application, as well as any other application developed in the future (together the “Popcorn Software”). 
 By signing this message, you confirm that you have carefully read this disclaimer.
-https://www.popcorndao.finance/disclaimer
+https://app.pop.network/disclaimer
 
 Timestamp: ${timestamp}`;
 };
