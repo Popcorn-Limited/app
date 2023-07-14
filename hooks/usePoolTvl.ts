@@ -2,7 +2,7 @@ import { BigNumber, Contract, constants } from "ethers";
 import useSWR, { SWRResponse } from "swr";
 import { usePrice } from "lib/Price";
 import { useNamedAccounts } from "lib/utils";
-import { ChainId, PRC_PROVIDERS } from "lib/utils/connectors";
+import { ChainId, RPC_PROVIDERS } from "lib/utils/connectors";
 
 const REFETCH_INTERVAL = 10 * 1_000;
 
@@ -34,7 +34,7 @@ export default function usePoolTVL(chainId: ChainId): SWRResponse<BigNumber, Err
   const { data: usdcPrice } = usePrice({ address: ethUsdc?.address, chainId: ChainId.Ethereum });
 
   return useSWR(
-    [`getPoolTVL-${chainId}`, popUsdcUniV3Pool?.address, PRC_PROVIDERS[chainId], pop?.address, usdc?.address, popPrice?.value, usdcPrice?.value],
+    [`getPoolTVL-${chainId}`, popUsdcUniV3Pool?.address, RPC_PROVIDERS[chainId], pop?.address, usdc?.address, popPrice?.value, usdcPrice?.value],
     getPoolTVL,
     {
       refreshInterval: REFETCH_INTERVAL,

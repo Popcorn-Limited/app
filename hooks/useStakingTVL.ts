@@ -2,7 +2,7 @@ import { BigNumber, constants, ethers } from "ethers";
 import useSWR, { SWRResponse } from "swr";
 import { useNamedAccounts } from "lib/utils";
 import { usePrice } from "lib/Price";
-import { ChainId, PRC_PROVIDERS } from "lib/utils/connectors";
+import { ChainId, RPC_PROVIDERS } from "lib/utils/connectors";
 
 const REFETCH_INTERVAL = 10 * 1_000;
 
@@ -28,7 +28,7 @@ export default function useStakingTVL(chainId: ChainId): SWRResponse<BigNumber, 
 
 
   return useSWR(
-    [`getStakingTVL-${chainId}`, popStaking?.address, PRC_PROVIDERS[chainId], popPrice?.value],
+    [`getStakingTVL-${chainId}`, popStaking?.address, RPC_PROVIDERS[chainId], popPrice?.value],
     getStakingTVL,
     {
       refreshInterval: REFETCH_INTERVAL,
