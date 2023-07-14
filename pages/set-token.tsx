@@ -18,10 +18,10 @@ export default function SetToken(): JSX.Element {
             </div>
             <div className="space-y-2">
               <p className="text-primaryDark">
-                1. Click on on of the cards to redeem your 3X or Butter for the underlying yearn vault token.
+                1. Click one of the cards to redeem your 3X or Butter for the underlying yearn vault token.
               </p>
               <p className="text-primaryDark">
-                2. Visit <a href="https://yearn.finance/vaults" className="text-blue-500">https://yearn.finance/vaults</a> and click on &quot;Holdings&quot; to redeem your vault token for curve lp token or migrate it to yearns new vaults.
+                2. Visit <a href="https://yearn.finance/vaults" className="text-blue-500">https://yearn.finance/vaults</a> and click on &quot;Holdings&quot; to redeem your vault token for curve lp token or migrate it to Yearn's new vaults.
               </p>
               <p className="text-primaryDark">
                 3. If you redeem your vault token visit <a href="https://curve.fi/#/ethereum/dashboard" className="text-blue-500">https://curve.fi/#/ethereum/dashboard</a> to see your curve lp token and redeem them for stablecoins.
