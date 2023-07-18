@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from "@heroicons/react/outline";
 import { ChainId } from "lib/utils/connectors";
 import PopUpModal from "components/Modal/PopUpModal";
 import SingleActionModal from "components/Modal/SingleActionModal";
@@ -7,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { SearchToken } from "components/SearchToken";
 import { Token } from "lib/types";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 export interface SelectTokenProps {
   allowSelection: boolean;
@@ -45,7 +45,7 @@ export default function SelectToken({
           }}
         >
           <div className="md:mr-2 relative">
-            <TokenIcon token={selectedToken?.address} imageSize="w-5 h-5" chainId={chainId} />
+            <TokenIcon token={selectedToken?.address} icon={selectedToken?.icon} imageSize="w-5 h-5" chainId={chainId} />
           </div>
           <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
             {selectedToken?.symbol}

@@ -85,11 +85,11 @@ export interface LockedBalance {
 }
 
 export type Token = {
-  contract: Contract;
   address: string;
   name: string;
   symbol: string;
   decimals: number;
+  contract?: Contract;
   balance?: BigNumber;
   allowance?: BigNumber;
   description?: string;
