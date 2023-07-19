@@ -1,5 +1,5 @@
 import { WidoWidget } from 'wido-widget'
-import { Address, useAccount, useConnect, useDisconnect, useToken } from 'wagmi'
+import { Address, useAccount, useConnect, useDisconnect, useToken, useSigner } from 'wagmi'
 import { RPC_PROVIDERS, RPC_URLS } from 'lib/utils'
 import { BigNumber, Contract, constants, ethers } from 'ethers'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -14,6 +14,11 @@ import FeeBreakdown from 'components/SweetVault/FeeBreakdown'
 import { validateInput } from 'components/AssetInputWithAction/internals/input'
 import useVaultToken from 'hooks/useVaultToken'
 import { ArrowDownIcon } from '@heroicons/react/24/outline'
+import MainActionButton from 'components/MainActionButton'
+import useApproveBalance from "hooks/useApproveBalance";
+import useWaitForTx from 'lib/utils/hooks/useWaitForTx'
+import toast from 'react-hot-toast'
+import { useAllowance } from 'lib/Erc20/hooks'
 
 
 const widoTheme = {
@@ -50,6 +55,9 @@ const widoTheme = {
   currentColor: 'currentColor'
 }
 
+function noOp() { }
+
+
 export default function WidoPage() {
   return (
     <NoSSR>
@@ -67,6 +75,13 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
   const [inputBalance, setInputBalance] = useState<number>(0);
   const [outputPreview, setOutputPreview] = useState<number>(0);
   const [availableToken, setAvailableToken] = useState<any[]>([])
+  const { waitForTx } = useWaitForTx();
+  const { data: allowance } = useAllowance({ address: inputToken?.address, account: "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD" as Address, chainId: 1 });
+  const { data: signer } = useSigner();
+  const [actionData, setActionData] = useState<string>("")
+
+  const showApproveButton = Number(allowance?.value) < inputBalance;
+  const isDeposit = inputToken?.address !== vaultAddress
 
   const handleChangeInput = ({ currentTarget: { value } }) => {
     setInputBalance(validateInput(value).isValid ? (value as any) : 0);
@@ -75,6 +90,35 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
   const formattedInputBalance = useMemo(() => {
     return parseUnits(validateInput(inputBalance || "0").formatted, inputToken?.decimals);
   }, [inputBalance, asset?.decimals]);
+
+  const {
+    write: approve = noOp,
+    isSuccess: isApproveSuccess,
+    isLoading: isApproveLoading,
+  } = useApproveBalance(inputToken?.address, "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD", 1, {
+    onSuccess: (tx) => {
+      waitForTx(tx, {
+        successMessage: "Assets approved!",
+        errorMessage: "Something went wrong",
+      });
+    },
+    onError: () => {
+      toast.error("User rejected the transaction", {
+        position: "top-center",
+      });
+    },
+  });
+
+  async function handleDeposit() {
+    if ((inputBalance || 0) == 0) return;
+    // Early exit if value is ZERO
+
+    //if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId));
+
+    if (showApproveButton) return approve();
+    // When approved continue to deposit
+    signer.sendTransaction({ data: actionData, to: "0x7Fb69e8fb1525ceEc03783FFd8a317bafbDfD394", value: "0" }).then(res => console.log(res))
+  }
 
 
   useEffect(() => {
@@ -101,7 +145,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
           }
         }))
     }
-    
+
     if (account !== undefined) getAvailableToken();
   }, [account])
 
@@ -116,6 +160,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
         slippagePercentage: 0.01,  // Acceptable max slippage for the swap
         user: account, // Address of user placing the order.
       })
+      setActionData(quoteResult.data)
       setOutputPreview(quoteResult.toTokenAmount ? Number(quoteResult.toTokenAmount) / (10 ** outputToken.decimals) : 0)
     }
     if (account !== undefined) getPreview();
@@ -127,7 +172,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
     <div className="flex flex-col w-full md:w-4/12 gap-8">
       <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
         <InputTokenWithError
-          captionText={"Input"}
+          captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
           onSelectToken={option => setInputToken(option)}
           onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(inputToken.balance) / (10 ** inputToken.decimals) } })}
           chainId={1}
@@ -162,7 +207,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
             </div>
           </div>
           <InputTokenWithError
-            captionText={"Output"}
+            captionText={"Output Amount"}
             onSelectToken={option => setOutputToken(option)}
             onMaxClick={() => { }}
             chainId={1}
@@ -174,6 +219,12 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
             allowSelection={inputToken.address === vault.address}
           />
         </>
+        <MainActionButton
+          label={showApproveButton ? "Approve" : (isDeposit ? "Deposit" : "Withdraw")}
+          type="button"
+          handleClick={handleDeposit}
+          disabled={inputBalance === 0}
+        />
       </section>
     </div>)
 }
