@@ -101,7 +101,8 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
           }
         }))
     }
-    getAvailableToken();
+    
+    if (account !== undefined) getAvailableToken();
   }, [account])
 
   useEffect(() => {
@@ -117,8 +118,10 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
       })
       setOutputPreview(quoteResult.toTokenAmount ? Number(quoteResult.toTokenAmount) / (10 ** outputToken.decimals) : 0)
     }
-    getPreview();
-  }, [inputBalance, inputToken, outputToken])
+    if (account !== undefined) getPreview();
+
+
+  }, [inputBalance, inputToken, outputToken, account])
 
   return (
     <div className="flex flex-col w-full md:w-4/12 gap-8">
@@ -177,41 +180,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
 
 function WidoTest() {
-  const { connector: activeConnector, isConnected, address: account } = useAccount()
-  const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect()
-  const { openConnectModal } = useConnectModal();
-  const { disconnect } = useDisconnect()
-  const [availableToken, setAvailableToken] = useState([])
-
-  const ethProvider = window.ethereum
-    ? new ethers.providers.Web3Provider(window.ethereum as any)
-    : undefined;
-
-  useEffect(() => {
-    async function getAvailableToken() {
-      const balances = await getBalances(
-        account, // Address of the user 
-        [1] // Optional Array of chain ids to filter by.
-      );
-      setAvailableToken(balances.filter(balance => Number(balance.balanceUsdValue) > 10).map(balance => { return { chainId: 1, address: balance.address } }))
-    }
-    getAvailableToken();
-  }, [account])
-
-  return <div className='flex flex-row items-center space-x-8'>
-    <div>
-      <button onClick={() => disconnect()}>Disconnect</button>
-      <WidoWidget
-        onConnectWalletClick={openConnectModal}
-        ethProvider={ethProvider}
-        presetFromToken={{ chainId: 1, address: "0x6B175474E89094C44Da98b954EedeAC495271d0F" }}
-        fromTokens={availableToken}
-        toTokens={[{ chainId: 1, address: "0x5d344226578DC100b2001DA251A4b154df58194f" }]}
-        // width={200}
-        title="Title"
-      />
-    </div>
+  return <div className='flex flex-row items-center'>
     <WidoSweetVault vaultAddress={"0x5d344226578DC100b2001DA251A4b154df58194f"} />
   </div>
 }
