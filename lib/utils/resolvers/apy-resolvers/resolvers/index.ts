@@ -8,3 +8,5 @@ export * from "./multiRewardStaking";
 export * from "./ousd";
 export * from "./llama";
 export * from "./idle";
+export * from "./balancer";
+export * from "./aura";

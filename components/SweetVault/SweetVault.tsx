@@ -33,7 +33,9 @@ const VAULT_APY_RESOLVER = {
   "Yearn": "yearnAsset",
   "Origin": "ousd",
   "Flux": "llama",
-  "Idle": "idle"
+  "Idle": "idle",
+  "Aura": "aura",
+  "Balancer": "balancer",
 }
 
 function getTagColor(tag: VaultTag): string {

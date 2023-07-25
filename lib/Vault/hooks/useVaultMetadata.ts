@@ -6,7 +6,6 @@ import { Address, useContractRead } from "wagmi";
 import TokenMetadata, { addLpMetadata } from "lib/utils/metadata/tokenMetadata";
 import ProtocolMetadata from "lib/utils/metadata/protocolMetadata";
 import StrategyMetadata, { addGenericStrategyDescription } from "lib/utils/metadata/strategyMetadata";
-import { Description } from "@headlessui/react/dist/components/description/description";
 
 function getLocalMetadata(address: string): IpfsMetadata {
   switch (address) {
@@ -256,6 +255,10 @@ function getFactoryMetadata(adapter, token, ipfsMetadata): IpfsMetadata {
     ipfsMetadata.protocol = ProtocolMetadata.aave;
     ipfsMetadata.token = { name: token.symbol, description: "None available" }
     ipfsMetadata.strategy = { name: "Aave Lending", description: addGenericStrategyDescription("lending", "Aave") }
+  } else if (adapter?.name?.includes("Aura")) {
+    ipfsMetadata.protocol = ProtocolMetadata.aura;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Aura Compounding", description: addGenericStrategyDescription("lpCompounding", "Aura") }
   } else if (adapter?.name?.includes("Compound")) {
     ipfsMetadata.protocol = ProtocolMetadata.compound;
     ipfsMetadata.token = { name: token.symbol, description: "None available" }
