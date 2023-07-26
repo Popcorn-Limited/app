@@ -44,7 +44,7 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
   });
   return (
     <>
-      <div className="hidden md:flex flex-row items-center space-x-2 mb-8">
+      <div className="hidden md:flex flex-row items-center space-x-2">
         {supportedNetworks.map((network) => (
           <PseudoRadioButton
             key={network}
