@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 interface ButtonProps {
   label: string;
-  handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  handleClick?: Function
   disabled?: boolean;
   hidden?: boolean;
 }
