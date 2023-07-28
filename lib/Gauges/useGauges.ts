@@ -1,32 +1,32 @@
 import { readContract } from "@wagmi/core";
-import { readContracts } from "wagmi";
+import { readContracts, useContractRead, useContractReads } from "wagmi";
 import { BigNumber } from "ethers";
+import { Pop } from "lib/types";
 
-const CONTROLLER_ADDRESS = "0xB92f555040BE2B901cda1d8a4A342FCe5E67aA16";
-
-export default async function useGauges({ chainId }: { chainId: number }): Promise<{ gauge: string, vault: string }[]> {
-  const n_gauges = await readContract({
-    address: CONTROLLER_ADDRESS,
+export default function useGauges({ address, chainId }: { address: string, chainId: number }): Pop.HookResult<{ address: string, vault: string }[]> {
+  const { data: n_gauges } = useContractRead({
+    address,
     abi: abiController,
     functionName: "n_gauges",
     chainId,
     args: []
-  }) as BigNumber
+  }) as { data: BigNumber, status: string }
 
-  const gauges = await readContracts({
-    contracts: Array(n_gauges.toNumber()).fill(undefined).map((item, idx) => {
+  const { data: gauges } = useContractReads({
+    contracts: Array(n_gauges?.toNumber()).fill(undefined).map((item, idx) => {
       return {
-        address: CONTROLLER_ADDRESS,
+        address,
         abi: abiController,
         functionName: "gauges",
         chainId,
         args: [idx]
       }
-    })
-  }) as string[]
+    }),
+    enabled: !!n_gauges,
+  }) as { data: string[], status: string }
 
-  const areGaugesKilled = await readContracts({
-    contracts: gauges.map((gauge: any) => {
+  const { data: areGaugesKilled } = useContractReads({
+    contracts: gauges?.map((gauge: any) => {
       return {
         address: gauge,
         abi: abiGauge,
@@ -34,13 +34,13 @@ export default async function useGauges({ chainId }: { chainId: number }): Promi
         chainId,
         args: []
       }
-    })
-  }) as boolean[]
+    }),
+    enabled: !!gauges,
+  }) as { data: boolean[], status: string }
 
-  const aliveGauges = gauges.filter((gauge: any, idx: number) => !areGaugesKilled[idx])
-
-  const lpTokens = await readContracts({
-    contracts: aliveGauges.map((gauge: any) => {
+  const aliveGauges = areGaugesKilled ? gauges?.filter((gauge: any, idx: number) => !areGaugesKilled[idx]) : gauges
+  const { data, status } = useContractReads({
+    contracts: aliveGauges?.map((gauge: any) => {
       return {
         address: gauge,
         abi: abiGauge,
@@ -48,10 +48,14 @@ export default async function useGauges({ chainId }: { chainId: number }): Promi
         chainId,
         args: [],
       }
-    })
-  }) as (string | null)[]
+    }),
+    enabled: !!aliveGauges,
+    select: (data) => {
+      return (data as string[]).map((token, i) => { return { address: aliveGauges[i], vault: token } })
+    }
+  }) as { data: { address: string, vault: string }[], status: string }
 
-  return aliveGauges.map((gauge: any, idx: number) => { return { gauge: gauge, vault: lpTokens[idx] } })
+  return { data, status } as Pop.HookResult<{ address: string, vault: string }[]>;
 }
 
 const abiController = [

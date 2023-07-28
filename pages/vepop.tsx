@@ -1,13 +1,13 @@
 import { BigNumber, Contract } from "ethers";
 import useApproveBalance from "hooks/useApproveBalance";
-import { useBalanceOf } from "lib/Erc20/hooks";
+import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { calcUnlockTime, calculateVeOut, getVotePeriodEndTime, useCreateLock } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
 import { RPC_PROVIDERS, formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { FormEventHandler, useState } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useContractRead } from "wagmi";
+import { Address, useAccount, useContractRead } from "wagmi";
 import NoSSR from "react-no-ssr";
 import InputNumber from "components/InputNumber";
 import MainActionButton from "components/MainActionButton";
@@ -18,11 +18,15 @@ import useGauges from "lib/Gauges/useGauges";
 import AnimatedChevron from "components/SweetVault/AnimatedChevron";
 import Title from "components/content/Title";
 import Accordion from "components/Accordion";
+import { NetworkSticker } from "components/NetworkSticker";
+import TokenIcon from "components/TokenIcon";
+import Modal from "components/Modal/Modal";
+import InputTokenWithError from "components/InputTokenWithError";
 
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0xA3f8668Ae522C27BA61C7e230Ff0967B945d675c"
-const GAUGE_CONTROLLER = "0xB92f555040BE2B901cda1d8a4A342FCe5E67aA16"
+const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
+const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
 
 export const useLockedBalanceOf: Pop.Hook<[BigNumber, BigNumber]> = ({ chainId, address, account }) => {
   return useConsistentRepolling(useContractRead({
@@ -41,23 +45,27 @@ export default function VePOP() {
   const { waitForTx } = useWaitForTx();
 
   const { address: account } = useAccount()
+
   const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: vePopBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-  //const gauges = useGauges({ chainId: 5 })
-  //console.log(gauges)
+  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
+
+  const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
 
   const [amount, setAmount] = useState(0);
   const [days, setDays] = useState(0);
 
+  const [showModal, setShowModal] = useState(false);
+
   // const { write: createLock } = useCreateLock(amount, days);
 
   async function testStuff() {
-    // const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
-    // const gaugeAddress = await contract.gauges(1)
-    // console.log({ gaugeAddress })
+    const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
+    const gaugeAddress = await contract.gauges(1)
+    console.log({ gaugeAddress })
 
-    const contract2 = new Contract("0x00A7bDD7400B2F4B93AfD0A44008aA9611ABa495", ["function name() view returns (string)"], RPC_PROVIDERS[5])
+    const contract2 = new Contract(gaugeAddress, ["function name() view returns (string)"], RPC_PROVIDERS[5])
     const lpToken = await contract2.name()
     console.log({ lpToken })
   }
@@ -82,10 +90,10 @@ export default function VePOP() {
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance("0x2eA78fcDc9B30a615a99dD6B8D7233374b23e273", "0xBA12222222228d8Ba445958a75a0704d566BF2C8", 5, {
+  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
-        successMessage: "Assets approved!",
+        successMessage: "POP approved!",
         errorMessage: "Something went wrong",
       });
     },
@@ -106,6 +114,41 @@ export default function VePOP() {
 
   return (
     <NoSSR>
+      <Modal show={showModal} setShowModal={setShowModal} >
+        <>
+          <h2 className="text-2xl mb-8">
+            Lock POP
+          </h2>
+          <InputNumber
+            onChange={handleSetAmount}
+            defaultValue={amount}
+            autoComplete="off"
+            autoCorrect="off"
+            type="text"
+            pattern="^[0-9]*[.,]?[0-9]*$"
+            placeholder={"0.0"}
+            minLength={1}
+            maxLength={79}
+            spellCheck="false"
+          />
+          <InputNumber
+            onChange={handleSetDays}
+            defaultValue={days}
+            autoComplete="off"
+            autoCorrect="off"
+            type="text"
+            pattern="^[0-9]*[.,]?[0-9]*$"
+            placeholder={"0.0"}
+            minLength={1}
+            maxLength={79}
+            spellCheck="false"
+          />
+          <div className="flex flex-row items-center mt-8 space-x-8">
+            <SecondaryActionButton label="Cancel" handleClick={() => setShowModal(false)} />
+            <MainActionButton label="Deposit" handleClick={() => setShowModal(false)} />
+          </div>
+        </>
+      </Modal>
       <div>
         <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
 
@@ -157,7 +200,7 @@ export default function VePOP() {
             </span>
             <div className="flex flex-row items-center space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
-              <TertiaryActionButton label="Lock POP" handleClick={approve} />
+              <TertiaryActionButton label="Lock POP" handleClick={() => setShowModal(true)} />
               <TertiaryActionButton label="Manage Stake" handleClick={approve} />
             </div>
           </div>
@@ -183,49 +226,86 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section>
-          <Accordion
-            header={
-              <div className="flex flex-row flex-wrap items-center justify-between">
+        <section className="space-y-4">
+          {gauges?.length > 0 ? gauges.map((gauge, index) =>
+            <Accordion
+              header={
+                <div className="flex flex-row flex-wrap items-center justify-between">
 
-                <div className="flex items-center justify-between select-none w-full md:w-1/3">
-                  AssetWithName
+                  <div className="flex items-center justify-between select-none w-full md:w-1/3">
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <NetworkSticker chainId={1} />
+                        <TokenIcon token={"0x5271045F7B73c17825A7A7aee6917eE46b0B7520"} chainId={1} imageSize="w-8 h-8" />
+                      </div>
+                      <h2 className="text-gray-900 text-2xl font-bold mt-1">
+                        OHM / FRAX LP
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="">
+                    <p className="text-primaryLight font-normal">Total Votes</p>
+                    <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+                      <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                        845000
+                      </Title>
+                    </p>
+                  </div>
+
+                  <div className="flex flex-row items-center">
+                    <div>
+                      <p className="text-primaryLight font-normal">My Votes</p>
+                      <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+                        <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                          11000
+                        </Title>
+                      </div>
+                    </div>
+                    <div className="">
+                      <p className="text-primaryLight font-normal">My Vote %</p>
+                      <div className="w-40 h-1 bg-black">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
+                    <AnimatedChevron className="w-7 h-7" />
+                  </div>
+
                 </div>
+              }
+            >
+              <div className="flex flex-row space-x-8 mt-8">
+                <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
+                  <span className="flex flex-row items-center justify-between">
+                    <p className="text-primaryLight font-normal">Gauge address:</p>
+                    <p className="font-bold text-primary">
+                      {gauge.address.slice(0, 6)}...{gauge.address.slice(-6)}
+                    </p>
+                  </span>
 
-                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-                  <p className="text-primaryLight font-normal">Total Votes</p>
-                  <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                    <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                      845000
-                    </Title>
-                  </p>
+                  <span className="flex flex-row items-center justify-between">
+                    <p className="text-primaryLight font-normal">Vault address:</p>
+                    <p className="font-bold text-primary">
+                      {gauge.vault.slice(0, 6)}...{gauge.vault.slice(-6)}
+                    </p>
+                  </span>
+
                 </div>
-
-                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-                  <p className="text-primaryLight font-normal">My Votes</p>
-                  <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                    <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
+                  <span className="flex flex-row items-center justify-between">
+                    <p className="text-primaryLight font-normal">Last Epochs Votes:</p>
+                    <p className="font-bold text-primary">
                       11000
-                    </Title>
-                  </div>
+                    </p>
+                  </span>
                 </div>
-
-                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-                  <p className="font-normal text-primaryLight">vAPY</p>
-                  <div className="w-40 h-2 bg-black">
-
-                  </div>
-                </div>
-
-                <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
-                  <AnimatedChevron className="w-7 h-7" />
-                </div>
-
               </div>
-            }
-          >
-
-          </Accordion>
+            </Accordion>
+          )
+            : <p>Loading Gauges...</p>
+          }
         </section>
 
       </div>
