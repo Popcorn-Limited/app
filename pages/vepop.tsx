@@ -58,19 +58,19 @@ export default function VePOP() {
 
   const [showModal, setShowModal] = useState(false);
 
-  // const { write: createLock } = useCreateLock(amount, days);
+  const { write: createLock } = useCreateLock(VOTING_ESCROW, amount, days);
 
   async function testStuff() {
-    const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
-    const gaugeAddress = await contract.gauges(1)
-    console.log({ gaugeAddress })
+    // const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
+    // const gaugeAddress = await contract.gauges(1)
+    // console.log({ gaugeAddress })
 
-    const contract2 = new Contract(gaugeAddress, ["function name() view returns (string)"], RPC_PROVIDERS[5])
-    const lpToken = await contract2.name()
+    const contract2 = new Contract(VOTING_ESCROW, ["function token() view returns (address)"], RPC_PROVIDERS[5])
+    const lpToken = await contract2.token()
     console.log({ lpToken })
   }
 
-  //testStuff()
+  // testStuff()
 
 
   function votingPeriodEnd(): number[] {
@@ -145,7 +145,7 @@ export default function VePOP() {
           />
           <div className="flex flex-row items-center mt-8 space-x-8">
             <SecondaryActionButton label="Cancel" handleClick={() => setShowModal(false)} />
-            <MainActionButton label="Deposit" handleClick={() => setShowModal(false)} />
+            <MainActionButton label="Deposit" handleClick={() => { createLock(); setShowModal(false) }} />
           </div>
         </>
       </Modal>
@@ -188,7 +188,7 @@ export default function VePOP() {
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">Locked Until</p>
-              <p className="font-bold">{lockedBal && lockedBal[1].toString() !== "0" ? new Date(lockedBal[1].toString()).toLocaleString() : "-"}</p>
+              <p className="font-bold">{lockedBal && lockedBal[1].toString() !== "0" ? new Date(Number(lockedBal[1]) * 1000).toLocaleDateString() : "-"}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">My vePOP</p>

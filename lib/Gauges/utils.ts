@@ -17,12 +17,12 @@ export function calculateVeOut(amount: number | string, days: number) {
   return Number(amount) * lockTime / maxTime;
 }
 
-export function useCreateLock(amount: number | string, days: number) {
+export function useCreateLock(address:string, amount: number | string, days: number) {
   const _amount = parseUnits(String(amount));
   const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
 
   const { config } = usePrepareContractWrite({
-    address: "0x664AD9bE8E5dd1EAc99Db1043C6Ce7ADcC4b9484",
+    address,
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
     args: [_amount, unlockTime],
