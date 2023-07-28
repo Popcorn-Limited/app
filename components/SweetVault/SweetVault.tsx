@@ -132,6 +132,7 @@ function SweetVault({
 
           <div className="flex items-center justify-between select-none w-full md:w-1/3">
             <AssetWithName token={token} vault={vaultMetadata} chainId={chainId} />
+            <p>{vault?.address}</p>
           </div>
 
           <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">

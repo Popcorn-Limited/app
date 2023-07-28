@@ -14,11 +14,15 @@ import MainActionButton from "components/MainActionButton";
 import { intervalToDuration } from "date-fns";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import TertiaryActionButton from "components/TertiaryActionButton";
+import useGauges from "lib/Gauges/useGauges";
+import AnimatedChevron from "components/SweetVault/AnimatedChevron";
+import Title from "components/content/Title";
+import Accordion from "components/Accordion";
 
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0x664AD9bE8E5dd1EAc99Db1043C6Ce7ADcC4b9484"
-const GAUGE_CONTROLLER = "0x67e9962450B740EcD04b20E87dA55654dad62c3f"
+const VOTING_ESCROW = "0xA3f8668Ae522C27BA61C7e230Ff0967B945d675c"
+const GAUGE_CONTROLLER = "0xB92f555040BE2B901cda1d8a4A342FCe5E67aA16"
 
 export const useLockedBalanceOf: Pop.Hook<[BigNumber, BigNumber]> = ({ chainId, address, account }) => {
   return useConsistentRepolling(useContractRead({
@@ -36,25 +40,30 @@ export const useLockedBalanceOf: Pop.Hook<[BigNumber, BigNumber]> = ({ chainId, 
 export default function VePOP() {
   const { waitForTx } = useWaitForTx();
 
-
   const { address: account } = useAccount()
   const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: vePopBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-
+  //const gauges = useGauges({ chainId: 5 })
+  //console.log(gauges)
 
   const [amount, setAmount] = useState(0);
   const [days, setDays] = useState(0);
 
-  const { write: createLock } = useCreateLock(amount, days);
+  // const { write: createLock } = useCreateLock(amount, days);
 
   async function testStuff() {
-    const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
-    const gaugeAddress = await contract.gauges(0)
-    console.log({ gaugeAddress })
+    // const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
+    // const gaugeAddress = await contract.gauges(1)
+    // console.log({ gaugeAddress })
+
+    const contract2 = new Contract("0x00A7bDD7400B2F4B93AfD0A44008aA9611ABa495", ["function name() view returns (string)"], RPC_PROVIDERS[5])
+    const lpToken = await contract2.name()
+    console.log({ lpToken })
   }
 
-  testStuff()
+  //testStuff()
+
 
   function votingPeriodEnd(): number[] {
     const periodEnd = getVotePeriodEndTime();
@@ -175,7 +184,48 @@ export default function VePOP() {
         </section>
 
         <section>
-          
+          <Accordion
+            header={
+              <div className="flex flex-row flex-wrap items-center justify-between">
+
+                <div className="flex items-center justify-between select-none w-full md:w-1/3">
+                  AssetWithName
+                </div>
+
+                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+                  <p className="text-primaryLight font-normal">Total Votes</p>
+                  <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+                    <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                      845000
+                    </Title>
+                  </p>
+                </div>
+
+                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+                  <p className="text-primaryLight font-normal">My Votes</p>
+                  <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+                    <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                      11000
+                    </Title>
+                  </div>
+                </div>
+
+                <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+                  <p className="font-normal text-primaryLight">vAPY</p>
+                  <div className="w-40 h-2 bg-black">
+
+                  </div>
+                </div>
+
+                <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
+                  <AnimatedChevron className="w-7 h-7" />
+                </div>
+
+              </div>
+            }
+          >
+
+          </Accordion>
         </section>
 
       </div>
