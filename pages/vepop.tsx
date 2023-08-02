@@ -21,8 +21,8 @@ import Accordion from "components/Accordion";
 import { NetworkSticker } from "components/NetworkSticker";
 import TokenIcon from "components/TokenIcon";
 import Modal from "components/Modal/Modal";
-import InputTokenWithError from "components/InputTokenWithError";
-
+import Slider from 'rc-slider';
+import Gauge from "components/gauges/Gauge";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -55,6 +55,10 @@ export default function VePOP() {
 
   const [amount, setAmount] = useState(0);
   const [days, setDays] = useState(0);
+
+  const [avVotes, setAvVotes] = useState(10000);
+  const [votes, setVotes] = useState(gauges?.map(gauge => 0));
+
 
   const [showModal, setShowModal] = useState(false);
 
@@ -111,6 +115,15 @@ export default function VePOP() {
   const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setDays(Number(value));
   };
+
+  function handleAvVotes(val: number, index: number) {
+    const newAvVotes = avVotes - val
+    setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
+
+    const newVotes = [...votes]
+    newVotes[index] = val
+    setVotes(newVotes)
+  }
 
   return (
     <NoSSR>
@@ -226,87 +239,27 @@ export default function VePOP() {
           </div>
         </section>
 
+        <section className="my-5">
+
+        </section>
+
         <section className="space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Accordion
-              header={
-                <div className="flex flex-row flex-wrap items-center justify-between">
-
-                  <div className="flex items-center justify-between select-none w-full md:w-1/3">
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <NetworkSticker chainId={1} />
-                        <TokenIcon token={"0x5271045F7B73c17825A7A7aee6917eE46b0B7520"} chainId={1} imageSize="w-8 h-8" />
-                      </div>
-                      <h2 className="text-gray-900 text-2xl font-bold mt-1">
-                        OHM / FRAX LP
-                      </h2>
-                    </div>
-                  </div>
-
-                  <div className="">
-                    <p className="text-primaryLight font-normal">Total Votes</p>
-                    <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                      <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                        845000
-                      </Title>
-                    </p>
-                  </div>
-
-                  <div className="flex flex-row items-center">
-                    <div>
-                      <p className="text-primaryLight font-normal">My Votes</p>
-                      <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-                        <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                          11000
-                        </Title>
-                      </div>
-                    </div>
-                    <div className="">
-                      <p className="text-primaryLight font-normal">My Vote %</p>
-                      <div className="w-40 h-1 bg-black">
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
-                    <AnimatedChevron className="w-7 h-7" />
-                  </div>
-
-                </div>
-              }
-            >
-              <div className="flex flex-row space-x-8 mt-8">
-                <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
-                  <span className="flex flex-row items-center justify-between">
-                    <p className="text-primaryLight font-normal">Gauge address:</p>
-                    <p className="font-bold text-primary">
-                      {gauge.address.slice(0, 6)}...{gauge.address.slice(-6)}
-                    </p>
-                  </span>
-
-                  <span className="flex flex-row items-center justify-between">
-                    <p className="text-primaryLight font-normal">Vault address:</p>
-                    <p className="font-bold text-primary">
-                      {gauge.vault.slice(0, 6)}...{gauge.vault.slice(-6)}
-                    </p>
-                  </span>
-
-                </div>
-                <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
-                  <span className="flex flex-row items-center justify-between">
-                    <p className="text-primaryLight font-normal">Last Epochs Votes:</p>
-                    <p className="font-bold text-primary">
-                      11000
-                    </p>
-                  </span>
-                </div>
-              </div>
-            </Accordion>
+            <Gauge gauge={gauge} index={index} avVotes={avVotes} handleChange={handleAvVotes} />
           )
             : <p>Loading Gauges...</p>
           }
         </section>
+        <div className="fixed bottom-10 w-2/3">
+          <div className="z-10 mx-auto w-104 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center">
+            <p className="mr-10 mt-1">
+              Voting power used: <span className="text-[#05BE64]">{((1 - avVotes / 10_000) * 100).toFixed(2)}%</span>
+            </p>
+            <button className="bg-[#FEE25D] rounded-lg py-3 px-2 text-center font-medium text-black">
+              Submit Votes
+            </button>
+          </div>
+        </div>
 
       </div>
     </NoSSR >

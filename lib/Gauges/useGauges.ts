@@ -1,9 +1,14 @@
-import { readContract } from "@wagmi/core";
-import { readContracts, useContractRead, useContractReads } from "wagmi";
+import { useContractRead, useContractReads } from "wagmi";
 import { BigNumber } from "ethers";
 import { Pop } from "lib/types";
 
-export default function useGauges({ address, chainId }: { address: string, chainId: number }): Pop.HookResult<{ address: string, vault: string }[]> {
+export interface Gauge {
+  address: string;
+  vault: string;
+  chainId: number;
+}
+
+export default function useGauges({ address, chainId }: { address: string, chainId: number }): Pop.HookResult<Gauge[]> {
   const { data: n_gauges } = useContractRead({
     address,
     abi: abiController,
@@ -51,11 +56,11 @@ export default function useGauges({ address, chainId }: { address: string, chain
     }),
     enabled: !!aliveGauges,
     select: (data) => {
-      return (data as string[]).map((token, i) => { return { address: aliveGauges[i], vault: token } })
+      return (data as string[]).map((token, i) => { return { address: aliveGauges[i], vault: token, chainId: chainId } })
     }
-  }) as { data: { address: string, vault: string }[], status: string }
+  }) as { data: Gauge[], status: string }
 
-  return { data, status } as Pop.HookResult<{ address: string, vault: string }[]>;
+  return { data, status } as Pop.HookResult<Gauge[]>;
 }
 
 const abiController = [

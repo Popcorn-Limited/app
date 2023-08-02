@@ -51,7 +51,7 @@ const GoogleAnalyticsPrompt = () => {
         as={React.Fragment}
       >
         <div className="w-full fixed bottom-0 left-0 z-40">
-          <div className="bg-white w-full py-6 px-8 rounded-t-4xl md:rounded-t-lg shadow-custom-2 flex flex-col md:flex-row items-center justify-center mx-auto space-y-6 md:space-y-0 md:space-x-10">
+          <div className="bg-white w-full py-6 px-8 rounded-t-4xl md:rounded-t-lg shadow-custom flex flex-col md:flex-row items-center justify-center mx-auto space-y-6 md:space-y-0 md:space-x-10">
             <p className="text-primaryDark">
               This site uses Google analytics to enhance your experience, understand site usage, <br /> and assist in
               creating a better experience.

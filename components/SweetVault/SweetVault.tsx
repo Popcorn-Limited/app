@@ -48,19 +48,7 @@ const PROTOCOL_ICONS = {
   "Balancer": "balancer",
 }
 
-function getTagColor(tag: VaultTag): string {
-  switch (tag) {
-    case VaultTag.lsd:
-    default:
-      return "bg-teal-500 text-gray-800";
-  }
-}
-
-function TagBatch({ tag }: { tag: VaultTag }): JSX.Element {
-  return <div className={`${getTagColor(tag)} bg-opacity-[15%] py-1 px-3 rounded-md`}>{tag[0].toUpperCase() + tag.slice(1)}</div>
-}
-
-function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vault: VaultMetadata, chainId: ChainId }) {
+export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vault: VaultMetadata, chainId: ChainId }) {
   return <div className="flex items-center gap-4">
     <div className="relative">
       <NetworkSticker chainId={chainId} />
@@ -76,11 +64,6 @@ function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vau
       />
       <p className="mt-1 text-[#55503D] font-medium">{vault?.metadata?.protocol?.name}</p>
     </div>
-    {/* {vault?.metadata?.tags && vault?.metadata?.tags.length > 0 &&
-      <>
-        {vault?.metadata?.tags.map((tag) => <TagBatch key={tag} tag={tag} />)}
-      </>
-    } */}
   </div>
 }
 

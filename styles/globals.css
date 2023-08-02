@@ -260,6 +260,11 @@ input[type="number"] {
   left: 40%;
 }
 
+
+.rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+  box-shadow: none !important;
+}
+
 .__react_component_tooltip {
   padding: 18px 24px !important;
 }
