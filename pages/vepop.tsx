@@ -24,6 +24,7 @@ import Modal from "components/Modal/Modal";
 import Slider from 'rc-slider';
 import Gauge from "components/vepop/Gauge";
 import LockModal from "components/vepop/modals/lock/LockModal";
+import ManageLockModal from "components/vepop/modals/manage/ManageLockModal";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -56,7 +57,8 @@ export default function VePOP() {
   const [avVotes, setAvVotes] = useState(10000);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
 
-  const [showModal, setShowModal] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
+  const [showMangementModal, setShowMangementModal] = useState(false);
 
 
   async function testStuff() {
@@ -114,7 +116,8 @@ export default function VePOP() {
 
   return (
     <NoSSR>
-      <LockModal show={[showModal, setShowModal]}/>
+      <LockModal show={[showLockModal, setShowLockModal]}/>
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]}/>
       <div>
         <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
 
@@ -166,8 +169,8 @@ export default function VePOP() {
             </span>
             <div className="flex flex-row items-center space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
-              <SecondaryActionButton label="Lock POP" handleClick={() => setShowModal(true)} />
-              <SecondaryActionButton label="Manage Stake" handleClick={approve} />
+              <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} />
+              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
             </div>
           </div>
 

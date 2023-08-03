@@ -1,6 +1,6 @@
 import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import {nextThursday} from "date-fns"
+import { nextThursday } from "date-fns"
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
@@ -10,6 +10,12 @@ export function calcUnlockTime(days: number, start = Date.now()): number {
   return Math.floor(unlockTime / week) * week * 1000;
 }
 
+export function calcDaysToUnlock(unlockTime: number): number {
+  const day = 86400;
+  const now = Math.floor(Date.now() / 1000)
+  return Math.floor((unlockTime - now) / day)
+}
+
 export function calculateVeOut(amount: number | string, days: number) {
   const week = 7;
   const maxTime = 52;
@@ -17,7 +23,7 @@ export function calculateVeOut(amount: number | string, days: number) {
   return Number(amount) * lockTime / maxTime;
 }
 
-export function useCreateLock(address:string, amount: number | string, days: number) {
+export function useCreateLock(address: string, amount: number | string, days: number) {
   const _amount = parseUnits(String(amount));
   const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
 
@@ -26,6 +32,48 @@ export function useCreateLock(address:string, amount: number | string, days: num
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
     args: [_amount, unlockTime],
+    chainId: Number(5),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useIncreaseLockAmount(address: string, amount: number | string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function increase_amount(uint256) external"],
+    functionName: "increase_amount",
+    args: [parseUnits(String(amount))],
+    chainId: Number(5),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useIncreaseLockTime(address: string, unlockTime: number) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function increase_unlock_time(uint256) external"],
+    functionName: "increase_unlock_time",
+    args: [unlockTime],
+    chainId: Number(5),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useWithdrawLock(address: string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function withdraw() external"],
+    functionName: "withdraw",
+    args: [],
     chainId: Number(5),
   });
 

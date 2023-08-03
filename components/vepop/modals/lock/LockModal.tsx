@@ -3,7 +3,7 @@ import VotingPowerInfo from "./VotingPowerInfo";
 import LockPopInterface from "./LockPopInterface";
 import LockPreview from "./LockPreview";
 import LockPopInfo from "./LockPopInfo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainActionButton from "components/MainActionButton";
 import TertiaryActionButton from "components/TertiaryActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
@@ -52,6 +52,11 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
   const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance.value || 0);
 
+  useEffect(() => {
+    if (!showModal) setStep(0)
+  },
+    [showModal]
+  )
 
   async function handleLock() {
     if ((amount || 0) == 0) return;

@@ -23,7 +23,7 @@ const TertiaryActionButton: React.FC<ButtonProps> = ({ label, handleClick, hidde
     <button
       className={`${
         hidden ? "hidden" : ""
-      } w-full flex justify-between items-center text-primary hover:text-black transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
+      } w-full flex justify-between items-center text-primary hover:text-black transition-all ease-in-out font-semibold leading-4 md:leading-7 relative`}
       onMouseEnter={animateArrow}
       onClick={handleClick}
     >
