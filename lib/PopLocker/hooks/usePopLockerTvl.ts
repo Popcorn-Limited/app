@@ -19,7 +19,7 @@ export const usePopLockerTvl: Pop.Hook<BigNumberWithFormatted> = ({ chainId, add
 
   const tvl =
     price?.value && popLockerSuppy
-      ? price?.value?.mul(popLockerSuppy as unknown as BigNumber).div(parseEther("1"))
+      ? price?.value * (popLockerSuppy as unknown as BigNumber) / parseEther("1")
       : undefined;
 
 

@@ -5,7 +5,7 @@ import { useContractWrite, usePrepareContractWrite } from "wagmi";
 
 // TODO: remove hard-coded gas
 // NOTE: Fails - out of gas from anvil local if lower that this
-const GAS_LIMIT = constants.Zero.add(1000000);
+const GAS_LIMIT = constants.Zero + 1000000;
 
 const useMainAction = (
   address: string,
@@ -24,8 +24,8 @@ const useMainAction = (
     overrides:
       chainId === ChainId.Localhost
         ? {
-            gasLimit: GAS_LIMIT,
-          }
+          gasLimit: GAS_LIMIT,
+        }
         : {},
   });
 

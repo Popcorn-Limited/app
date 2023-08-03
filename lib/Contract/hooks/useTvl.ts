@@ -44,7 +44,7 @@ export const useTvl: Pop.Hook<BigNumberWithFormatted> = ({ chainId, address, res
 
   const tvl =
     price?.value && balance
-      ? price?.value?.mul(balance as unknown as BigNumber).div(parseEther("1"))
+      ? price?.value * (balance as unknown as BigNumber) / parseEther("1")
       : undefined;
 
   const status = useMultiStatus([priceStatus, !!_tvlResolver ? secondaryBalanceStatus : primaryBalanceStatus]);

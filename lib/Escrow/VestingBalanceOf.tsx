@@ -40,7 +40,7 @@ const eth_call =
       });
 
       const vestingBalance = useMemo(() => {
-        const bal = (balance?.value || constants.Zero).sub(claimableBalance?.value || constants.Zero);
+        const bal = (balance?.value || constants.Zero) - (claimableBalance?.value || constants.Zero);
         return {
           value: bal,
           formatted: formatAndRoundBigNumber(bal, 18),

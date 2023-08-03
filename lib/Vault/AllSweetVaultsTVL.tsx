@@ -65,7 +65,7 @@ export function SweetVaultTVL({
   })
 
   const price: BigNumberWithFormatted & { decimals?: number } =
-    vaultPrice?.value.gt(0) ? vaultPrice : tokenPrice
+    Number(vaultPrice?.value) > 0 ? vaultPrice : tokenPrice
 
   return children(
     ((Number((price?.value as any) || 0) / 10 ** (price?.decimals || 18)) * Number(totalAssets?.value || 0)) /

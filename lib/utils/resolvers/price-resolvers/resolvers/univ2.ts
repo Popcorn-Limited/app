@@ -29,18 +29,18 @@ export const univ2 = async (address: string, chainId: ChainId, rpc) => {
   ]);
 
   const valueOfToken0 = token0Price.value
-    .mul(parseUnits("1", 18 - token0Price.decimals))
-    .mul(amount0Current.mul(parseUnits("1", 18 - token0Price.decimals)))
-    .div(parseEther("1"));
+    * parseUnits("1", 18 - token0Price.decimals)
+    * amount0Current * parseUnits("1", 18 - token0Price.decimals)
+    / parseEther("1");
 
   const valueOfToken1 = token1Price.value
-    .mul(parseUnits("1", 18 - token1Price.decimals))
-    .mul(amount1Current.mul(parseUnits("1", 18 - token1Price.decimals)))
-    .div(parseEther("1"));
+    * parseUnits("1", 18 - token1Price.decimals)
+    * amount1Current * parseUnits("1", 18 - token1Price.decimals)
+    / parseEther("1");
 
-  const valueOfUnderlying = valueOfToken0.add(valueOfToken1);
+  const valueOfUnderlying = valueOfToken0 + valueOfToken1;
 
-  const pricePerShare = parseEther("1").mul(valueOfUnderlying).div(totalSupply);
+  const pricePerShare = parseEther("1") * valueOfUnderlying / totalSupply;
 
   // console.log({
   //   address,

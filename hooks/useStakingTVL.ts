@@ -18,7 +18,7 @@ export async function getStakingTVL(
     rpcProvider,
   );
   const totalStake = await popLocker.lockedSupply();
-  return totalStake.mul(popPrice).div(constants.WeiPerEther);
+  return totalStake * popPrice / constants.WeiPerEther;
 }
 
 export default function useStakingTVL(chainId: ChainId): SWRResponse<BigNumber, Error> {

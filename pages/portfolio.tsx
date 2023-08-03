@@ -24,7 +24,7 @@ const sumUpBalances = (balances = {}, selectedNetworks: Array<any> = []) =>
   Object.keys(balances).reduce((total, key) => {
     const asset = balances[key];
     const value = selectedNetworks.includes(asset.chainId) ? asset.value : 0;
-    return total.add(value);
+    return total + value;
   }, constants.Zero);
 
 const filterByChainId = (contracts: Array<any>, chainId, selectedNetworks) =>
@@ -107,7 +107,7 @@ export const PortfolioPage: NextPage = () => {
   }, [account]);
 
   const addToBalances = (key, type: "claimable" | "pop" | "vesting" | "sweetVaults", chainId: number, value?: BigNumber) => {
-    if (value?.gt(0)) {
+    if (Number(value) > 0) {
       setBalances((balances) => ({
         ...balances,
         [type]: {
@@ -124,8 +124,8 @@ export const PortfolioPage: NextPage = () => {
     vesting: sumUpBalances(balances.vesting, selectedNetworks),
     claimable: sumUpBalances(balances.claimable, selectedNetworks),
   };
-  const rewardsBalance = totalBalance.claimable.add(totalBalance.vesting);
-  const networth = totalBalance.pop.add(totalBalance.sweetVaults).add(rewardsBalance);
+  const rewardsBalance = totalBalance.claimable + totalBalance.vesting;
+  const networth = totalBalance.pop + totalBalance.sweetVaults + rewardsBalance;
 
   return (
     <NoSSR>

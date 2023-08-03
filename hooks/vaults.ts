@@ -8,7 +8,7 @@ import { useTypedReadCall } from "./wagmi";
 
 // TODO: remove hard-coded gas
 // NOTE: Fails - out of gas from anvil local if lower that this
-const GAS_LIMIT = constants.Zero.add(1000000);
+const GAS_LIMIT = constants.Zero + 1000000;
 
 export const useDepositVaultBalance = (
   vaultAddress: string,

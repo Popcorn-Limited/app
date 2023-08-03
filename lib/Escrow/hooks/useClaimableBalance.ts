@@ -35,17 +35,17 @@ export const useClaimableBalance: Pop.Hook<BigNumberWithFormatted> = ({
     })),
   }) as Pop.HookResult<BigNumber[]>;
 
-  const value = data?.reduce((acc, curr) => acc.add(curr || 0), ZERO) || ZERO;
+  const value = data?.reduce((acc, curr) => acc + (curr || 0), ZERO) || ZERO;
   return {
     data: data
       ? {
-          value,
-          formatted: data && formatAndRoundBigNumber(value as BigNumber, 18),
-        }
+        value,
+        formatted: data && formatAndRoundBigNumber(value as BigNumber, 18),
+      }
       : {
-          value: constants.Zero,
-          formatted: "0",
-        },
+        value: constants.Zero,
+        formatted: "0",
+      },
     status,
   } as Pop.HookResult<BigNumberWithFormatted>;
 };

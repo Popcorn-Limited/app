@@ -25,14 +25,14 @@ export const vault = async (address: string, chainId: ChainId, rpc) => {
 
   let shareRate = ZERO;
   try {
-    shareRate = totalAssets.mul(parseUnits(String(decimals))).div(totalSupply);
-  } catch (_) {}
+    shareRate = totalAssets * parseUnits(String(decimals)) / totalSupply;
+  } catch (_) { }
 
   // use llama to fetch price and multiply by `shareRate`
   const llamaTokenPrice = await defi_llama(asset, chainId);
   const { value: tokenPrice } = llamaTokenPrice;
 
-  const value = ZERO.add(tokenPrice.mul(shareRate).div(parseUnits(String(decimals))));
+  const value = ZERO + tokenPrice * shareRate / parseUnits(String(decimals));
 
   return { value, decimals };
 };

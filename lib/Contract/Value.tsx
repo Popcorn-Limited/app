@@ -23,13 +23,13 @@ const eth_call = (Component: Pop.FC<any>) =>
     const value =
       balance && price
         ? balance
-            .mul(price)
-            .mul(parseUnits("1", decimals == 6 ? 12 : 0))
-            .div(parseUnits("1", 18))
+        * price
+        * parseUnits("1", decimals == 6 ? 12 : 0)
+        / parseUnits("1", 18)
         : constants.Zero;
 
     useEffect(() => {
-      if (status === "success" && value.gt(0)) {
+      if (status === "success" && Number(value) > 0) {
         callback?.(value);
       }
     }, [status, value._hex, decimals, price]);

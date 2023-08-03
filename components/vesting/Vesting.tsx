@@ -25,7 +25,7 @@ export default function Vesting({ chainId, addClaimable, isNotAvailable }: Vesti
   const [totalClaimable, setTotalClaimable] = useState(constants.Zero);
   const [totalVesting, setTotalVesting] = useState(constants.Zero);
   const escrowsIds: string[] = escrows
-    ?.filter((escrow) => escrow.claimable.gt(constants.Zero))
+    ?.filter((escrow) => Number(escrow.claimable) > 0)
     .map((escrow) => escrow.id);
 
   useEffect(() => {
@@ -33,10 +33,10 @@ export default function Vesting({ chainId, addClaimable, isNotAvailable }: Vesti
       status === "success" &&
       !!escrows &&
       escrows.length > 0 &&
-      (totalClaimable.eq(constants.Zero) || totalVesting.eq(constants.Zero))
+      (totalClaimable===constants.Zero || totalVesting===constants.Zero)
     ) {
-      const claimable = escrows.reduce((acc, curr) => acc.add(curr.claimable || 0), constants.Zero) || constants.Zero;
-      const vesting = escrows.reduce((acc, curr) => acc.add(curr.vesting || 0), constants.Zero) || constants.Zero;
+      const claimable = escrows.reduce((acc, curr) => acc+(curr.claimable || 0), constants.Zero) || constants.Zero;
+      const vesting = escrows.reduce((acc, curr) => acc+(curr.vesting || 0), constants.Zero) || constants.Zero;
       addClaimable(claimable);
       setTotalClaimable(claimable);
       setTotalVesting(vesting);
@@ -60,7 +60,7 @@ export default function Vesting({ chainId, addClaimable, isNotAvailable }: Vesti
           {/*eslint-enable */}
         </ContentLoader>
       </div>
-      <div className={`flex flex-col h-full ${totalClaimable.eq(constants.Zero) ? "hidden" : ""}`}>
+      <div className={`flex flex-col h-full ${totalClaimable===constants.Zero ? "hidden" : ""}`}>
         <div className="flex flex-row items-center mt-4">
           <div className="w-4 h-4 mr-4 relative">
             <Image src={networkLogos[chainId]} alt={ChainId[chainId]} fill />

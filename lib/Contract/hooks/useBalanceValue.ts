@@ -30,9 +30,9 @@ export const useBalanceValue: Pop.Hook<BigNumberWithFormatted> = ({
     if (typeof enabled === "boolean" && !enabled) return empty;
     if (price && balance) {
       const value = balance
-        .mul(price)
-        .mul(parseUnits("1", decimals == 6 ? 12 : 0))
-        .div(parseUnits("1", 18));
+        * price
+        * parseUnits("1", decimals == 6 ? 12 : 0)
+        / parseUnits("1", 18);
       return {
         data: { value, formatted: value && formatAndRoundBigNumber(value, 18) },
         status: "success",

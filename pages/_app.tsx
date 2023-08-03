@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { GlobalLinearProgressAndLoading } from "components/GlobalLinearProgressAndLoading";
 import { StateProvider } from "context/store";
 import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, goerli, localhost, bsc, fantom } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
@@ -19,7 +19,7 @@ import "../styles/globals.css";
 import { NetworthContextProvider } from "context/Networth";
 import OfacCheck from "components/OfacCheck";
 
-const { chains, provider, webSocketProvider } = configureChains(
+const { chains, publicClient, webSocketPublicClient  } = configureChains(
   [
     mainnet,
     polygon,
@@ -43,14 +43,17 @@ const { chains, provider, webSocketProvider } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Popcorn",
+  projectId: "b2f883ab9ae2fbb812cb8e0d83efea7b",
   chains,
 });
 
-const wagmiClient = createClient({
+
+
+const wagmiClient = createConfig({
   autoConnect: true,
   connectors,
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
 });
 
 const { title, description, socialShareImage } = {
@@ -125,7 +128,7 @@ export default function MyApp(props) {
         <link rel="preconnect" href="https://fonts.gstatic.com" />
       </Head>
       <StateProvider>
-        <WagmiConfig client={wagmiClient}>
+        <WagmiConfig config={wagmiClient}>
           <GlobalLinearProgressAndLoading loading={loading} setLoading={setLoading} />
           <FeatureToggleProvider>
             <RainbowKitProvider chains={chains}>

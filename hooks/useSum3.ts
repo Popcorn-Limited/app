@@ -23,7 +23,7 @@ export const useSum = ({
     if (!amount || !!_expected == false) return;
     if (typeof _expected !== "number") return;
     count.current++;
-    sum.current = sum.current.add(amount);
+    sum.current = sum.current + amount;
   };
 
   useEffect(() => {

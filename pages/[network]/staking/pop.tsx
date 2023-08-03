@@ -208,11 +208,11 @@ export default function Index(): JSX.Element {
                       checked={restake}
                       onChange={() => setRestake(!restake)}
                       className={`mr-4 rounded h-5 w-5 border-customLightGray 
-                    ${restake && !lockedBalances?.unlockable.eq(constants.Zero)
+                    ${restake && !lockedBalances?.unlockable === constants.Zero
                           ? "focus:ring-blue-500 text-blue-600"
                           : "focus:ring-gray-500 text-primaryDark"
                         }`}
-                      disabled={lockedBalances?.unlockable.eq(constants.Zero)}
+                      disabled={lockedBalances?.unlockable === constants.Zero}
                     />
                     <p className="text-primaryDark">Restake POP</p>
                   </div>
@@ -221,7 +221,7 @@ export default function Index(): JSX.Element {
                   <MainActionButton
                     label={`${restake ? "Restake" : "Withdraw"} POP`}
                     handleClick={restakeLock}
-                    disabled={lockedBalances?.unlockable.eq(constants.Zero)}
+                    disabled={lockedBalances?.unlockable === constants.Zero}
                   />
                 </div>
               </div>

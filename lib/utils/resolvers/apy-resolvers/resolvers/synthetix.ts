@@ -29,17 +29,17 @@ export async function synthetix(address, chainId, rpc?): Promise<{ value: BigNum
     resolve_price({ address: rewardsToken, chainId, rpc }),
   ]);
 
-  const totalSupplyValue = totalSupply.mul(stakingTokenPrice.value).div(parseUnits("1", stakingTokenPrice.decimals));
+  const totalSupplyValue = totalSupply * stakingTokenPrice.value / parseUnits("1", stakingTokenPrice.decimals);
 
   const rewardsValuePerPeriod = rewardForDuration
-    .mul(rewardsTokenPrice.value)
-    .div(parseUnits("1", rewardsTokenPrice.decimals));
+    * rewardsTokenPrice.value
+    / parseUnits("1", rewardsTokenPrice.decimals);
 
-  const rewardsValuePerYear = BigNumber.from(365 * 24 * 60 * 60)
-    .div(rewardsDuration)
-    .mul(rewardsValuePerPeriod);
+  const rewardsValuePerYear = BigInt(365 * 24 * 60 * 60)
+    / rewardsDuration
+    * rewardsValuePerPeriod;
 
-  const apy = rewardsValuePerYear.mul(parseEther("100")).div(totalSupplyValue);
+  const apy = rewardsValuePerYear * parseEther("100") / totalSupplyValue;
 
   return { value: apy, decimals: 18 };
 }

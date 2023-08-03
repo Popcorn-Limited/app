@@ -12,7 +12,7 @@ export const getItemKey = (token: any) => `${token.chainId}:${token.__alias}:${t
 function sortBalDesc(a, b, balances: BalanceByKey): 0 | 1 | -1 {
   const aValue = balances[getItemKey(a)]?.value;
   const bValue = balances[getItemKey(b)]?.value;
-  return bValue?.gt(aValue || 0) ? 1 : -1;
+  return Number(bValue) > Number(aValue || 0) ? 1 : -1;
 }
 
 function sortBalAsc(a, b, balances: BalanceByKey): 0 | 1 | -1 {

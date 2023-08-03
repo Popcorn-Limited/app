@@ -19,7 +19,7 @@ export const useTokenEmission: Pop.Hook<BigNumberWithFormatted> = ({ chainId, ad
     scopeKey: `getRewardForDuration:${chainId}:${address}`,
     enabled: !disabled && enabled,
     select: (data) => {
-      const value = (data as BigNumber).isZero() ? BigNumber.from(0) : (data as BigNumber).div(7);
+      const value = (data as BigNumber).isZero() ? 0 : (data as BigNumber) / 7;
       return {
         value: value,
         formatted: formatAndRoundBigNumber(value, 18),

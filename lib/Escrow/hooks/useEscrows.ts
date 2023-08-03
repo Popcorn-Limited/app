@@ -43,9 +43,8 @@ export const useEscrows: Pop.Hook<Escrow[]> = ({
           balance: escrow[4],
           account: escrow[5],
           claimable: !!claimableBalances && claimableBalances.length > 0 ? claimableBalances[i] : constants.Zero,
-          vesting: escrow[4].sub(
-            !!claimableBalances && claimableBalances.length > 0 ? claimableBalances[i] : constants.Zero,
-          ),
+          vesting: escrow[4] - (
+            !!claimableBalances && claimableBalances.length) > 0 ? claimableBalances[i] : constants.Zero,
         };
       });
     },

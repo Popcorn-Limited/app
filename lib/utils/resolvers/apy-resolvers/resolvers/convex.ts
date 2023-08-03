@@ -24,12 +24,12 @@ export async function convex(address, chainId, rpc?): Promise<{ value: BigNumber
   ]);
   const totalSupply =
     chainId === ChainId.Optimism
-      ? (await popContract.balanceOf(address)).sub(parseEther("1250"))
+      ? (await popContract.balanceOf(address)) - parseEther("1250")
       : await contract.totalSupply();
 
-  const rewardsValuePerYear = BigNumber.from(365 * 24 * 60 * 60)
-    .div(rewardsDuration)
-    .mul(rewardForDuration);
-  const apy = rewardsValuePerYear.mul(parseEther("100")).div(totalSupply);
+  const rewardsValuePerYear = BigInt(365 * 24 * 60 * 60)
+    / rewardsDuration
+    * rewardForDuration;
+  const apy = rewardsValuePerYear * parseEther("100") / totalSupply;
   return { value: apy, decimals: 18 };
 }

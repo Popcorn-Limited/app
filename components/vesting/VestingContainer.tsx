@@ -24,7 +24,7 @@ export default function VestingContainer({ selectedNetworks }: VestingContainerP
 
   return (
     <>
-      <div className={`mb-4 ${!loading && sum?.eq(constants.Zero) ? "" : "hidden"}`}>
+      <div className={`mb-4 ${!loading && sum === constants.Zero ? "" : "hidden"}`}>
         <NotAvailable
           title="No Records Available"
           body="No vesting records available"
@@ -36,7 +36,7 @@ export default function VestingContainer({ selectedNetworks }: VestingContainerP
           key={chain + "Vesting"}
           chainId={chain}
           addClaimable={add}
-          isNotAvailable={!loading && sum?.eq(constants.Zero)}
+          isNotAvailable={!loading && sum === constants.Zero}
         />
       ))}
     </>

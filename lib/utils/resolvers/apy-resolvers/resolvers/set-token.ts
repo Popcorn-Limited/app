@@ -21,17 +21,17 @@ export async function set_token(address, chainId, rpc): Promise<{ value: BigNumb
   );
 
   const componentValues = prices.reduce((acc, [component, price]) => {
-    const value = price.value.mul(quantities[component]).div(parseEther("1"));
+    const value = price.value * quantities[component] / parseEther("1");
     return {
       ...acc,
       [component]: value,
-      total: acc?.total ? acc.total.add(value) : value,
+      total: acc?.total ? acc.total + value : value,
     };
   }, {});
 
   const apy = apys.reduce(
     (acc, [component, apy], index) =>
-      acc.add(componentValues[component].mul(apy).div(componentValues.total).mul(parseUnits("1", 2))),
+      acc + componentValues[component] * apy / componentValues.total * parseUnits("1", 2),
     parseEther("0"),
   );
 

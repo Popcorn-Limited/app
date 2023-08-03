@@ -117,9 +117,9 @@ const Products = () => {
                     ? `$${NumberFormatter.format(
                       parseInt(
                         formatUnits(
-                          constants.Zero.add(ethStakingTVL?.value || constants.Zero).add(
-                            polyStakingTVL?.value || constants.Zero).add(
-                              opStakingTVL?.value || constants.Zero))))}`
+                          constants.Zero + (ethStakingTVL?.value || constants.Zero) +
+                          (polyStakingTVL?.value || constants.Zero) +
+                          (opStakingTVL?.value || constants.Zero))))}`
                     : "$0",
                 infoIconProps: {
                   title: "Total Value Locked",

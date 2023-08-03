@@ -17,7 +17,7 @@ import { useSpendableBalance } from "lib/POP";
 
 const safeRound = (bn: BigNumber, decimals = 18) => {
   const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
-  return Number(formatUnits(bn.div(roundingValue).mul(roundingValue), decimals))
+  return Number(formatUnits(bn / roundingValue * roundingValue, decimals))
 }
 
 function AssetInputWithAction({
@@ -117,7 +117,7 @@ function AssetInputWithAction({
   );
 
   // When approved asume allowance has been approved
-  const showApproveButton = isApproveSuccess ? false : formattedInputBalance.gt(allowance || 0);
+  const showApproveButton = isApproveSuccess ? false : Number(formattedInputBalance) > (Number(allowance) || 0);
 
   async function handleDeposit() {
     if ((inputBalance || 0) == 0) return;
@@ -140,7 +140,7 @@ function AssetInputWithAction({
     return (inputBalance || 0) > Number(userBalance?.formatted) ? "* Balance not available" : "";
   }, [inputBalance, userBalance?.formatted]);
 
-  const isEmptyBalance = formattedInputBalance.eq(0) || userBalance?.value.eq(0);
+  const isEmptyBalance = formattedInputBalance === 0 || userBalance?.value === 0;
   const hideMainButton = isEmptyBalance || isApproveLoading || errorMessage != "";
 
   function ActionableComponent() {

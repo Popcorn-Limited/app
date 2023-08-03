@@ -33,9 +33,9 @@ export const useSum2 = ({
     expected,
     loading,
     count: Object.values(index.current).length,
-    sum: Object.values(index.current).reduce((acc, curr) => acc.add(curr), constants.Zero),
+    sum: Object.values(index.current).reduce((acc, curr) => acc + curr, constants.Zero),
     sumFormatted: formatAndRoundBigNumber(
-      Object.values(index.current).reduce((acc, curr) => acc.add(curr), constants.Zero),
+      Object.values(index.current).reduce((acc, curr) => acc + curr, constants.Zero),
       decimals || 18,
     ),
     index: index.current,
@@ -64,7 +64,7 @@ export const useSum2 = ({
 
   const doSum = () => {
     return Object.values(index.current).reduce((acc: BigNumber, val: BigNumber) => {
-      return acc.add(val);
+      return acc + val;
     }, constants.Zero);
   };
 

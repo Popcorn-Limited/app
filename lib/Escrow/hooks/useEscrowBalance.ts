@@ -36,7 +36,7 @@ export const useEscrowBalance: Pop.Hook<BigNumberWithFormatted> = ({
     select: (data) => {
       return (data as [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string][]).reduce(
         (total, [start, lastUpdateTime, end, initialBalance, balance, account]) => {
-          return total.add(balance);
+          return total + balance;
         },
         constants.Zero,
       );
@@ -46,13 +46,13 @@ export const useEscrowBalance: Pop.Hook<BigNumberWithFormatted> = ({
   return {
     data: data
       ? {
-          value: data as BigNumber,
-          formatted: formatAndRoundBigNumber(data as BigNumber, 18),
-        }
+        value: data as BigNumber,
+        formatted: formatAndRoundBigNumber(data as BigNumber, 18),
+      }
       : {
-          value: constants.Zero,
-          formatted: "0",
-        },
+        value: constants.Zero,
+        formatted: "0",
+      },
     status,
   } as Pop.HookResult<BigNumberWithFormatted>;
 };

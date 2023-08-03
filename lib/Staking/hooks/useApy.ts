@@ -1,10 +1,9 @@
-import { useProvider } from "wagmi";
 import useSWR from "swr";
 import { resolve_apy } from "lib/utils/resolvers/apy-resolvers/resolve_apy";
 import { useMemo } from "react";
 import { popHookAdapter } from "lib/utils/hooks/swrPopHookAdapter";
 import { BigNumberWithFormatted, Pop } from "lib/types";
-import { useNamedAccounts } from "lib/utils";
+import { RPC_PROVIDERS, useNamedAccounts } from "lib/utils";
 import useLog from "lib/utils/hooks/useLog";
 
 interface UseApyProps extends Pop.StdProps {
@@ -12,7 +11,6 @@ interface UseApyProps extends Pop.StdProps {
 }
 
 export const useApy: Pop.Hook<BigNumberWithFormatted> = ({ resolver, address, chainId }: UseApyProps) => {
-  const provider = useProvider({ chainId: Number(chainId) });
   const [metadata] = useNamedAccounts(chainId.toString() as any, (!!address && [address]) || []);
   const _resolver = useMemo(() => resolver || metadata?.apyResolver, [resolver, metadata]);
   useLog({ resolver, address, chainId, _resolver, metadata, shouldFetch: !!address && !!chainId && !!_resolver }, [
@@ -29,7 +27,7 @@ export const useApy: Pop.Hook<BigNumberWithFormatted> = ({ resolver, address, ch
 
   return popHookAdapter(
     useSWR(!!address && !!chainId && !!_resolver ? [`useApy:${chainId}:${address}:${_resolver}`] : null, async () => {
-      return address && (await resolve_apy({ address, chainId, rpc: provider, resolver: _resolver }));
+      return address && (await resolve_apy({ address, chainId, rpc: RPC_PROVIDERS[chainId], resolver: _resolver }));
     }),
   ) as Pop.HookResult<BigNumberWithFormatted>;
 };

@@ -23,7 +23,7 @@ export default function PortfolioSection({
   balance?: BigNumber;
   sectionKeyName?: string;
 }) {
-  const balanceGTZero = balance?.gt(0);
+  const balanceGTZero = Number(balance) > 0;
   const networkListComponent = (
     <div className="flex items-center gap-5">
       <h2 className="text-2xl md:text-3xl leading-6 md:leading-8 font-normal">{title}</h2>

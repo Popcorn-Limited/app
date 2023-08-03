@@ -23,8 +23,8 @@ export const set_token: PriceResolver = async (address: string, chainId: ChainId
   const quantities = _components.reduce((acc, component, index) => ({ ...acc, [component]: _quantities[index] }), {});
 
   const total = prices
-    .reduce((acc, [component, price], index) => acc.add(price.value.mul(quantities[component])), parseEther("0"))
-    .div(parseEther("1"));
+    .reduce((acc, [component, price], index) => acc + (price.value * quantities[component]), parseEther("0"))
+    / parseEther("1");
 
   return { value: total, decimals: 18 };
 };

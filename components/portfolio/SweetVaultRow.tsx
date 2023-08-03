@@ -48,7 +48,7 @@ export default function SweetVaultRow({ vaultAddress, chainId, account, callback
 
 
   return (
-    <tr className={`${balance?.value?.gt(0) ? "" : "hidden"}`}>
+    <tr className={`${Number(balance?.value) > 0 ? "" : "hidden"}`}>
       <td className="md:bg-customLightGray md:bg-opacity-[10%] rounded-l-2xl py-2 md:py-4 pl-2 md:pl-10">
         <div className="flex items-center gap-4">
           <div className="relative">

@@ -77,6 +77,7 @@ export const useLockedBalances: Pop.Hook<{
     ],
     functionName: "lockedBalances",
     args: [account as Address],
+    select: (data) => { return { total: data[0], unlockable: data[1], locked: data[2], lockData: data[3] } }
   }) as any as Pop.HookResult<{
     total: BigNumber;
     unlockable: BigNumber;

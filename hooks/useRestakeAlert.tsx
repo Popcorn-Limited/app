@@ -42,7 +42,7 @@ export default function useRestakeAlert() {
   useEffect(() => {
     if (!account || !popLocker) return;
     if (
-      lockedBalances?.data?.unlockable.gt(constants.Zero) &&
+      Number(lockedBalances?.data?.unlockable) > 0 &&
       !restakeAlerted &&
       state.networkChangePromptModal.visible === false &&
       state.singleActionModal.content !== "To continue please sign terms and conditions." &&

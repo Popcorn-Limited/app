@@ -9,46 +9,46 @@ import { useClaimableBalance } from "./hooks/useClaimableBalance";
 
 const eth_call =
   (Component: Pop.FC<{ data?: BigNumberWithFormatted }>) =>
-  ({
-    ...props
-  }: Pop.StdProps & {
-    render?: (props: {
-      price?: BigNumber;
-      address?: string;
-      chainId?: Number;
-      balance?: BigNumberWithFormatted;
-      decimals?: number;
-      status?: Pop.HookResult["status"];
-    }) => React.ReactElement;
-  } & { callback?: (value?: BigNumber) => void }) => {
-    const { data: token, status: claimableTokenStatus } = useClaimableToken(props);
-    const { data, status: balanceStatus } = useClaimableBalance(props);
-    const { data: price } = usePrice({ ...props, address: token });
+    ({
+      ...props
+    }: Pop.StdProps & {
+      render?: (props: {
+        price?: BigNumber;
+        address?: string;
+        chainId?: Number;
+        balance?: BigNumberWithFormatted;
+        decimals?: number;
+        status?: Pop.HookResult["status"];
+      }) => React.ReactElement;
+    } & { callback?: (value?: BigNumber) => void }) => {
+      const { data: token, status: claimableTokenStatus } = useClaimableToken(props);
+      const { data, status: balanceStatus } = useClaimableBalance(props);
+      const { data: price } = usePrice({ ...props, address: token });
 
-    const status = useMultiStatus([claimableTokenStatus, balanceStatus]);
+      const status = useMultiStatus([claimableTokenStatus, balanceStatus]);
 
-    useEffect(() => {
-      if (status === "success" && data?.value.gt(0)) {
-        props.callback?.(data?.value);
+      useEffect(() => {
+        if (status === "success" && Number(data?.value) > 0) {
+          props.callback?.(data?.value);
+        }
+      }, [status, data?.value]);
+
+      if (props.render) {
+        return (
+          <>
+            {props.render({
+              price: price?.value,
+              address: token,
+              chainId: props.chainId,
+              balance: data,
+              status,
+              decimals: price?.decimals,
+            })}
+          </>
+        );
       }
-    }, [status, data?.value]);
-
-    if (props.render) {
-      return (
-        <>
-          {props.render({
-            price: price?.value,
-            address: token,
-            chainId: props.chainId,
-            balance: data,
-            status,
-            decimals: price?.decimals,
-          })}
-        </>
-      );
-    }
-    return <Component {...props} data={data} status={status} />;
-  };
+      return <Component {...props} data={data} status={status} />;
+    };
 
 export const ClaimableBalanceOf = eth_call(withLoading(({ data }) => <>{data?.formatted}</>));
 

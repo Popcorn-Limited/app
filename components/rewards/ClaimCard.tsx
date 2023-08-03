@@ -53,7 +53,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({ staking, chainId, addEarned }) =>
                   </div>
                   <div
                     className={`hover:scale-102 transition duration-500 ease-in-out transform w-full md:h-48 border-b border-customLightGray border-opacity-40
-               ${status !== "success" || earned?.value?.eq(constants.Zero) ? "hidden" : ""}`}
+               ${status !== "success" || earned?.value === constants.Zero ? "hidden" : ""}`}
                   >
                     <div className="flex flex-col md:flex-row justify-between pt-4 pb-6 md:px-8">
                       <div className="flex flex-col justify-between">
@@ -89,7 +89,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({ staking, chainId, addEarned }) =>
                             Number(chain.id) !== Number(chainId) ? () => switchNetwork(Number(chainId)) : () => claim()
                           }
                           label="Claim"
-                          disabled={earned?.value?.eq(constants.Zero)}
+                          disabled={earned?.value === constants.Zero}
                         />
                       </div>
                     </div>

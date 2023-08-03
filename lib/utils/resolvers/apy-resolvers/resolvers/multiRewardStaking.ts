@@ -36,12 +36,12 @@ export async function multiRewardStaking(address, chainId, rpc?): Promise<{ valu
   const rewardInfos = await Promise.all(rewardTokens.map(token => multiRewardStaking.rewardInfos(token)))
 
   const rewardsPerSecond = rewardsTokenPrices.map((price, i) => rewardInfos[i].rewardsPerSecond
-    .mul(price.value)
-    .div(parseUnits("1", price.decimals)))
-  const rewardsValuePerSecond = rewardsPerSecond.reduce((total, num) => total.add(num), constants.Zero)
-  const rewardsValuePerYear = BigNumber.from(365 * 24 * 60 * 60).mul(rewardsValuePerSecond);
+    * price.value
+    / parseUnits("1", price.decimals))
+  const rewardsValuePerSecond = rewardsPerSecond.reduce((total, num) => total + num, constants.Zero)
+  const rewardsValuePerYear = BigInt(365 * 24 * 60 * 60) * rewardsValuePerSecond;
 
-  const apy = rewardsValuePerYear.mul(parseUnits("1")).div(totalSupplyValue);
+  const apy = rewardsValuePerYear * parseUnits("1") / totalSupplyValue;
   return { value: apy, decimals: 18 };
 }
 

@@ -13,7 +13,7 @@ export const useSum = ({
   const add = (amount?: BigNumber) => {
     if (!amount) return;
     setCount((count) => count + 1);
-    setSum((sum) => sum.add(amount));
+    setSum((sum) => sum + amount);
   };
 
   const reset = () => {

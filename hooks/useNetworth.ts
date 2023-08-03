@@ -1,5 +1,5 @@
 import { ChainId } from "lib/utils/connectors";
-import { BigNumber, constants } from "ethers/lib/ethers";
+import { constants } from "ethers/lib/ethers";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
 import { useNamedAccounts } from "lib/utils";
@@ -11,23 +11,23 @@ import { useLockedBalances } from "lib/PopLocker/hooks";
 import { useEscrowBalance } from "lib/Escrow/hooks/useEscrowBalance";
 import { useEscrowIds, useEscrows } from "lib/Escrow";
 
-function getHoldingValue(tokenAmount: BigNumber, tokenPrice: BigNumber): BigNumber {
-  tokenAmount = tokenAmount?.gt(constants.Zero) ? tokenAmount : constants.Zero;
-  return tokenAmount.eq(constants.Zero) || tokenPrice?.eq(constants.Zero)
+function getHoldingValue(tokenAmount: BigInt, tokenPrice: BigInt): BigInt {
+  tokenAmount = Number(tokenAmount) > 0 ? tokenAmount : 0;
+  return Number(tokenAmount) === 0 || Number(tokenPrice) === 0
     ? constants.Zero
-    : tokenAmount?.mul(tokenPrice ? tokenPrice : constants.Zero).div(constants.WeiPerEther) || constants.Zero;
+    : (tokenAmount * (tokenPrice ? tokenPrice : constants.Zero) / constants.WeiPerEther) || constants.Zero;
 }
 
 export default function useNetWorth(): {
-  Ethereum: BigNumber;
-  Polygon: BigNumber;
-  BNB: BigNumber;
-  Arbitrum: BigNumber;
-  Optimism: BigNumber;
-  totalNetWorth: BigNumber;
-  pop: BigNumber;
-  vesting: BigNumber;
-  deposits: BigNumber;
+  Ethereum: BigInt;
+  Polygon: BigInt;
+  BNB: BigInt;
+  Arbitrum: BigInt;
+  Optimism: BigInt;
+  totalNetWorth: BigInt;
+  pop: BigInt;
+  vesting: BigInt;
+  deposits: BigInt;
 } {
   const { address: account } = useAccount();
   const { Ethereum, Polygon, BNB, Arbitrum, Optimism } = ChainId;
@@ -93,24 +93,24 @@ export default function useNetWorth(): {
     address: ethereumRewardsEscrow?.address,
     account,
   })
-  const mainnetEscrowClaimablePop = mainnetEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
-  const mainnetEscrowVestingPop = mainnetEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
+  const mainnetEscrowClaimablePop = mainnetEscrows?.reduce((total, escrow) => total + escrow.claimable, constants.Zero)
+  const mainnetEscrowVestingPop = mainnetEscrows?.reduce((total, escrow) => total + escrow.vesting, constants.Zero)
 
   const { data: polygonEscrows } = useEscrows({
     chainId: Polygon,
     address: polygonRewardsEscrow?.address,
     account,
   })
-  const polygonEscrowClaimablePop = polygonEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
-  const polygonEscrowVestingPop = polygonEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
+  const polygonEscrowClaimablePop = polygonEscrows?.reduce((total, escrow) => total + escrow.claimable, constants.Zero)
+  const polygonEscrowVestingPop = polygonEscrows?.reduce((total, escrow) => total + escrow.vesting, constants.Zero)
 
   const { data: optimismEscrows } = useEscrows({
     chainId: Optimism,
     address: opRewardsEscrow?.address,
     account,
   })
-  const optimismEscrowClaimablePop = optimismEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
-  const optimismEscrowVestingPop = optimismEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
+  const optimismEscrowClaimablePop = optimismEscrows?.reduce((total, escrow) => total + escrow.claimable, constants.Zero)
+  const optimismEscrowVestingPop = optimismEscrows?.reduce((total, escrow) => total + escrow.vesting, constants.Zero)
 
 
   const { data: bnbEscrows } = useEscrows({
@@ -118,8 +118,8 @@ export default function useNetWorth(): {
     address: bnbRewardsEscrow?.address,
     account,
   })
-  const bnbEscrowClaimablePop = bnbEscrows?.reduce((total, escrow) => total.add(escrow.claimable), constants.Zero)
-  const bnbEscrowVestingPop = bnbEscrows?.reduce((total, escrow) => total.add(escrow.vesting), constants.Zero)
+  const bnbEscrowClaimablePop = bnbEscrows?.reduce((total, escrow) => total + escrow.claimable, constants.Zero)
+  const bnbEscrowVestingPop = bnbEscrows?.reduce((total, escrow) => total + escrow.vesting, constants.Zero)
 
   const { data: mainnetLpBalance } = useBalanceOf({
     address: ethereumPopUsdcArrakisVault?.address,
@@ -226,20 +226,20 @@ export default function useNetWorth(): {
 
 
   const mainnetEscrowHoldings = useHoldingValue(
-    constants.Zero.add(mainnetEscrowClaimablePop || "0").add(mainnetEscrowVestingPop || "0"),
+    constants.Zero + (mainnetEscrowClaimablePop || "0") + (mainnetEscrowVestingPop || "0"),
     popPrice?.value,
   );
 
   const polygonEscrowHoldings = useHoldingValue(
-    constants.Zero.add(polygonEscrowClaimablePop || "0").add(polygonEscrowVestingPop || "0"),
+    constants.Zero + (polygonEscrowClaimablePop || "0") + (polygonEscrowVestingPop || "0"),
     popPrice?.value,
   );
   const bnbEscrowHoldings = useHoldingValue(
-    constants.Zero.add(bnbEscrowClaimablePop || "0").add(bnbEscrowVestingPop || "0"),
+    constants.Zero + (bnbEscrowClaimablePop || "0") + (bnbEscrowVestingPop || "0"),
     popPrice?.value,
   );
   const optimismEscrowHoldings = useHoldingValue(
-    constants.Zero.add(optimismEscrowClaimablePop || "0").add(optimismEscrowVestingPop || "0"),
+    constants.Zero + (optimismEscrowClaimablePop || "0") + (optimismEscrowVestingPop || "0"),
     popPrice?.value,
   );
 
@@ -274,7 +274,7 @@ export default function useNetWorth(): {
       arbitrumPopHoldings,
       optimismPopHoldings,
       bnbPopHoldings,
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   };
 
   const calculateVestingHoldings = () => {
@@ -290,7 +290,7 @@ export default function useNetWorth(): {
       threeXStakingRewardsHoldings,
       mainnetLPStakingRewardsHoldings,
       polygonLPStakingRewardsHoldings
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   }
 
   const calculateDepositHoldings = () => {
@@ -302,11 +302,11 @@ export default function useNetWorth(): {
       mainnetPopStakingHoldings,
       polygonPopStakingHoldings,
       optimismPopStakingHoldings
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   }
 
 
-  const calculateEthereumHoldings = (): BigNumber => {
+  const calculateEthereumHoldings = (): BigInt => {
     return [
       mainnetPopHoldings,
       mainnetPopStakingHoldings,
@@ -321,10 +321,10 @@ export default function useNetWorth(): {
       mainnetLPStakingRewardsHoldings,
       mainnetPopLpHoldings,
       mainnetPopLpStakingHoldings,
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   };
 
-  const calculatePolygonHoldings = (): BigNumber => {
+  const calculatePolygonHoldings = (): BigInt => {
     return [
       polygonPopHoldings,
       polygonPopStakingHoldings,
@@ -333,19 +333,19 @@ export default function useNetWorth(): {
       polygonLPStakingRewardsHoldings,
       polygonPopLpHoldings,
       polygonPopLpStakingHoldings,
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   };
 
-  const calculateArbitrumHoldings = (): BigNumber => {
-    return [arbitrumPopHoldings].reduce((total, num) => total.add(num));
+  const calculateArbitrumHoldings = (): BigInt => {
+    return [arbitrumPopHoldings].reduce((total, num) => total + num);
   };
 
-  const calculateOptimismHoldings = (): BigNumber => {
-    return [optimismPopHoldings, optimismEscrowHoldings, optimismPopStakingHoldings].reduce((total, num) => total.add(num));
+  const calculateOptimismHoldings = (): BigInt => {
+    return [optimismPopHoldings, optimismEscrowHoldings, optimismPopStakingHoldings].reduce((total, num) => total + num);
   };
 
-  const calculateBnbHoldings = (): BigNumber => {
-    return [bnbPopHoldings, bnbEscrowHoldings].reduce((total, num) => total.add(num));
+  const calculateBnbHoldings = (): BigInt => {
+    return [bnbPopHoldings, bnbEscrowHoldings].reduce((total, num) => total + num);
   };
 
   const calculateTotalHoldings = () => {
@@ -355,7 +355,7 @@ export default function useNetWorth(): {
       calculateBnbHoldings(),
       calculateArbitrumHoldings(),
       calculateOptimismHoldings(),
-    ].reduce((total, num) => total.add(num));
+    ].reduce((total, num) => total + num);
   };
 
   return {

@@ -21,9 +21,9 @@ export async function getPoolTVL(
   const popBal = await pop.balanceOf(poolAddress);
   const usdcBal = await usdc.balanceOf(poolAddress);
 
-  const popValue = popBal.mul(popPrice).div(constants.WeiPerEther);
-  const usdcValue = usdcBal.mul(usdcPrice).div("1000000"); // use 1e6
-  return popValue.add(usdcValue);
+  const popValue = popBal * popPrice / constants.WeiPerEther;
+  const usdcValue = usdcBal * usdcPrice / 1000000; // use 1e6
+  return popValue + usdcValue;
 }
 
 export default function usePoolTVL(chainId: ChainId): SWRResponse<BigNumber, Error> {

@@ -26,7 +26,7 @@ import useVaultMetadata, { VaultMetadata, VaultTag } from "lib/Vault/hooks/useVa
 import { SweetVaultTVL } from "lib/Vault/AllSweetVaultsTVL";
 import useAdapterToken from "hooks/useAdapter";
 
-const HUNDRED = constants.Zero.add(100);
+const HUNDRED = constants.Zero + 100;
 
 const VAULT_APY_RESOLVER = {
   "Beefy": "beefy",
@@ -176,7 +176,7 @@ function SweetVault({
                       render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
                         <section className="flex items-center gap-1 text-primary">
                           {formatAndRoundBigNumber(
-                            HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
+                            HUNDRED * (apy?.data?.value || constants.Zero) + (stakingApy?.data?.value || constants.Zero) || constants.Zero,
                             18,
                           )} %
                           <InfoIconWithTooltip
@@ -186,7 +186,7 @@ function SweetVault({
                                 <li>
                                   Staking APY:{" "}
                                   {formatAndRoundBigNumber(
-                                    HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
+                                    HUNDRED * (stakingApy?.data?.value || constants.Zero),
                                     18,
                                   )}
                                   %
@@ -194,7 +194,7 @@ function SweetVault({
                                 <li>
                                   Vault APY:{" "}
                                   {formatAndRoundBigNumber(
-                                    HUNDRED.mul(apy?.data?.value || constants.Zero),
+                                    HUNDRED * (apy?.data?.value || constants.Zero),
                                     18,
                                   )}
                                   %
