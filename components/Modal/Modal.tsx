@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 export default function Modal({ show, setShowModal, children }: { show: boolean, setShowModal: any, children: any }) {
-
   return (
     <Transition.Root show={show} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setShowModal}>
@@ -29,7 +29,12 @@ export default function Modal({ show, setShowModal, children }: { show: boolean,
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-[#FAF9F4] border border-[#F0EEE0] px-8 py-9 transition-all sm:w-full sm:max-w-lg">
+              <Dialog.Panel
+                className="relative transform overflow-hidden rounded-lg bg-[#FAF9F4] border border-[#F0EEE0] px-8 py-9 transition-all sm:w-full sm:max-w-lg"
+              >
+                <div className="flex justify-end">
+                  <XMarkIcon className="w-10 h-10 text-black mb-10" onClick={() => setShowModal(false)} role="button" />
+                </div>
                 {children}
               </Dialog.Panel>
             </Transition.Child>

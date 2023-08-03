@@ -12,8 +12,8 @@ import NoSSR from "react-no-ssr";
 import InputNumber from "components/InputNumber";
 import MainActionButton from "components/MainActionButton";
 import { intervalToDuration } from "date-fns";
-import SecondaryActionButton from "components/SecondaryActionButton";
 import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import useGauges from "lib/Gauges/useGauges";
 import AnimatedChevron from "components/SweetVault/AnimatedChevron";
 import Title from "components/content/Title";
@@ -22,7 +22,8 @@ import { NetworkSticker } from "components/NetworkSticker";
 import TokenIcon from "components/TokenIcon";
 import Modal from "components/Modal/Modal";
 import Slider from 'rc-slider';
-import Gauge from "components/gauges/Gauge";
+import Gauge from "components/vepop/Gauge";
+import LockModal from "components/vepop/modals/lock/LockModal";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -53,8 +54,6 @@ export default function VePOP() {
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
 
-  const [amount, setAmount] = useState(0);
-  const [days, setDays] = useState(0);
 
   const [avVotes, setAvVotes] = useState(10000);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
@@ -62,7 +61,7 @@ export default function VePOP() {
 
   const [showModal, setShowModal] = useState(false);
 
-  const { write: createLock } = useCreateLock(VOTING_ESCROW, amount, days);
+
 
   async function testStuff() {
     // const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
@@ -108,13 +107,7 @@ export default function VePOP() {
     },
   });
 
-  const handleSetAmount: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    setAmount(Number(value));
-  };
 
-  const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    setDays(Number(value));
-  };
 
   function handleAvVotes(val: number, index: number) {
     const newAvVotes = avVotes - val
@@ -127,41 +120,7 @@ export default function VePOP() {
 
   return (
     <NoSSR>
-      <Modal show={showModal} setShowModal={setShowModal} >
-        <>
-          <h2 className="text-2xl mb-8">
-            Lock POP
-          </h2>
-          <InputNumber
-            onChange={handleSetAmount}
-            defaultValue={amount}
-            autoComplete="off"
-            autoCorrect="off"
-            type="text"
-            pattern="^[0-9]*[.,]?[0-9]*$"
-            placeholder={"0.0"}
-            minLength={1}
-            maxLength={79}
-            spellCheck="false"
-          />
-          <InputNumber
-            onChange={handleSetDays}
-            defaultValue={days}
-            autoComplete="off"
-            autoCorrect="off"
-            type="text"
-            pattern="^[0-9]*[.,]?[0-9]*$"
-            placeholder={"0.0"}
-            minLength={1}
-            maxLength={79}
-            spellCheck="false"
-          />
-          <div className="flex flex-row items-center mt-8 space-x-8">
-            <SecondaryActionButton label="Cancel" handleClick={() => setShowModal(false)} />
-            <MainActionButton label="Deposit" handleClick={() => { createLock(); setShowModal(false) }} />
-          </div>
-        </>
-      </Modal>
+      <LockModal show={[showModal, setShowModal]}/>
       <div>
         <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
 
@@ -213,8 +172,8 @@ export default function VePOP() {
             </span>
             <div className="flex flex-row items-center space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
-              <TertiaryActionButton label="Lock POP" handleClick={() => setShowModal(true)} />
-              <TertiaryActionButton label="Manage Stake" handleClick={approve} />
+              <SecondaryActionButton label="Lock POP" handleClick={() => setShowModal(true)} />
+              <SecondaryActionButton label="Manage Stake" handleClick={approve} />
             </div>
           </div>
 
@@ -237,10 +196,6 @@ export default function VePOP() {
               </div>
             </div>
           </div>
-        </section>
-
-        <section className="my-5">
-
         </section>
 
         <section className="space-y-4">

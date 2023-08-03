@@ -34,7 +34,6 @@ const PopSweetVaults: NextPage = () => {
     ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
   ]
 
-  console.log(allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address)))
   return (
     <SweetVaults
       vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}

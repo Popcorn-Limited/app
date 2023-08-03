@@ -1,7 +1,7 @@
 import { Transition } from "@headlessui/react";
 import MainActionButton from "components/MainActionButton";
 import React, { useEffect, useState } from "react";
-import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import { useFeatures } from "hooks/useFeatures";
 import useInitializeGTM from "hooks/useInitializeGTM";
 
@@ -58,7 +58,7 @@ const GoogleAnalyticsPrompt = () => {
             </p>
             <div className="flex flex-col md:flex-row w-full md:w-auto space-y-4 md:space-y-0 md:space-x-6">
               <MainActionButton label="Opt-in" handleClick={handleAccept} />
-              <TertiaryActionButton label="Opt-out" handleClick={handleDecline} />
+              <SecondaryActionButton label="Opt-out" handleClick={handleDecline} />
             </div>
           </div>
         </div>

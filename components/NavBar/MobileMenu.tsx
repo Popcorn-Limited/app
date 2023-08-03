@@ -8,7 +8,7 @@ import RedditIcon from "components/SVGIcons/RedditIcon";
 import TelegramIcon from "components/SVGIcons/TelegramIcon";
 import TwitterIcon from "components/SVGIcons/TwitterIcon";
 import YoutubeIcon from "components/SVGIcons/YoutubeIcon";
-import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -250,7 +250,7 @@ export const MobileMenu: React.FC = () => {
         <div>
           <p className="text-black mb-3">Connect to Wallet</p>
           <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={!!address} />
-          <TertiaryActionButton label="Disconnect" handleClick={disconnect} hidden={!address} />
+          <SecondaryActionButton label="Disconnect" handleClick={disconnect} hidden={!address} />
           <hr className="my-6" />
           <p className="text-black mb-3">Select Network</p>
           <div

@@ -6,7 +6,7 @@ import StatusWithLabel from "components/StatusWithLabel";
 import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 import { NetworkSticker } from "components/NetworkSticker";
 import TokenIcon from "components/TokenIcon";
-import SecondaryActionButton from "components/SecondaryActionButton";
+import TertiaryActionButton from "components/TertiaryActionButton";
 import { Metadata, Tvl } from "lib/Contract";
 import MobileCardSlider from "components/MobileCardSlider";
 import { useChainIdFromUrl } from "hooks/useChainIdFromUrl";
@@ -172,7 +172,7 @@ export default function Index(): JSX.Element {
                     </div>
                     <Link href={`/rewards`} passHref target="_self">
                       <div className="border-t border-customLightGray pt-2 px-1">
-                        <SecondaryActionButton label="Claim Page" />
+                        <TertiaryActionButton label="Claim Page" />
                       </div>
                     </Link>
                   </div>
@@ -231,7 +231,7 @@ export default function Index(): JSX.Element {
                         </div>
                         <Link href={`/rewards`} passHref target="_self">
                           <div className="border-t border-customLightGray pt-2 px-1">
-                            <SecondaryActionButton label="Claim Page" />
+                            <TertiaryActionButton label="Claim Page" />
                           </div>
                         </Link>
                       </div>

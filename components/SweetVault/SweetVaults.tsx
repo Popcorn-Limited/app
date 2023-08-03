@@ -105,7 +105,6 @@ export default function SweetVaults({
               searchString={searchString}
               selectedTags={selectedTags.length === tags.length ? [] : selectedTags}
               deployer={deployer}
-
             />
           )
         })}
