@@ -50,17 +50,13 @@ export default function VePOP() {
   const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: vePopBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
-
 
   const [avVotes, setAvVotes] = useState(10000);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
 
-
   const [showModal, setShowModal] = useState(false);
-
 
 
   async function testStuff() {
@@ -72,8 +68,6 @@ export default function VePOP() {
     const lpToken = await contract2.token()
     console.log({ lpToken })
   }
-
-  // testStuff()
 
 
   function votingPeriodEnd(): number[] {

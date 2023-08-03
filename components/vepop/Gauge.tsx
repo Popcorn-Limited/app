@@ -5,17 +5,24 @@ import TokenIcon from "components/TokenIcon";
 import Title from "components/content/Title";
 import useAdapterToken from "hooks/useAdapter";
 import useVaultToken from "hooks/useVaultToken";
+import useCurrentGaugeWeight from "lib/Gauges/useCurrentGaugeWeight";
 import { Gauge } from "lib/Gauges/useGauges";
+import useUpcomingGaugeWeight from "lib/Gauges/useUpcomingGaugeWeight";
 import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
 import Slider from "rc-slider";
 import { useState } from "react";
 import { Address, useToken } from "wagmi";
 
+const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
+
+
 export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: Gauge, index: number, avVotes: number, handleChange: Function }): JSX.Element {
-  const { data: vault } = useToken({ address: gauge.vault as Address, chainId: gauge.chainId })
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
   const vaultMetadata = useVaultMetadata(gauge.vault, token, adapter, gauge.chainId);
+
+  const { data: currentGaugeWeight } = useCurrentGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
+  const { data: upcomingGaugeWeight } = useUpcomingGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
 
   const [amount, setAmount] = useState(0);
 
@@ -39,11 +46,11 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
             <div className="flex flex-row items-center w-full">
 
               <div className="w-3/12">
-                <p className="text-primaryLight font-normal">Previous Votes</p>
+                <p className="text-primaryLight font-normal">Current Votes</p>
               </div>
 
               <div className="w-3/12">
-                <p className="text-primaryLight font-normal">Total Votes</p>
+                <p className="text-primaryLight font-normal">Upcoming Votes</p>
               </div>
 
               <div className="w-3/12">
@@ -59,13 +66,13 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
 
               <div className="w-3/12">
                 <p className=" text-primary text-3xl">
-                  6600
+                  {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
 
               <div className="w-3/12">
                 <p className=" text-primary text-3xl text-start">
-                  {4200 + amount}
+                  {(Number(upcomingGaugeWeight?.formatted) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
 
@@ -103,23 +110,16 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
           <span className="flex flex-row items-center justify-between">
             <p className="text-primaryLight font-normal">Gauge address:</p>
             <p className="font-bold text-primary">
-              {gauge.address.slice(0, 6)}...{gauge.address.slice(-6)}
-            </p>
-          </span>
-
-          <span className="flex flex-row items-center justify-between">
-            <p className="text-primaryLight font-normal">Vault address:</p>
-            <p className="font-bold text-primary">
-              {gauge.vault.slice(0, 6)}...{gauge.vault.slice(-6)}
+              {gauge.address}
             </p>
           </span>
 
         </div>
         <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
           <span className="flex flex-row items-center justify-between">
-            <p className="text-primaryLight font-normal">Last Epochs Votes:</p>
+            <p className="text-primaryLight font-normal">Vault address:</p>
             <p className="font-bold text-primary">
-              GaugeController.get_gauge_weight(addr: address)
+              {gauge.vault}
             </p>
           </span>
         </div>
