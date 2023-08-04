@@ -13,7 +13,7 @@ function Accordion({ children, header, initiallyOpen, containerClassName }: { ch
             className="block w-full cursor-pointer marker:hidden active:outline-none focus:outline-none">
             <div className="flex flex-row items-center justify-between">
               {header}
-              <ChevronDownIcon className={`text-secondaryLight ml-10 h-5 w-5 flex-shrink-0 transition duration-300 ${open ? 'rotate-180 transform' : ''}`} />
+              <ChevronDownIcon className={`hidden md:block text-secondaryLight ml-10 h-5 w-5 flex-shrink-0 transition duration-300 ${open ? 'rotate-180 transform' : ''}`} />
             </div>
           </Popover.Button>
           <Transition

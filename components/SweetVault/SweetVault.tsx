@@ -112,7 +112,7 @@ function SweetVault({
   return (
     <Accordion
       header={
-        <div className="flex flex-row flex-wrap items-center justify-between">
+        <div className="flex flex-row flex-wrap items-center justify-between w-full text-start">
 
           <div className="flex items-center justify-between select-none w-full md:w-1/3">
             <AssetWithName token={token} vault={vaultMetadata} chainId={chainId} />
@@ -204,10 +204,6 @@ function SweetVault({
                 {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
               </SweetVaultTVL>
             </Title>
-          </div>
-
-          <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
-            <AnimatedChevron className="w-7 h-7" />
           </div>
 
         </div>
