@@ -1,9 +1,10 @@
 import { BigNumber } from "ethers";
+import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 import { calcDaysToUnlock, calcUnlockTime, calculateVeOut } from "lib/Gauges/utils";
 
-export default function IncreaseTimePreview({ days, lockedBal }: { days: number, lockedBal: [BigNumber, BigNumber] }): JSX.Element {
-  const totalDays = calcDaysToUnlock(Number(lockedBal[1])) + days
-  const amount = Number(lockedBal[0]) / 1e18
+export default function IncreaseTimePreview({ days, lockedBal }: { days: number, lockedBal: LockedBalance }): JSX.Element {
+  const totalDays = calcDaysToUnlock(Number(lockedBal?.end)) + days
+  const amount = Number(lockedBal?.amount) / 1e18
 
   return (
     <div className="space-y-8 mb-8 text-start">

@@ -6,11 +6,12 @@ import InputTokenWithError from "components/InputTokenWithError";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { BigNumber, constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
+import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 
 export default function IncreaseStakeInterface({ amountState, daysState, lockedBal }:
-  { amountState: [number, Dispatch<SetStateAction<number>>], daysState: [number, Dispatch<SetStateAction<number>>], lockedBal: [BigNumber, BigNumber] }): JSX.Element {
+  { amountState: [number, Dispatch<SetStateAction<number>>], daysState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {
   const { address: account } = useAccount()
 
   const { data: pop } = useToken({ chainId: 5, address: POP as Address });
@@ -59,11 +60,11 @@ export default function IncreaseStakeInterface({ amountState, daysState, lockedB
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Current Lock Amount</p>
-          <p className="text-[#141416]">{lockedBal ? formatAndRoundBigNumber(lockedBal[0], 18) : ""} POP</p>
+          <p className="text-[#141416]">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""} POP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p className="text-[#141416]">{lockedBal && lockedBal[1].toString() !== "0" ? new Date(Number(lockedBal[1]) * 1000).toLocaleDateString() : "-"}</p>
+          <p className="text-[#141416]">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
         </div>
       </div>
 

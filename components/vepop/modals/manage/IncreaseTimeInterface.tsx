@@ -7,6 +7,7 @@ import InputTokenWithError from "components/InputTokenWithError";
 import { safeRound } from "lib/utils";
 import { BigNumber, constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
+import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 
@@ -22,14 +23,14 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
 }
 
 export default function IncreaseTimeInterface({ daysState, lockedBal }:
-  { daysState: [number, Dispatch<SetStateAction<number>>], lockedBal: [BigNumber, BigNumber] }): JSX.Element {
+  { daysState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {
   const [days, setDays] = daysState
 
   const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setDays(Number(value));
   };
 
-  const totalDays = calcDaysToUnlock(Number(lockedBal[1])) + days
+  const totalDays = calcDaysToUnlock(Number(lockedBal?.end)) + days
 
   return (
     <div className="space-y-8 mb-8 text-start">
@@ -70,7 +71,7 @@ export default function IncreaseTimeInterface({ daysState, lockedBal }:
         <p className="text-primary font-semibold mb-1">Voting Power</p>
         <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
 
-          <p className="text-primaryDark">{Number(lockedBal[0]) > 0 ? calculateVeOut(Number(lockedBal[0]) / 1e18, totalDays).toFixed(2) : "0"}</p>
+          <p className="text-primaryDark">{Number(lockedBal?.amount) > 0 ? calculateVeOut(Number(lockedBal?.amount) / 1e18, totalDays).toFixed(2) : "0"}</p>
         </div>
       </div>
 

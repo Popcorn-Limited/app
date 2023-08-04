@@ -50,7 +50,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
   });
 
   const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
-  const showApproveButton = isApproveSuccess ? false : amount > Number(allowance.value || 0);
+  const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
     if (!showModal) setStep(0)
@@ -67,6 +67,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     if (showApproveButton) return approve();
     // When approved continue to deposit
     createLock();
+    setShowModal(false);
   }
 
 

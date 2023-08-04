@@ -1,8 +1,9 @@
 import { BigNumber } from "ethers";
+import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 import { calcDaysToUnlock, calculateVeOut } from "lib/Gauges/utils";
 
-export default function IncreaseStakePreview({ amount, lockedBal }: { amount: number, lockedBal: [BigNumber, BigNumber] }): JSX.Element {
-  const totalLocked = (Number(lockedBal[0]) / 1e18) + amount
+export default function IncreaseStakePreview({ amount, lockedBal }: { amount: number, lockedBal: LockedBalance }): JSX.Element {
+  const totalLocked = (Number(lockedBal?.amount) / 1e18) + amount
 
   return (
     <div className="space-y-8 mb-8 text-start">
@@ -20,11 +21,11 @@ export default function IncreaseStakePreview({ amount, lockedBal }: { amount: nu
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
-          <p className="text-[#141416]">{lockedBal && lockedBal[1].toString() !== "0" ? new Date(Number(lockedBal[1]) * 1000).toLocaleDateString() : "-"}</p>
+          <p className="text-[#141416]">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p className="text-[#141416]">{amount > 0 ? calculateVeOut(amount, calcDaysToUnlock(Number(lockedBal[1]))).toFixed(2) : "0"} vePOP</p>
+          <p className="text-[#141416]">{amount > 0 ? calculateVeOut(amount, calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "0"} vePOP</p>
         </div>
       </div>
 

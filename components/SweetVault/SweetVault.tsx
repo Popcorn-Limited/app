@@ -49,6 +49,7 @@ const PROTOCOL_ICONS = {
 }
 
 export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vault: VaultMetadata, chainId: ChainId }) {
+  const protocolIcon = PROTOCOL_ICONS[vault?.metadata?.protocol?.name] 
   return <div className="flex items-center gap-4">
     <div className="relative">
       <NetworkSticker chainId={chainId} />
@@ -59,7 +60,7 @@ export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResu
     </h2>
     <div className="bg-[#ebe7d466] border border-[#ebe7d4cc] rounded-lg py-1 px-3 flex flex-row items-center">
       <img
-        src={`https://icons.llamao.fi/icons/protocols/${PROTOCOL_ICONS[vault?.metadata?.protocol?.name]}?w=48&h=48`}
+        src={protocolIcon ? `https://icons.llamao.fi/icons/protocols/${protocolIcon}?w=48&h=48` : "/images/icons/POP.svg"}
         className="w-6 h-6 mr-1 rounded-full border border-[#ebe7d4cc]"
       />
       <p className="mt-1 text-[#55503D] font-medium">{vault?.metadata?.protocol?.name}</p>

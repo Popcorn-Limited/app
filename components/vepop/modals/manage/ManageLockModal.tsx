@@ -15,7 +15,7 @@ import IncreaseStakePreview from "./IncreaseStakePreview";
 import UnstakePreview from "./UnstakePreview";
 import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
-import { useLockedBalanceOf } from "pages/vepop";
+import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -45,7 +45,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
 
   const { waitForTx } = useWaitForTx();
   const { write: increaseLockAmount } = useIncreaseLockAmount(VOTING_ESCROW, amount);
-  const { write: increaseLockTime } = useIncreaseLockTime(VOTING_ESCROW, Number(lockedBal[1]) + (days * 86400));
+  const { write: increaseLockTime } = useIncreaseLockTime(VOTING_ESCROW, Number(lockedBal?.end || 0) + (days * 86400));
   const { write: withdrawLock } = useWithdrawLock(VOTING_ESCROW);
   const {
     write: approve = noOp,
@@ -66,7 +66,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   });
 
   const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
-  const showApproveButton = isApproveSuccess ? false : amount > Number(allowance.value || 0);
+  const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
     if (!showModal) { setStep(0); setMangementOption(null) }
@@ -85,7 +85,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     }
     if (mangementOption === ManagementOption.IncreaseTime) increaseLockTime()
     if (mangementOption === ManagementOption.Unlock) withdrawLock()
-
+    setShowModal(false)
   }
 
   return (

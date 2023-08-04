@@ -1,76 +1,45 @@
-import { BigNumber, Contract } from "ethers";
+import { BigNumber, Contract, constants } from "ethers";
 import useApproveBalance from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
-import { calcUnlockTime, calculateVeOut, getVotePeriodEndTime, useCreateLock } from "lib/Gauges/utils";
+import { getVotePeriodEndTime, useVoteForGauges } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
-import { RPC_PROVIDERS, formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
+import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
-import { FormEventHandler, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Address, useAccount, useContractRead } from "wagmi";
+import { Address, useAccount, useContractRead, useSigner } from "wagmi";
 import NoSSR from "react-no-ssr";
-import InputNumber from "components/InputNumber";
 import MainActionButton from "components/MainActionButton";
 import { intervalToDuration } from "date-fns";
-import TertiaryActionButton from "components/TertiaryActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import useGauges from "lib/Gauges/useGauges";
-import AnimatedChevron from "components/SweetVault/AnimatedChevron";
-import Title from "components/content/Title";
-import Accordion from "components/Accordion";
-import { NetworkSticker } from "components/NetworkSticker";
-import TokenIcon from "components/TokenIcon";
-import Modal from "components/Modal/Modal";
-import Slider from 'rc-slider';
 import Gauge from "components/vepop/Gauge";
 import LockModal from "components/vepop/modals/lock/LockModal";
 import ManageLockModal from "components/vepop/modals/manage/ManageLockModal";
+import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
 const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
 
-export const useLockedBalanceOf: Pop.Hook<[BigNumber, BigNumber]> = ({ chainId, address, account }) => {
-  return useConsistentRepolling(useContractRead({
-    address,
-    chainId: Number(chainId),
-    abi: ["function locked(address) view returns ((uint256,uint256))"],
-    functionName: "locked",
-    args: (!!account && [account]) || [],
-    scopeKey: `lockedBalanceOf:${chainId}:${address}:${account}`,
-    enabled: !!(chainId && address && account),
-  }),
-  ) as Pop.HookResult<[BigNumber, BigNumber]>;
-}
 
 export default function VePOP() {
   const { waitForTx } = useWaitForTx();
 
   const { address: account } = useAccount()
+  const { data: signer } = useSigner({ chainId: 5 })
 
   const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-  const { data: vePopBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
+  const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
 
-  const [avVotes, setAvVotes] = useState(10000);
+  const [avVotes, setAvVotes] = useState(0);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
-
-
-  async function testStuff() {
-    // const contract = new Contract(GAUGE_CONTROLLER, ["function gauges(uint256) external view returns (address)"], RPC_PROVIDERS[5])
-    // const gaugeAddress = await contract.gauges(1)
-    // console.log({ gaugeAddress })
-
-    const contract2 = new Contract(VOTING_ESCROW, ["function token() view returns (address)"], RPC_PROVIDERS[5])
-    const lpToken = await contract2.token()
-    console.log({ lpToken })
-  }
-
 
   function votingPeriodEnd(): number[] {
     const periodEnd = getVotePeriodEndTime();
@@ -103,21 +72,47 @@ export default function VePOP() {
     },
   });
 
+  useEffect(() => {
+    if (veBal) setAvVotes((Number(veBal?.value) / 1e18))
+  }, [veBal])
 
 
   function handleAvVotes(val: number, index: number) {
-    const newAvVotes = avVotes - val
-    setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
-
     const newVotes = [...votes]
     newVotes[index] = val
     setVotes(newVotes)
+
+    const newAvVotes = avVotes - (val - newVotes[index])
+    setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
+  }
+
+  function handleVotes() {
+    const gaugeController = new Contract(
+      "0xF9D1E727E1530373654522F293ad01897173142F",
+      ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
+      signer
+    )
+
+    let addr = new Array<string>(8);
+    let v = new Array<number>(8);
+
+    for (let i = 0; i < Math.ceil(gauges.length / 8); i++) {
+      addr = [];
+      v = [];
+
+      for (let n = 0; n < 8; n++) {
+        const l = i * 8
+        addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
+        v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
+      }
+      gaugeController.vote_for_many_gauge_weights(addr, votes)
+    }
   }
 
   return (
     <NoSSR>
-      <LockModal show={[showLockModal, setShowLockModal]}/>
-      <ManageLockModal show={[showMangementModal, setShowMangementModal]}/>
+      <LockModal show={[showLockModal, setShowLockModal]} />
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <div>
         <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
 
@@ -128,8 +123,8 @@ export default function VePOP() {
           </div>
 
           <div className="w-1/2">
-            <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[38px] md:leading-11 mb-4 md:mb-8">
-              Lock <span className="underline text-[#C391FF]">80POP</span> for vePOP, Rewards, and Voting Power
+            <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[38px] md:leading-14 mb-4 md:mb-8">
+              Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
             </h1>
             <p className="text-base text-primaryDark">
               Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
@@ -153,15 +148,15 @@ export default function VePOP() {
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">My Locked POP</p>
-              <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal[0], 18) : ""}</p>
+              <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">Locked Until</p>
-              <p className="font-bold">{lockedBal && lockedBal[1].toString() !== "0" ? new Date(Number(lockedBal[1]) * 1000).toLocaleDateString() : "-"}</p>
+              <p className="font-bold">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">My vePOP</p>
-              <p className="font-bold">{vePopBal?.formatted}</p>
+              <p className="font-bold">{veBal?.formatted}</p>
             </span>
             <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
               <p className="">Voting period ends</p>
@@ -169,7 +164,7 @@ export default function VePOP() {
             </span>
             <div className="flex flex-row items-center space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
-              <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} />
+              <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
               <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
             </div>
           </div>
@@ -197,17 +192,20 @@ export default function VePOP() {
 
         <section className="space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Gauge gauge={gauge} index={index} avVotes={avVotes} handleChange={handleAvVotes} />
+            <Gauge gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
           )
             : <p>Loading Gauges...</p>
           }
         </section>
-        <div className="fixed bottom-10 w-2/3">
-          <div className="z-10 mx-auto w-104 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center">
-            <p className="mr-10 mt-1">
-              Voting power used: <span className="text-[#05BE64]">{((1 - avVotes / 10_000) * 100).toFixed(2)}%</span>
+        <div className="absolute left-0 bottom-10 w-full">
+          <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
+            <p className="mt-1">
+              Voting power used: <span className="text-[#05BE64]">{((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2)}%</span>
             </p>
-            <button className="bg-[#FEE25D] rounded-lg py-3 px-2 text-center font-medium text-black">
+            <button
+              className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
+              onClick={handleVotes}
+            >
               Submit Votes
             </button>
           </div>

@@ -1,22 +1,20 @@
 import Accordion from "components/Accordion";
-import { NetworkSticker } from "components/NetworkSticker";
 import { AssetWithName } from "components/SweetVault/SweetVault";
-import TokenIcon from "components/TokenIcon";
-import Title from "components/content/Title";
 import useAdapterToken from "hooks/useAdapter";
 import useVaultToken from "hooks/useVaultToken";
 import useCurrentGaugeWeight from "lib/Gauges/useCurrentGaugeWeight";
 import { Gauge } from "lib/Gauges/useGauges";
 import useUpcomingGaugeWeight from "lib/Gauges/useUpcomingGaugeWeight";
 import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
+import { BigNumberWithFormatted } from "lib/types";
 import Slider from "rc-slider";
 import { useState } from "react";
-import { Address, useToken } from "wagmi";
 
 const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
 
 
-export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: Gauge, index: number, avVotes: number, handleChange: Function }): JSX.Element {
+export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, index: number, votes: [number, Function], veBal: BigNumberWithFormatted }): JSX.Element {
+  const [avVotes, handleAvVotes] = votes;
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
   const vaultMetadata = useVaultMetadata(gauge.vault, token, adapter, gauge.chainId);
@@ -28,7 +26,7 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
 
   function onChange(value) {
     if (value > avVotes + amount) value = avVotes + amount;
-    handleChange(value - amount, index);
+    handleAvVotes(value, index);
     setAmount(value);
   }
 
@@ -72,13 +70,13 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
 
               <div className="w-3/12">
                 <p className=" text-primary text-3xl text-start">
-                  {(Number(upcomingGaugeWeight?.formatted) / 1e16).toFixed(2) || 0} %
+                  {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
 
               <div className="w-3/12">
                 <p className=" text-primary text-3xl">
-                  {((amount / 10000) * 100).toFixed(2)} %
+                  {((amount / (Number(veBal?.value) / 1e18)) * 100).toFixed(2)} %
                 </p>
               </div>
 
@@ -96,7 +94,7 @@ export default function Gauge({ gauge, index, avVotes, handleChange }: { gauge: 
                   }}
                   value={amount}
                   onChange={(val) => onChange(val)}
-                  max={10000}
+                  max={Number(veBal?.value) / 1e18}
                 />
               </div>
             </div>

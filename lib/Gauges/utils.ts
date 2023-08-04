@@ -23,6 +23,19 @@ export function calculateVeOut(amount: number | string, days: number) {
   return Number(amount) * lockTime / maxTime;
 }
 
+export function getVotePeriodEndTime(): number {
+  const n = nextThursday(new Date());
+  const epochEndTime = Date.UTC(
+    n.getFullYear(),
+    n.getMonth(),
+    n.getDate(),
+    0,
+    0,
+    0
+  );
+  return epochEndTime;
+}
+
 export function useCreateLock(address: string, amount: number | string, days: number) {
   const _amount = parseUnits(String(amount));
   const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
@@ -80,17 +93,4 @@ export function useWithdrawLock(address: string) {
   return useContractWrite({
     ...config,
   });
-}
-
-export function getVotePeriodEndTime(): number {
-  const n = nextThursday(new Date());
-  const epochEndTime = Date.UTC(
-    n.getFullYear(),
-    n.getMonth(),
-    n.getDate(),
-    0,
-    0,
-    0
-  );
-  return epochEndTime;
 }
