@@ -180,6 +180,14 @@ export const MobileMenu: React.FC = () => {
                       </div>
                       <div className="py-6">
                         <NavbarLink
+                          label="VePOP"
+                          url={`/vepop`}
+                          isActive={router?.pathname.includes("/vepop")}
+                          onClick={() => toggleMenu(false)}
+                        />
+                      </div>
+                      <div className="py-6">
+                        <NavbarLink
                           label="Rewards"
                           url={`/rewards`}
                           isActive={router?.pathname.includes("/rewards")}

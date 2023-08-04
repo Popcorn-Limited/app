@@ -76,7 +76,7 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
 
               <div className="w-3/12">
                 <p className=" text-primary text-3xl">
-                  {((amount / (Number(veBal?.value) / 1e18)) * 100).toFixed(2)} %
+                  {veBal ? ((amount / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"} %
                 </p>
               </div>
 

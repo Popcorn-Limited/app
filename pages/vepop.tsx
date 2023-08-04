@@ -122,8 +122,8 @@ export default function VePOP() {
             </svg>
           </div>
 
-          <div className="w-1/2">
-            <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[38px] md:leading-14 mb-4 md:mb-8">
+          <div className="md:w-1/2">
+            <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[44px] md:leading-14 mb-4 md:mb-8">
               Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
             </h1>
             <p className="text-base text-primaryDark">
@@ -139,8 +139,8 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="py-10 flex flex-row items-center justify-between space-x-8">
-          <div className="w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+        <section className="py-10 md:flex md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-8">
+          <div className="w-full md:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">My POP</p>
@@ -160,16 +160,16 @@ export default function VePOP() {
             </span>
             <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
               <p className="">Voting period ends</p>
-              <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h : {votingPeriodEnd()[2]}m</p>
+              <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden md:inline">: {votingPeriodEnd()[2]}m</span></p>
             </span>
-            <div className="flex flex-row items-center space-x-8 mt-6">
+            <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
               <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
               <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
             </div>
           </div>
 
-          <div className="w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+          <div className="md:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">APR</p>
@@ -190,17 +190,22 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="hidden md:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Gauge gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
+            <Gauge key={gauge.address} gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
           )
             : <p>Loading Gauges...</p>
           }
         </section>
-        <div className="absolute left-0 bottom-10 w-full">
+
+        <section className="md:hidden">
+          <p className="text-primary">Gauge Voting not available on mobile.</p>
+        </section>
+
+        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
           <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
-              Voting power used: <span className="text-[#05BE64]">{((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2)}%</span>
+              Voting power used: <span className="text-[#05BE64]">{veBal ? ((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"}%</span>
             </p>
             <button
               className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
