@@ -79,10 +79,11 @@ export default function VePOP() {
 
   function handleAvVotes(val: number, index: number) {
     const newVotes = [...votes]
+    const newAvVotes = avVotes - (val - newVotes[index])
+
     newVotes[index] = val
     setVotes(newVotes)
 
-    const newAvVotes = avVotes - (val - newVotes[index])
     setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
   }
 
@@ -105,7 +106,7 @@ export default function VePOP() {
         addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
         v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
       }
-      gaugeController.vote_for_many_gauge_weights(addr, votes)
+      gaugeController.vote_for_many_gauge_weights(addr, v)
     }
   }
 
@@ -127,7 +128,7 @@ export default function VePOP() {
               Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
             </h1>
             <p className="text-base text-primaryDark">
-              Vote with your vePOP below to influence how much $oPOP each vault will receive. 
+              Vote with your vePOP below to influence how much $oPOP each vault will receive.
               Your vote will persist until you change it and editing a vault can only be done once every 10 days.
             </p>
 
