@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import AssetInputWithAction from "components/AssetInputWithAction";
 import { constants } from "ethers";
 import StakingTermsAndConditions from "components/StakingTermsAndConditions";
-import { formatDate, useNamedAccounts } from "lib/utils";
+import { formatDate, formatNumber, useNamedAccounts } from "lib/utils";
 import MainActionButton from "components/MainActionButton";
 import VestingRecordDropDown from "components/staking/VestingRecordDropDown";
 import { ChainId, formatAndRoundBigNumber } from "lib/utils";
@@ -102,7 +102,7 @@ export default function Index(): JSX.Element {
             <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
               {/* Somehow the Convex Staking Contract breaks on optimism. Therefore we simply check the balanceOf pop token in the staking contract */}
               <StatusWithLabel
-                content={`${((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18)).toFixed(2)} $`}
+                content={`$ ${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
                 label="TVL"
               />
             </div>

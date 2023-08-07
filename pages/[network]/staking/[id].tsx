@@ -18,6 +18,7 @@ import MainActionButton from "components/MainActionButton";
 import useExit from "lib/Staking/hooks/useExit";
 import { usePrice } from "lib/Price";
 import { useBalanceOf } from "lib/Erc20/hooks";
+import { formatNumber } from "lib/utils";
 
 function noOp() { }
 
@@ -83,8 +84,8 @@ export default function Index(): JSX.Element {
                   </div>
                   <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
                     <StatusWithLabel
-                      content={`${((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18)).toFixed(2)} $`}
-                    label="TVL" 
+                      content={`$ ${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
+                      label="TVL"
                     />
                   </div>
                   <div className="block mt-6 laptop:mt-8 pr-8 laptop:pr-0 laptop:pl-6 laptop:border-l laptop:border-customLightGray">

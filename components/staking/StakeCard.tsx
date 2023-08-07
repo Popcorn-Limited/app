@@ -1,4 +1,4 @@
-import { ChainId, networkMap } from "lib/utils";
+import { ChainId, formatNumber, networkMap } from "lib/utils";
 import MainActionButton from "components/MainActionButton";
 import TokenIcon from "components/TokenIcon";
 import { StakingType } from "hooks/staking/useAllStakingAddresses";
@@ -102,7 +102,7 @@ const StakeCard: React.FC<StakeCardProps> = ({ stakingAddress, stakingType, chai
                     <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
                       <p className="text-primaryLight leading-6">TVL</p>
                       <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
-                        {((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18)).toFixed(2)} $
+                        $ {formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}
                       </div>
                     </div>
                     <div className="w-full md:w-1/2 mt-6 md:mt-0">
