@@ -16,6 +16,8 @@ import NoSSR from "react-no-ssr";
 import { Erc20, Staking } from "lib";
 import MainActionButton from "components/MainActionButton";
 import useExit from "lib/Staking/hooks/useExit";
+import { usePrice } from "lib/Price";
+import { useBalanceOf } from "lib/Erc20/hooks";
 
 function noOp() { }
 
@@ -28,6 +30,14 @@ export default function Index(): JSX.Element {
   const { write: exit = noOp } = useExit(stakingAddress, chainId);
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
+
+  const { data: price } = usePrice({
+    address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+    chainId: 1,
+    resolver: "llama"
+  })
+  const { data: tokenStaked } = useBalanceOf({ address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8", chainId, account: stakingAddress })
+
 
   function handleExit() {
     if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId))
@@ -56,7 +66,7 @@ export default function Index(): JSX.Element {
                 <div className="flex flex-wrap">
                   <div className="block pr-8 md:pr-6 mt-6 md:mt-8">
                     <StatusWithLabel
-                      content={<Staking.Apy chainId={chainId} address={stakingAddress} />}
+                      content={"0.00%"}
                       label={
                         <>
                           <span className="lowercase">v</span>APR
@@ -72,7 +82,10 @@ export default function Index(): JSX.Element {
                     />
                   </div>
                   <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
-                    <StatusWithLabel content={<Tvl chainId={chainId} address={stakingAddress} />} label="TVL" />
+                    <StatusWithLabel
+                      content={`${((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18)).toFixed(2)} $`}
+                    label="TVL" 
+                    />
                   </div>
                   <div className="block mt-6 laptop:mt-8 pr-8 laptop:pr-0 laptop:pl-6 laptop:border-l laptop:border-customLightGray">
                     <StatusWithLabel

@@ -25,11 +25,18 @@ import { useLockedBalances } from "lib/PopLocker/hooks";
 import useRestake from "hooks/useRestake";
 import NoSSR from "react-no-ssr";
 import { ValueOfBalance } from "lib/Erc20";
-import { useAllowance } from "lib/Erc20/hooks";
+import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
+import { usePrice } from "lib/Price";
 
 const TAB_DEPOSIT = "Deposit";
 const TAB_WITHDRAW = "Withdraw";
 const TABS = [TAB_DEPOSIT, TAB_WITHDRAW];
+
+const POP = {
+  1: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
+  10: "0x6F0fecBC276de8fC69257065fE47C5a03d986394",
+  137: "0xC5B57e9a1E7914FDA753A88f24E5703e617Ee50c",
+}
 
 export default function Index(): JSX.Element {
   const chainId = useChainIdFromUrl();
@@ -45,6 +52,13 @@ export default function Index(): JSX.Element {
   const [chosenLock, setChosenLock] = useState({ amount: constants.Zero, boosted: constants.Zero, unlockTime: 0 });
   const [restake, setRestake] = useState(true);
   const { write: restakeLock } = useRestake(restake, popStaking?.address, chainId, account);
+
+  const { data: price } = usePrice({
+    address: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
+    chainId: 1,
+    resolver: "llama"
+  })
+  const { data: tokenStaked } = useBalanceOf({ address: POP[chainId], chainId, account: popStaking?.address })
 
   useEffect(() => {
     if (status === "success" && lockedBalances.lockData.length > 0) {
@@ -71,7 +85,7 @@ export default function Index(): JSX.Element {
           <div className="flex flex-wrap">
             <div className="block pr-8 md:pr-6 mt-6 md:mt-8">
               <StatusWithLabel
-                content={<Staking.Apy chainId={chainId} address={popStaking?.address} />}
+                content={"0.00%"}
                 label={
                   <>
                     <span className="lowercase">v</span>APR
@@ -88,13 +102,7 @@ export default function Index(): JSX.Element {
             <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
               {/* Somehow the Convex Staking Contract breaks on optimism. Therefore we simply check the balanceOf pop token in the staking contract */}
               <StatusWithLabel
-                content={
-                  chainId === ChainId.Optimism ? (
-                    <ValueOfBalance chainId={chainId} address={pop?.address} account={popStaking?.address as Address} />
-                  ) : (
-                    <Tvl chainId={chainId} address={popStaking?.address} />
-                  )
-                }
+                content={`${((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18)).toFixed(2)} $`}
                 label="TVL"
               />
             </div>
