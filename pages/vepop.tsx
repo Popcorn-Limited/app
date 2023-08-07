@@ -127,7 +127,8 @@ export default function VePOP() {
               Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
             </h1>
             <p className="text-base text-primaryDark">
-              Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
+              Vote with your vePOP below to influence how much $oPOP each vault will receive. 
+              Your vote will persist until you change it and editing a vault can only be done once every 10 days.
             </p>
 
           </div>

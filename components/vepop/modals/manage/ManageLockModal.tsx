@@ -97,7 +97,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
           <>
             {step === 1 &&
               <>
-                <IncreaseStakeInterface amountState={[amount, setAmount]} daysState={[days, setDays]} lockedBal={lockedBal} />
+                <IncreaseStakeInterface amountState={[amount, setAmount]} lockedBal={lockedBal} />
                 <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />
               </>
             }

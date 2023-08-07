@@ -18,7 +18,7 @@ export function calcDaysToUnlock(unlockTime: number): number {
 
 export function calculateVeOut(amount: number | string, days: number) {
   const week = 7;
-  const maxTime = 52;
+  const maxTime = 52 * 4; // 4 years in weeks
   const lockTime = Math.floor(days / week);
   return Number(amount) * lockTime / maxTime;
 }

@@ -25,7 +25,7 @@ export default function IncreaseStakePreview({ amount, lockedBal }: { amount: nu
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>New Voting Power</p>
-          <p className="text-[#141416]">{amount > 0 ? calculateVeOut(amount, calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "0"} vePOP</p>
+          <p className="text-[#141416]">{amount > 0 ? calculateVeOut((Number(lockedBal?.amount) / 1e18) + amount, calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "0"} vePOP</p>
         </div>
       </div>
 

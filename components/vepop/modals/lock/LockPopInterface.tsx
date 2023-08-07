@@ -81,6 +81,7 @@ export default function LockPopInterface({ amountState, daysState }:
           <LockTimeButton label="6M" isActive={days === 180} handleClick={() => setDays(180)} />
           <LockTimeButton label="1Y" isActive={days === 365} handleClick={() => setDays(365)} />
           <LockTimeButton label="2Y" isActive={days === 730} handleClick={() => setDays(730)} />
+          <LockTimeButton label="4Y" isActive={days === 1460} handleClick={() => setDays(1460)} />
           <div className="w-40 flex px-5 py-2 items-center rounded-lg border border-customLightGray">
             <InputNumber
               onChange={handleSetDays}
