@@ -84,7 +84,7 @@ export default function Index(): JSX.Element {
                   </div>
                   <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
                     <StatusWithLabel
-                      content={`$ ${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
+                      content={`$${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
                       label="TVL"
                     />
                   </div>
