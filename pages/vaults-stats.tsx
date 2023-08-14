@@ -555,7 +555,7 @@ export default function Vaults() {
                         <span className={`flex flex-col my-auto`}>
                             <p className={`text-[0.75rem]`}>Total Value locked</p>
                             <p className={`text-[1.5rem] leading-none font-bold`}>
-                                ${ (statistics.tvl)}
+                                ${Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(statistics.tvl)}
                             </p>
                         </span>
                     </div>
