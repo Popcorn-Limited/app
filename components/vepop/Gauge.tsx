@@ -63,19 +63,19 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
             <div className="flex flex-row items-center">
 
               <div className="w-3/12">
-                <p className=" text-primary text-3xl">
+                <p className=" text-primary text-xl">
                   {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
 
               <div className="w-3/12">
-                <p className=" text-primary text-3xl text-start">
+                <p className=" text-primary text-xl text-start">
                   {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
 
               <div className="w-3/12">
-                <p className=" text-primary text-3xl">
+                <p className=" text-primary text-xl">
                   {veBal ? ((amount / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"} %
                 </p>
               </div>
