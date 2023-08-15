@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
-import axios, { AxiosRequestHeaders } from "axios";
+import axios from "axios";
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import SelectField from "../components/SelectField";
+import { ChainId, RPC_URLS } from "lib/utils";
+import NoSSR from "react-no-ssr";
 
 type DuneQueryResult<T> = {
     result: {
@@ -20,19 +22,24 @@ const vaultTvlChartColors = [
     "#FA5A6E",
 ]
 
-const chainOptions = [{
-    image: 'https://cdn.furucombo.app/assets/img/token/MATIC.png',
-    label: 'Polygon'
-}, {
-    image: 'https://cdn.furucombo.app/assets/img/token/ETH.png',
-    label: 'Ethereum'
-}, {
-    image: 'https://cdn.furucombo.app/assets/img/token/ARB.svg',
-    label: 'Arbitrium'
-}, {
-    image: 'https://cdn.furucombo.app/assets/img/token/BTC.svg',
-    label: 'Binance'
-}]
+const chainOptions = [
+    // {
+    //     image: 'https://cdn.furucombo.app/assets/img/token/MATIC.png',
+    //     label: 'Polygon'
+    // },
+    {
+        image: 'https://cdn.furucombo.app/assets/img/token/ETH.png',
+        label: 'Ethereum'
+    },
+    // {
+    //     image: 'https://cdn.furucombo.app/assets/img/token/ARB.svg',
+    //     label: 'Arbitrum'
+    // },
+    // {
+    //     image: 'https://cdn.furucombo.app/assets/img/token/BTC.svg',
+    //     label: 'Binance'
+    // }
+]
 
 const leaderboardOptions = [{
     label: 'Top Stakers'
@@ -176,7 +183,7 @@ export default function Vaults() {
                 },
                 tooltip: {
                     valueSuffix: '%',
-                    formatter: function() {
+                    formatter: function () {
                         return `${this.key}: ${this.y?.toLocaleString()}`;
                     }
                 },
@@ -187,7 +194,7 @@ export default function Vaults() {
                     data,
                     type: 'pie'
                 }]
-        },
+            },
         );
     }
 
@@ -241,7 +248,7 @@ export default function Vaults() {
                     enabled: false,
                 },
                 tooltip: {
-                    formatter: function() {
+                    formatter: function () {
                         return Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.y as number);
                     },
                 },
@@ -286,7 +293,7 @@ export default function Vaults() {
 
         const balancer = new BalancerSDK({
             network: Network.MAINNET,
-            rpcUrl: process.env.INFURA_URL as string,
+            rpcUrl: RPC_URLS[ChainId.Ethereum] as string,
         })
 
         const [
@@ -410,203 +417,205 @@ export default function Vaults() {
     }, [])
 
     return (
-        <div className={`text-white p-8 bg-[#141416]`}>
-            <h1 className={`font-bold text-[2rem]`}>Popcorn Statistics</h1>
-            <p className={`text-[1.125rem] mb-8`}>Total Stats start from 23 June 2023.</p>
-            <div className={`grid md:grid-cols-2 gap-[2rem]`}>
-                <div className={`bg-[#23262f] rounded-[1rem] border-[#353945] border-[1px] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>Total Supply</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
-                    </div>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>Liquid Supply</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
-                    </div>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>FDV</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2})}</h2>
-                    </div>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>Market Cap</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2})}</h2>
-                    </div>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>POP Price</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2})}</h2>
-                    </div>
-                    <div className={`flex flex-col`}>
-                        <p className={`text-[1rem]`}>Burned POP</p>
-                        <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>Coming Soon</h2>
-                    </div>
-                </div>
-                <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                    <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                        <img src="/images/icons/popLogo.svg" alt="Logo" className={`w-8 h-8 self-center`} />
-                        <div className={`flex flex-col justify-center`}>
-                            <p className={`text-[1rem]`}>POPCORN</p>
-                            <p className={`text-[0.625rem]`}>Liquid POP market (Mainnet only)</p>
+        <NoSSR>
+            <div className={`text-white p-8 bg-[#141416]`}>
+                <h1 className={`font-bold text-[2rem]`}>Popcorn Statistics</h1>
+                <p className={`text-[1.125rem] mb-8`}>Total Stats start from 23 June 2023.</p>
+                <div className={`grid md:grid-cols-2 gap-[2rem]`}>
+                    <div className={`bg-[#23262f] rounded-[1rem] border-[#353945] border-[1px] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>Total Supply</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
+                        </div>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>Liquid Supply</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
+                        </div>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>FDV</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                        </div>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>Market Cap</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                        </div>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>POP Price</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                        </div>
+                        <div className={`flex flex-col`}>
+                            <p className={`text-[1rem]`}>Burned POP</p>
+                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>Coming Soon</h2>
                         </div>
                     </div>
-                    <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
-                        <div className={`flex flex-col grow-[1]`}>
-                            <div className={`flex justify-between`}>
-                                <p>POP in 80/20 BAL pool</p>
-                                <p className={`font-bold text-right`}>{statistics.popInBalPool.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>WETH in 80/20 BAL pool</p>
-                                <p className={`font-bold text-right`}>{statistics.wethInBalPool.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>BAL LPs</p>
-                                <p className={`font-bold text-right`}>{statistics.balLp.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>vePOP (staked LPs)</p>
-                                <p className={`font-bold text-right`}>{statistics.vePop.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>cPOP emissions</p>
-                                <p className={`font-bold text-right`}>{statistics.cPopEmissions.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>cPOP exercised</p>
-                                <p className={`font-bold text-right`}>{(statistics.cPopExercised * 100).toLocaleString()}%</p>
+                    <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                        <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                            <img src="/images/icons/popLogo.svg" alt="Logo" className={`w-8 h-8 self-center`} />
+                            <div className={`flex flex-col justify-center`}>
+                                <p className={`text-[1rem]`}>POPCORN</p>
+                                <p className={`text-[0.625rem]`}>Liquid POP market (Mainnet only)</p>
                             </div>
                         </div>
-                        <div className={`flex justify-center`} ref={liquidPopMarketChartElem} />
-                    </div>
-                </div>
-                <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                    <div className={`h-[4rem] flex justify-between border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                        <p className={`text-[0.75rem] sm:text-[1rem] my-auto`}>Sweet Vault TVL</p>
-                        <SelectField value={tvlChain} options={chainOptions} onChange={opt => setTvlChain(opt)} />
-                    </div>
-                    <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
-                        <div className={`flex flex-col justify-between grow-[1]`}>
-                            {statistics.vaultTvl.map((item, idx) => {
-                                return (
-                                    <div key={idx} className={`flex justify-between`}>
-                                        <p>{item.title}</p>
-                                        <p className={`font-bold text-right`}>${item.count.toLocaleString()}</p>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                        <div className={`flex justify-center`} ref={vaultTvlChartElem} />
-                    </div>
-                </div>
-                <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                    <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                        <p className={`text-[1rem] my-auto`}>Total Stats</p>
-                    </div>
-                    <div className={`py-4 px-6 flex gap-[3.5rem]`}>
-                        <div className={`flex flex-col grow-[1]`}>
-                            <div className={`flex justify-between`}>
-                                <p>Total Revenue</p>
-                                <p className={`font-bold text-right`}>${statistics.totalRevenue.toLocaleString()}</p>
+                        <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
+                            <div className={`flex flex-col grow-[1]`}>
+                                <div className={`flex justify-between`}>
+                                    <p>POP in 80/20 BAL pool</p>
+                                    <p className={`font-bold text-right`}>{statistics.popInBalPool.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>WETH in 80/20 BAL pool</p>
+                                    <p className={`font-bold text-right`}>{statistics.wethInBalPool.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>BAL LPs</p>
+                                    <p className={`font-bold text-right`}>{statistics.balLp.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>vePOP (staked LPs)</p>
+                                    <p className={`font-bold text-right`}>{statistics.vePop.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>cPOP emissions</p>
+                                    <p className={`font-bold text-right`}>{statistics.cPopEmissions.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>cPOP exercised</p>
+                                    <p className={`font-bold text-right`}>{(statistics.cPopExercised * 100).toLocaleString()}%</p>
+                                </div>
                             </div>
-                            <div className={`flex justify-between`}>
-                                <p>Sweet Vault Fees</p>
-                                <p className={`font-bold text-right`}>Coming Soon</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>cPOP Revenue</p>
-                                <p className={`font-bold text-right`}>${statistics.cPopRevenue.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>Total Users</p>
-                                <p className={`font-bold text-right`}>{statistics.walletsPopMoreZero.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>Public Good Funding</p>
-                                <p className={`font-bold text-right`}>${statistics.publicGoodFunding.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>7 Day Cex Volume</p>
-                                <p className={`font-bold text-right`}>${statistics.weekCexVolume.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>7 Day Dex Volume</p>
-                                <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>{'Wallets with POP > 100'}</p>
-                                <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundred.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>{'Wallets with POP > 1,000'}</p>
-                                <p className={`font-bold text-right`}>{statistics.walletsPopMoreThousand.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>{'Wallets with POP > 100,000'}</p>
-                                <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundredThousand.toLocaleString()}</p>
-                            </div>
-                            <div className={`flex justify-between`}>
-                                <p>{'Wallets with POP > 1,000,000'}</p>
-                                <p className={`font-bold text-right`}>{statistics.walletsPopMoreMillion.toLocaleString()}</p>
-                            </div>
+                            <div className={`flex justify-center`} ref={liquidPopMarketChartElem} />
                         </div>
                     </div>
-                </div>
-                <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                    <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                        <span className={`flex flex-col my-auto`}>
-                            <p className={`text-[0.75rem]`}>Total Value locked</p>
-                            <p className={`text-[1.5rem] leading-none font-bold`}>
-                                ${Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(statistics.tvl)}
-                            </p>
-                        </span>
-                    </div>
-                    <div className={`py-4 px-6`}>
-                        <div ref={TVLOverTimeChartElem} />
-                    </div>
-                </div>
-                <div className={`col-span-full grid md:grid-cols-3 gap-8`}>
-                    <div className={`md:col-span-2`}>
-                        <h2 className={`text-[1.5rem] font-bold mb-2`}>{'Snapshot PIP\'s'}</h2>
-                        <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                            <div className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] gap-[1rem] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                                <span>#</span>
-                                <span>Title</span>
-                                <span className={`hidden md:block`}>Date</span>
-                            </div>
-                            <div className={`py-4 px-6 flex flex-col gap-4 max-h-[30rem] overflow-auto`}>
-                                {statistics.snapshotPips.map((item, idx) => {
+                    <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                        <div className={`h-[4rem] flex justify-between border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                            <p className={`text-[0.75rem] sm:text-[1rem] my-auto`}>Sweet Vault TVL</p>
+                            <SelectField value={tvlChain} options={chainOptions} onChange={opt => setTvlChain(opt)} />
+                        </div>
+                        <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
+                            <div className={`flex flex-col justify-between grow-[1]`}>
+                                {statistics.vaultTvl.map((item, idx) => {
                                     return (
-                                        <div key={idx} className={`grid grid-cols-[2.5rem_1fr] md:grid-cols-[2.5rem_1fr_1fr_3rem] gap-[1rem]`}>
-                                            <span>{idx + 1}</span>
-                                            <span>{item.title}</span>
-                                            <span className={`hidden md:block`}>{formatDate(item.created * 1000)}</span>
-                                            <a className={`hidden md:block`} href="https://snapshot.org/#/popcorn-snapshot.eth">Link</a>
+                                        <div key={idx} className={`flex justify-between`}>
+                                            <p>{item.title}</p>
+                                            <p className={`font-bold text-right`}>${item.count.toLocaleString()}</p>
                                         </div>
                                     )
                                 })}
                             </div>
+                            <div className={`flex justify-center`} ref={vaultTvlChartElem} />
                         </div>
                     </div>
-                    <div>
-                        <h2 className={`text-[1.5rem] font-bold mb-2`}>Leaderboard</h2>
-                        <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
-                            <div className={`min-h-[4rem] max-h-[4rem] flex content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
-                                <SelectField value={leaderboardOption} options={leaderboardOptions} onChange={opt => setleaderboardOption(opt)}  />
+                    <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                        <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                            <p className={`text-[1rem] my-auto`}>Total Stats</p>
+                        </div>
+                        <div className={`py-4 px-6 flex gap-[3.5rem]`}>
+                            <div className={`flex flex-col grow-[1]`}>
+                                <div className={`flex justify-between`}>
+                                    <p>Total Revenue</p>
+                                    <p className={`font-bold text-right`}>${statistics.totalRevenue.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>Sweet Vault Fees</p>
+                                    <p className={`font-bold text-right`}>Coming Soon</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>cPOP Revenue</p>
+                                    <p className={`font-bold text-right`}>${statistics.cPopRevenue.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>Total Users</p>
+                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreZero.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>Public Good Funding</p>
+                                    <p className={`font-bold text-right`}>${statistics.publicGoodFunding.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>7 Day Cex Volume</p>
+                                    <p className={`font-bold text-right`}>${statistics.weekCexVolume.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>7 Day Dex Volume</p>
+                                    <p className={`font-bold text-right`}>${statistics.weekDexVolume.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with POP > 100'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundred.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with POP > 1,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreThousand.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with POP > 100,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreHundredThousand.toLocaleString()}</p>
+                                </div>
+                                <div className={`flex justify-between`}>
+                                    <p>{'Wallets with POP > 1,000,000'}</p>
+                                    <p className={`font-bold text-right`}>{statistics.walletsPopMoreMillion.toLocaleString()}</p>
+                                </div>
                             </div>
-                            <div className={`py-4 px-6 flex flex-col gap-4 max-h-[30rem] overflow-auto`}>
-                                {statistics.leaderboard.map((item, idx) => {
-                                    return (
-                                        <div key={idx} className={`grid grid-cols-[2.5rem_1fr_1fr] gap-[1rem]`}>
-                                            <span>{idx + 1}</span>
-                                            <span>{item.address.slice(0, 7)}</span>
-                                            <span className={`font-bold`}>{item.count.toLocaleString(undefined, {maximumFractionDigits: 2})} POP</span>
-                                        </div>
-                                    )
-                                })}
+                        </div>
+                    </div>
+                    <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                        <div className={`h-[4rem] flex gap-2 border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                            <span className={`flex flex-col my-auto`}>
+                                <p className={`text-[0.75rem]`}>Total Value locked</p>
+                                <p className={`text-[1.5rem] leading-none font-bold`}>
+                                    ${Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(statistics.tvl)}
+                                </p>
+                            </span>
+                        </div>
+                        <div className={`py-4 px-6`}>
+                            <div ref={TVLOverTimeChartElem} />
+                        </div>
+                    </div>
+                    <div className={`col-span-full grid md:grid-cols-3 gap-8`}>
+                        <div className={`md:col-span-2`}>
+                            <h2 className={`text-[1.5rem] font-bold mb-2`}>{'Snapshot PIP\'s'}</h2>
+                            <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                                <div className={`min-h-[4rem] max-h-[4rem] grid grid-cols-[2.5rem_1fr] gap-[1rem] md:grid-cols-[2.5rem_1fr_1fr_3rem] content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                                    <span>#</span>
+                                    <span>Title</span>
+                                    <span className={`hidden md:block`}>Date</span>
+                                </div>
+                                <div className={`py-4 px-6 flex flex-col gap-4 max-h-[30rem] overflow-auto`}>
+                                    {statistics.snapshotPips.map((item, idx) => {
+                                        return (
+                                            <div key={idx} className={`grid grid-cols-[2.5rem_1fr] md:grid-cols-[2.5rem_1fr_1fr_3rem] gap-[1rem]`}>
+                                                <span>{idx + 1}</span>
+                                                <span>{item.title}</span>
+                                                <span className={`hidden md:block`}>{formatDate(item.created * 1000)}</span>
+                                                <a className={`hidden md:block`} href="https://snapshot.org/#/popcorn-snapshot.eth">Link</a>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 className={`text-[1.5rem] font-bold mb-2`}>Leaderboard</h2>
+                            <div className={`bg-[#23262f] flex flex-col border-[1px] border-[#353945] rounded-[1rem]`}>
+                                <div className={`min-h-[4rem] max-h-[4rem] flex content-center border-b-[1px] border-[#353945] px-[1.5rem]`}>
+                                    <SelectField value={leaderboardOption} options={leaderboardOptions} onChange={opt => setleaderboardOption(opt)} />
+                                </div>
+                                <div className={`py-4 px-6 flex flex-col gap-4 max-h-[30rem] overflow-auto`}>
+                                    {statistics.leaderboard.map((item, idx) => {
+                                        return (
+                                            <div key={idx} className={`grid grid-cols-[2.5rem_1fr_1fr] gap-[1rem]`}>
+                                                <span>{idx + 1}</span>
+                                                <span>{item.address.slice(0, 7)}</span>
+                                                <span className={`font-bold`}>{item.count.toLocaleString(undefined, { maximumFractionDigits: 2 })} POP</span>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </NoSSR>
     )
 }
