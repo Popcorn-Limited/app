@@ -1,7 +1,7 @@
 import { BigNumber, Contract, constants } from "ethers";
 import useApproveBalance from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
-import { getVotePeriodEndTime, useVoteForGauges } from "lib/Gauges/utils";
+import { getVotePeriodEndTime } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
 import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
@@ -17,10 +17,15 @@ import Gauge from "components/vepop/Gauge";
 import LockModal from "components/vepop/modals/lock/LockModal";
 import ManageLockModal from "components/vepop/modals/manage/ManageLockModal";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
+import useOPopPrice from "lib/OPop/useOPopPrice";
+import useOPopDiscount from "lib/OPop/useOPopDiscount";
+import OPopModal from "components/vepop/modals/oPop/OPopModal";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
 const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
+const OPOP = "0x57de6369E9e1fd485584B78A29b501B1CA65EB29"
+const OPOP_ORACLE = "0x4b4a8479CDFaB077BA4D0926041D10098f18bFe7"
 
 
 export default function VePOP() {
@@ -33,6 +38,9 @@ export default function VePOP() {
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
 
+  const { data: oPopPrice } = useOPopPrice({ chainId: 5, address: OPOP_ORACLE })
+  const { data: oPopDiscount } = useOPopDiscount({ chainId: 5, address: OPOP_ORACLE })
+
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
 
   const [avVotes, setAvVotes] = useState(0);
@@ -40,6 +48,7 @@ export default function VePOP() {
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
+  const [showOPopModal, setShowOPopModal] = useState(false);
 
   function votingPeriodEnd(): number[] {
     const periodEnd = getVotePeriodEndTime();
@@ -114,6 +123,7 @@ export default function VePOP() {
     <NoSSR>
       <LockModal show={[showLockModal, setShowLockModal]} />
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
+      <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
         <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
 
@@ -189,6 +199,7 @@ export default function VePOP() {
                 <p className="">($0.00)</p>
               </div>
             </div>
+            <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
           </div>
         </section>
 
