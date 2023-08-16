@@ -20,6 +20,7 @@ import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 import useOPopPrice from "lib/OPop/useOPopPrice";
 import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
+import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -35,13 +36,14 @@ export default function VePOP() {
   const { data: signer } = useSigner({ chainId: 5 })
 
   const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
+  const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
 
   const { data: oPopPrice } = useOPopPrice({ chainId: 5, address: OPOP_ORACLE })
-  const { data: oPopDiscount } = useOPopDiscount({ chainId: 5, address: OPOP_ORACLE })
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
+  const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
   const [avVotes, setAvVotes] = useState(0);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
@@ -125,16 +127,16 @@ export default function VePOP() {
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
-        <section className="md:py-10 md:border-b border-[#F0EEE0] md:flex md:flex-row items-center justify-between">
+        <section className="lg:py-10 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
 
-          <div className="bg-[#C391FF] rounded-lg h-64 w-full p-6 mb-10 flex md:hidden justify-end items-end ">
+          <div className="bg-[#C391FF] rounded-lg h-64 w-full p-6 mb-10 flex lg:hidden justify-end items-end ">
             <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
               <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#9B55FF" />
             </svg>
           </div>
 
-          <div className="md:w-1/2">
-            <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[44px] md:leading-14 mb-4 md:mb-8">
+          <div className="lg:w-1/2">
+            <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-14 mb-4 lg:mb-8">
               Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
             </h1>
             <p className="text-base text-primaryDark">
@@ -144,15 +146,15 @@ export default function VePOP() {
 
           </div>
 
-          <div className="bg-[#C391FF] rounded-lg h-64 w-112 p-6 hidden md:flex justify-end items-end ">
+          <div className="bg-[#C391FF] rounded-lg h-64 w-112 p-6 hidden lg:flex justify-end items-end ">
             <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
               <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#9B55FF" />
             </svg>
           </div>
         </section>
 
-        <section className="py-10 md:flex md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-8">
-          <div className="w-full md:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+        <section className="py-10 lg:flex lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
+          <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">My POP</p>
@@ -172,40 +174,41 @@ export default function VePOP() {
             </span>
             <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
               <p className="">Voting period ends</p>
-              <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden md:inline">: {votingPeriodEnd()[2]}m</span></p>
+              <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
             </span>
-            <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8 mt-6">
+            <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
               <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
               <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
             </div>
           </div>
 
-          <div className="md:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+          <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">APR</p>
               <p className="font-bold">? %</p>
             </span>
             <span className="flex flex-row items-center justify-between">
-              <p className="">cPOP</p>
-              <p className="font-bold">0</p>
+              <p className="">Claimable oPOP</p>
+              <p className="font-bold">{(Number(gaugeRewards?.total) / 1e18).toFixed(2)}</p>
             </span>
             <div className="h-8"></div>
             <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
-              <p className="">Total</p>
+              <p className="">My oPOP</p>
               <div>
-                <p className="font-bold">0.0000</p>
-                <p className="">($0.00)</p>
+                <p className="font-bold text-end">{(Number(oPopBal?.value) / 1e18).toFixed(2)}</p>
+                <p className="">($ {(Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)})</p>
               </div>
             </div>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-row items-center justify-between space-x-8">
               <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
+              <SecondaryActionButton label="Claim oPOP" handleClick={() => { }} disabled={Number(gaugeRewards?.total) === 0} />
             </div>
           </div>
         </section>
 
-        <section className="hidden md:block space-y-4">
+        <section className="hidden lg:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
             <Gauge key={gauge.address} gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
           )
@@ -213,11 +216,11 @@ export default function VePOP() {
           }
         </section>
 
-        <section className="md:hidden">
+        <section className="lg:hidden">
           <p className="text-primary">Gauge Voting not available on mobile.</p>
         </section>
 
-        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
+        <div className="hidden lg:block absolute left-0 bottom-10 w-full ">
           <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
               Voting power used: <span className="text-[#05BE64]">{veBal ? ((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"}%</span>

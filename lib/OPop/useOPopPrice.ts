@@ -9,7 +9,7 @@ export default function useOPopPrice({ chainId, address }): Pop.HookResult<BigNu
     useContractRead({
       address,
       chainId: Number(chainId),
-      abi: ["function getPrice(address) view returns (uint256)"],
+      abi: ["function getPrice() view returns (uint256)"],
       functionName: "getPrice",
       args: [],
       scopeKey: `getOPrice:${chainId}:${address}`,

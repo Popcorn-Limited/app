@@ -103,8 +103,8 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
         </div>
       }
     >
-      <div className="flex flex-row space-x-8 mt-8">
-        <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
+      <div className="lg:flex lg:flex-row lg:space-x-8 space-y-4 lg:space-y-0 mt-8">
+        <div className="border border-[#F0EEE0] rounded-lg bg-white lg:w-1/2 p-6">
           <span className="flex flex-row flex-wrap items-center justify-between">
             <p className="text-primaryLight font-normal">Gauge address:</p>
             <p className="font-bold text-primary">
@@ -113,7 +113,7 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
           </span>
 
         </div>
-        <div className="border border-[#F0EEE0] rounded-lg bg-white w-1/2 p-6">
+        <div className="border border-[#F0EEE0] rounded-lg bg-white lg:w-1/2 p-6">
           <span className="flex flex-row flex-wrap items-center justify-between">
             <p className="text-primaryLight font-normal">Vault address:</p>
             <p className="font-bold text-primary">
