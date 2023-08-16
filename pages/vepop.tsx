@@ -177,7 +177,7 @@ export default function VePOP() {
             <div className="md:flex md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8 mt-6">
               <MainActionButton label="Get POP" handleClick={approve} />
               <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
-              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} />
+              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
             </div>
           </div>
 
@@ -191,7 +191,7 @@ export default function VePOP() {
               <p className="">cPOP</p>
               <p className="font-bold">0</p>
             </span>
-            <div className="h-24"></div>
+            <div className="h-8"></div>
             <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
               <p className="">Total</p>
               <div>
@@ -199,7 +199,9 @@ export default function VePOP() {
                 <p className="">($0.00)</p>
               </div>
             </div>
-            <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
+            <div className="mt-5">
+              <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
+            </div>
           </div>
         </section>
 
