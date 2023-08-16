@@ -1,5 +1,5 @@
 import Modal from "components/Modal/Modal";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
 import MainActionButton from "components/MainActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
@@ -17,7 +17,8 @@ import TokenIcon from "components/TokenIcon";
 import useOPopPrice from "lib/OPop/useOPopPrice";
 import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import { usePrice } from "lib/Price";
-import { formatAndRoundBigNumber } from "lib/utils";
+import { formatAndRoundBigNumber, safeRound } from "lib/utils";
+import { validateInput } from "components/AssetInputWithAction/internals/input";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const OPOP = "0x57de6369E9e1fd485584B78A29b501B1CA65EB29"
@@ -25,8 +26,6 @@ const OPOP_ORACLE = "0x4b4a8479CDFaB077BA4D0926041D10098f18bFe7"
 
 export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }:
   { amountState: [number, Dispatch<SetStateAction<number>>], maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {
-  const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
 
   const [amount, setAmount] = amountState;
@@ -45,20 +44,57 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const { data: weth } = useToken({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
 
 
-  // 
+  const handleMaxWeth = () => {
+    const maxEth = safeRound(ethBal?.value || constants.Zero, 18);
+
+    setMaxPaymentAmount(maxEth);
+    setAmount(getOPopAmount(maxEth))
+  };
+
+  const handleMaxOPop = () => {
+    const maxOPop = safeRound(oPopBal?.value || constants.Zero, 18);
+
+    setMaxPaymentAmount(getPaymentAmount(maxOPop));
+    setAmount(maxOPop)
+  };
+
+  function getPaymentAmount(oPopAmount: number) {
+    const oPopValue = oPopAmount * (Number(oPopPrice?.value) / 1e18);
+
+    return oPopValue / (Number(wethPrice?.value) / 1e18);
+  }
+
+  function getOPopAmount(paymentAmount: number) {
+    const ethValue = paymentAmount * (Number(wethPrice?.value) / 1e18);
+
+    return ethValue / (Number(oPopPrice?.value) / 1e18);
+  }
+
+  const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
+    const amount = validateInput(value).isValid ? Number(value as any) : 0
+    setAmount(amount);
+    setMaxPaymentAmount(getPaymentAmount(amount));
+  };
+
+  const handleEthInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
+    const amount = validateInput(value).isValid ? Number(value as any) : 0
+    setMaxPaymentAmount(amount);
+    setAmount(getOPopAmount(amount));
+  };
+
 
   return (
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oPOP</h2>
-      <p className="text-primary font-semibold">Strike Price: $ {"0.04"/*formatAndRoundBigNumber(oPopPrice?.value, 18)*/} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: 50.00 %</p>
+      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(oPopPrice?.value, 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oPOP"}
           onSelectToken={() => { }}
-          onMaxClick={() => { }}
+          onMaxClick={handleMaxOPop}
           chainId={5}
           value={amount}
-          onChange={() => { }}
+          onChange={handleOPopInput}
           defaultValue={amount}
           selectedToken={
             {
@@ -78,11 +114,11 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
         <InputTokenWithError
           captionText={"Amount WETH"}
           onSelectToken={() => { }}
-          onMaxClick={() => { }}
+          onMaxClick={handleMaxWeth}
           chainId={10}
-          value={amount}
-          onChange={() => { }}
-          defaultValue={amount}
+          value={maxPaymentAmount}
+          onChange={handleEthInput}
+          defaultValue={maxPaymentAmount}
           selectedToken={
             {
               ...weth,
@@ -117,7 +153,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
         <div
           className={`w-full flex flex-row px-5 py-4 items-center justify-between rounded-lg border border-customLightGray`}
         >
-          <p>10</p>
+          <p>{amount}</p>
           <span
             className={`flex flex-row items-center justify-end`}
           >
