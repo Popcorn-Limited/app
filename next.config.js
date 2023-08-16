@@ -18,7 +18,6 @@ module.exports = {
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     IPFS_URL: process.env.IPFS_URL,
     DUNE_API_KEY: process.env.DUNE_API_KEY,
-    INFURA_URL: process.env.DUNE_API_KEY,
     NEXT_PUBLIC_ENABLE_TESTNETS: process.env.ENABLE_TESTNETS,
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
   },

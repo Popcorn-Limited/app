@@ -37,7 +37,7 @@ export default function SelectField({
                     <img className={`w-6 h-6 rounded-[50%]`} src={value.image} />
                 )}
                 <div className={`text-white`}>
-                    {value.label}
+                    {value?.label}
                 </div>
                 {!isOpened ? (
                     <ChevronDownIcon className={`text-white w-5`} />
