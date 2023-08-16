@@ -344,6 +344,7 @@ export default function Vaults() {
 
         const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
         const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
+        const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
 
         setStatistics({
             ...statistics,
@@ -360,7 +361,13 @@ export default function Vaults() {
             snapshotPips: snapshotPips.data.result.rows,
             weekDexVolume: duneDexVolume.data.result.rows.reduce((acc, item) => acc + item['USD Volume'], 0),
             tvlMonthByMonth: tvlByTime.data.tokensInUsd,
-            tvl: Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens).reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
+            tvl: tvlByTokens.reduce((acc, key) => acc + tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[key], 0),
+            vaultTvl: tvlByTokens.map(item => {
+                return {
+                    title: item,
+                    count: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item]
+                }
+            }),
             popInBalPool: Number(popInBalPool?.balance),
             wethInBalPool: Number(wethInBalPool?.balance),
         })
@@ -379,10 +386,10 @@ export default function Vaults() {
                 },
             ]
         )
-        initDonutChart(vaultTvlChartElem.current, statistics.vaultTvl.map((item, idx) => {
+        initDonutChart(vaultTvlChartElem.current, tvlByTokens.map((item, idx) => {
             return {
-                name: item.title,
-                y: item.count,
+                name: item,
+                y: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item],
                 color: vaultTvlChartColors[idx % vaultTvlChartColors.length]
             }
         }))
@@ -485,7 +492,7 @@ export default function Vaults() {
                     </div>
                     <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
                         <div className={`flex flex-col justify-between grow-[1]`}>
-                            {statistics.vaultTvl.map((item, idx) => {
+                            {[...statistics.vaultTvl].sort((a, b) => b.count - a.count).splice(0, 6).map((item, idx) => {
                                 return (
                                     <div key={idx} className={`flex justify-between`}>
                                         <p>{item.title}</p>
