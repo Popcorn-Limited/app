@@ -21,13 +21,14 @@ import useOPopPrice from "lib/OPop/useOPopPrice";
 import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
+import { useClaimOPop } from "lib/OPop/useClaimOPop";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
 const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
 const OPOP = "0x57de6369E9e1fd485584B78A29b501B1CA65EB29"
 const OPOP_ORACLE = "0x4b4a8479CDFaB077BA4D0926041D10098f18bFe7"
-
+const OPOP_MINTER = ""
 
 export default function VePOP() {
   const { waitForTx } = useWaitForTx();
@@ -64,6 +65,8 @@ export default function VePOP() {
     ];
     return formattedTime;
   }
+
+  const { write: claimOPop } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
 
   const {
     write: approve = noOp,
@@ -137,13 +140,11 @@ export default function VePOP() {
 
           <div className="lg:w-1/2">
             <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-14 mb-4 lg:mb-8">
-              Lock <span className="underline text-[#C391FF]">POP</span> for vePOP, <br />Rewards, and Voting Power
+              Lock <span className="underline text-[#C391FF]">POP LP</span> for vePOP, <br /> voting power, and oPOP rewards
             </h1>
             <p className="text-base text-primaryDark">
-              Vote with your vePOP below to influence how much $oPOP each vault will receive.
-              Your vote will persist until you change it and editing a vault can only be done once every 10 days.
+              User your vePOP to vote on how much oPOP each vault receives. You can edit your vote only once every 10 days.
             </p>
-
           </div>
 
           <div className="bg-[#C391FF] rounded-lg h-64 w-112 p-6 hidden lg:flex justify-end items-end ">
@@ -157,11 +158,11 @@ export default function VePOP() {
           <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
-              <p className="">My POP</p>
+              <p className="">My POP LP</p>
               <p className="font-bold">{popBal?.formatted}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
-              <p className="">My Locked POP</p>
+              <p className="">My Locked POP LP</p>
               <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
@@ -177,8 +178,8 @@ export default function VePOP() {
               <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
             </span>
             <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-              <MainActionButton label="Get POP" handleClick={approve} />
-              <SecondaryActionButton label="Lock POP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
+              <MainActionButton label="Get POP LP" handleClick={approve} />
+              <SecondaryActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
               <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
             </div>
           </div>
@@ -203,7 +204,7 @@ export default function VePOP() {
             </div>
             <div className="mt-5 flex flex-row items-center justify-between space-x-8">
               <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
-              <SecondaryActionButton label="Claim oPOP" handleClick={() => { }} disabled={Number(gaugeRewards?.total) === 0} />
+              <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
             </div>
           </div>
         </section>

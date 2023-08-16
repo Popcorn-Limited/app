@@ -9,9 +9,10 @@ export default function LockPopInfo(): JSX.Element {
       <div>
         <h2 className="text-start text-5xl">Locking POP</h2>
         <p className="text-start">
-          Locking your POP to recieve vote-escrowed vePOP.
-          vePOP allows you to earn boosted liquidity mining rewards,
-          vote on vault gauge incentives,
+          Lock your POP LP to receive vote-escrowed vePOP.
+          vePOP has many purposes. 
+          It allows you to boost your vault yield by earning POP call options (oPOP).
+          You can use vePOP to vote on vault gauge incentives,
           participate in governance and earn protocol fees.
           Unlocking POP early results in a penalty of up to 75% of your POP.
         </p>
