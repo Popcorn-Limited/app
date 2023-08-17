@@ -66,18 +66,27 @@ export default function WidoPage() {
   )
 }
 
+const WIDO_TOKEN_MANAGER = "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD"
+const WIDO_ROUTER = "0x7Fb69e8fb1525ceEc03783FFd8a317bafbDfD394"
+
 function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
   const { address: account } = useAccount()
   const { data: vault } = useToken({ address: vaultAddress as Address, chainId: 1 })
   const { data: asset } = useVaultToken(vaultAddress, 1);
+
   const [inputToken, setInputToken] = useState<any>(asset)
   const [outputToken, setOutputToken] = useState<any>(vault)
+
   const [inputBalance, setInputBalance] = useState<number>(0);
   const [outputPreview, setOutputPreview] = useState<number>(0);
+
   const [availableToken, setAvailableToken] = useState<any[]>([])
+
   const { waitForTx } = useWaitForTx();
-  const { data: allowance } = useAllowance({ address: inputToken?.address, account: "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD" as Address, chainId: 1 });
+  const { data: allowance } = useAllowance({ address: inputToken?.address, account: WIDO_TOKEN_MANAGER as Address, chainId: 1 });
+
   const { data: signer } = useSigner();
+
   const [actionData, setActionData] = useState<string>("")
 
   const showApproveButton = Number(allowance?.value) < inputBalance;
@@ -95,7 +104,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(inputToken?.address, "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD", 1, {
+  } = useApproveBalance(inputToken?.address, WIDO_TOKEN_MANAGER, 1, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "Assets approved!",
@@ -117,7 +126,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
     if (showApproveButton) return approve();
     // When approved continue to deposit
-    signer.sendTransaction({ data: actionData, to: "0x7Fb69e8fb1525ceEc03783FFd8a317bafbDfD394", value: "0" }).then(res => console.log(res))
+    signer.sendTransaction({ data: actionData, to: WIDO_ROUTER, value: "0" }).then(res => console.log(res))
   }
 
 
@@ -180,8 +189,8 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
           onChange={handleChangeInput}
           selectedToken={inputToken}
           errorMessage={""}
-          tokenList={outputToken.address === vault.address ? availableToken : []}
-          allowSelection={outputToken.address === vault.address}
+          tokenList={outputToken?.address === vault?.address ? availableToken : []}
+          allowSelection={outputToken?.address === vault?.address}
         />
         <>
           <div className="relative py-4">
@@ -215,8 +224,8 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
             onChange={() => { }}
             selectedToken={outputToken}
             errorMessage={""}
-            tokenList={inputToken.address === vault.address ? availableToken : []}
-            allowSelection={inputToken.address === vault.address}
+            tokenList={inputToken.address === vault?.address ? availableToken : []}
+            allowSelection={inputToken.address === vault?.address}
           />
         </>
         <MainActionButton
@@ -226,7 +235,8 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
           disabled={inputBalance === 0}
         />
       </section>
-    </div>)
+    </div>
+  )
 }
 
 

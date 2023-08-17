@@ -37,7 +37,7 @@ export default function SelectToken({
 
   return (
     <>
-      <div className="relative w-auto justify-end">
+      <div className="relative w-52 justify-end">
         <span
           className={`flex flex-row items-center justify-end ${allowSelection ? "cursor-pointer group" : ""}`}
           onClick={() => {
