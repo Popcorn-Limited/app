@@ -88,7 +88,7 @@ export default function VePOP() {
 
   useEffect(() => {
     if (veBal) setAvVotes((Number(veBal?.value) / 1e18))
-  }, [veBal])
+  }, [])
 
 
   function handleAvVotes(val: number, index: number) {
