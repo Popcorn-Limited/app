@@ -101,12 +101,38 @@ export default function VePOP() {
     setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
   }
 
+  function roundToFixed(value, decimals) {
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(value * multiplier) / multiplier;
+  }
+
+  function normalizeVotes(votes) {
+    let roundedVotes = votes.map(vote => roundToFixed(vote, 0));
+    const totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
+
+    if (totalVotes <= 100) return roundedVotes;
+
+    // Calculate the excess votes
+    const excessVotes = totalVotes - 100;
+
+    // Find the index of the largest vote
+    const maxIndex = roundedVotes.indexOf(Math.max(...roundedVotes));
+
+    // Adjust the largest vote by subtracting the excess
+    roundedVotes[maxIndex] -= excessVotes;
+
+    return roundedVotes;
+  }
+
   function handleVotes() {
     const gaugeController = new Contract(
       "0xF9D1E727E1530373654522F293ad01897173142F",
       ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
       signer
     )
+
+    // Normalize the votes to ensure they never exceed 100% in total
+    const normalizedVotes = normalizeVotes(votes);
 
     let addr = new Array<string>(8);
     let v = new Array<number>(8);
@@ -118,11 +144,13 @@ export default function VePOP() {
       for (let n = 0; n < 8; n++) {
         const l = i * 8
         addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
-        v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
+        v[n] = normalizedVotes[n + l] === undefined ? 0 : normalizedVotes[n + l];
       }
       gaugeController.vote_for_many_gauge_weights(addr, v)
     }
   }
+
+
 
   return (
     <NoSSR>
