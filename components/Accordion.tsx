@@ -9,13 +9,13 @@ function Accordion({ children, header, initiallyOpen, containerClassName }: { ch
     >
       {({ open }) => (
         <>
-          <Popover.Button
-            className="block w-full cursor-pointer marker:hidden active:outline-none focus:outline-none">
-            <div className="flex flex-row items-center justify-between">
-              {header}
-              <ChevronDownIcon className={`hidden md:block text-secondaryLight ml-10 h-5 w-5 flex-shrink-0 transition duration-300 ${open ? 'rotate-180 transform' : ''}`} />
-            </div>
-          </Popover.Button>
+          <div className="flex flex-row items-center justify-between">
+            {header}
+            <Popover.Button
+              className="cursor-pointer marker:hidden active:outline-none focus:outline-none">
+              <ChevronDownIcon className={`hidden sm:block text-secondaryLight ml-10 h-5 w-5 flex-shrink-0 transition duration-300 ${open ? 'rotate-180 transform' : ''}`} />
+            </Popover.Button>
+          </div>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"

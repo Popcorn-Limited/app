@@ -208,7 +208,7 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="hidden lg:block space-y-4">
+        <section className="hidden sm:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
             <Gauge key={gauge.address} gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
           )
@@ -216,14 +216,22 @@ export default function VePOP() {
           }
         </section>
 
-        <section className="lg:hidden">
+        <section className="sm:hidden">
           <p className="text-primary">Gauge Voting not available on mobile.</p>
         </section>
 
-        <div className="hidden lg:block absolute left-0 bottom-10 w-full ">
+        <div className="hidden sm:block absolute left-0 bottom-10 w-full ">
           <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
-              Voting power used: <span className="text-[#05BE64]">{veBal ? ((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"}%</span>
+              Voting power used: <span className="text-[#05BE64]">
+                {
+                  veBal && veBal.value
+                    ? Math.abs((1 - avVotes / (Number(veBal.value) / 1e18)) * 100) < 0.005
+                      ? "0"
+                      : ((1 - avVotes / (Number(veBal.value) / 1e18)) * 100).toFixed(2)
+                    : "0"
+                }%
+              </span>
             </p>
             <button
               className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
