@@ -139,7 +139,6 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
       balances = balances.filter(balance => Number(balance.balanceUsdValue) > 10);
       const allowances = await Promise.all(balances.map(balance =>
         getTokenAllowance({ chainId: 1, fromToken: balance.address, toToken: vaultAddress, toChainId: 1, accountAddress: account })))
-
       setAvailableToken(
         balances.map((balance, i) => {
           return {
@@ -167,7 +166,7 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
         toToken: outputToken?.address,  // Token address of to token
         amount: formattedInputBalance?.toString(),  // Token amount of from token
         slippagePercentage: 0.01,  // Acceptable max slippage for the swap
-        user: account, // Address of user placing the order.
+        user: constants.AddressZero, // Address of user placing the order.
       })
       setActionData(quoteResult.data)
       setOutputPreview(quoteResult.toTokenAmount ? Number(quoteResult.toTokenAmount) / (10 ** outputToken.decimals) : 0)
@@ -176,6 +175,8 @@ function WidoSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
 
   }, [inputBalance, inputToken, outputToken, account])
+
+  wido.getPriceData("Ethereum", "USDT yVault").then(res => console.log(res))
 
   return (
     <div className="flex flex-col w-full md:w-4/12 gap-8">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import NoSSR from "react-no-ssr";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -9,14 +9,16 @@ import AllSweetVaultsTVL from "../../lib/Vault/AllSweetVaultsTVL";
 import AllSweetVaultDeposits from "lib/Vault/AllSweetVautDeposits";
 import { VaultTag } from "lib/Vault/hooks";
 import { Tabs } from "components/Tabs";
+import { getBalances } from "wido";
+import { BigNumber } from "ethers";
 
 export const SUPPORTED_NETWORKS = [
-  ChainId.ALL,
+  // ChainId.ALL,
   ChainId.Ethereum,
-  ChainId.Polygon,
-  ChainId.Optimism,
-  ChainId.Arbitrum,
-  ChainId.BNB,
+  // ChainId.Polygon,
+  // ChainId.Optimism,
+  // ChainId.Arbitrum,
+  // ChainId.BNB,
   // ChainId.Fantom,
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Localhost] : [])
 ]
@@ -35,6 +37,36 @@ export default function SweetVaults({
   const { address: account } = useAccount()
   const [searchString, handleSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState(tags)
+  const [availableToken, setAvailableToken] = useState([])
+
+  async function getAvailableToken() {
+    try {
+      let balances = await getBalances(
+        account, // Address of the user 
+        SUPPORTED_NETWORKS.map(chainId => Number(chainId)) // Optional Array of chain ids to filter by.
+      );
+      balances = balances.filter(balance => Number(balance.balanceUsdValue) > 10);
+      setAvailableToken(
+        balances.map((balance, i) => {
+          return {
+            address: balance.address,
+            name: balance.name,
+            symbol: balance.symbol,
+            decimals: balance.decimals,
+            chainId: balance.chainId,
+            icon: balance.logoURI,
+            balance: Number(balance.balance) / (10 ** balance.decimals),
+            price: Number(balance.usdPrice),
+          }
+        }))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (account && availableToken.length === 0) getAvailableToken()
+  }, [account])
 
   return (
     <NoSSR>
@@ -68,7 +100,7 @@ export default function SweetVaults({
         </div>
       </section>
       <section className="flex flex-col gap-8 md:px-8">
-        {vaults.map((vault) => {
+        {vaults.filter(vault => vault.address === "0xc8C88fdF2802733f8c4cd7c0bE0557fdC5d2471c").map((vault) => {
           return (
             <SweetVault
               key={`sv-${vault.address}-${vault.chainId}`}
@@ -77,7 +109,7 @@ export default function SweetVaults({
               searchString={searchString}
               selectedTags={selectedTags.length === tags.length ? [] : selectedTags}
               deployer={deployer}
-
+              inputTokens={availableToken.filter(token => Number(token.chainId) === Number(vault.chainId))}
             />
           )
         })}

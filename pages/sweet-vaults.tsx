@@ -3,6 +3,9 @@ import SweetVaults, { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaul
 import useNetworkFilter from "hooks/useNetworkFilter";
 import { useAllVaults } from "hooks/vaults";
 import { ChainId } from "lib/utils";
+import { useAccount } from "wagmi";
+import { getBalances } from "wido";
+import { useEffect } from "react";
 
 
 const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
@@ -16,6 +19,8 @@ const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f
 
 const PopSweetVaults: NextPage = () => {
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS);
+  const { address: account } = useAccount();
+
 
   const { data: ethVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined);
   const { data: polyVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Polygon) ? ChainId.Polygon : undefined);
@@ -26,11 +31,11 @@ const PopSweetVaults: NextPage = () => {
 
   const allVaults = [
     ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
-    ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
-    ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
-    ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
-    ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
-    ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
+    //...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
+    //...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
+    //...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
+    //...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
+    //...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
   ]
 
   return (

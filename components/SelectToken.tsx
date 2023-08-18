@@ -54,9 +54,8 @@ export default function SelectToken({
           {allowSelection && (
             <>
               <ChevronDownIcon
-                className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary transform transition-all ease-in-out duration-200 ${
-                  showPopUp || showSelectTokenModal ? " rotate-180" : ""
-                }`}
+                className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary transform transition-all ease-in-out duration-200 ${showPopUp || showSelectTokenModal ? " rotate-180" : ""
+                  }`}
               />
             </>
           )}
