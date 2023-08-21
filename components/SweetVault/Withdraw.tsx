@@ -34,7 +34,7 @@ function Withdraw({
         chainId={chainId}
         action={(balance) => {
           return {
-            label: "Withdraw",
+            label: "Unstake & Withdraw",
             abi: [
               "function redeemAndWithdraw(address vault, uint256 burnAmount, address receiver, address owner) external",
               "function redeem(uint256 burnAmount) external"
