@@ -17,17 +17,17 @@ export default function TokenIcon({
   imageSize,
 }: TokenIconProps): JSX.Element {
   const metadata = useContractMetadata({ address, chainId });
-
+  
   if (icon) return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
 
   if (metadata?.data?.icons?.length > 1) {
     return (
       <div className="flex flex-row flex-shrink-0 flex-grow-0">
-        <img src={metadata?.data?.icons[0]} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+        <img src={metadata?.data?.icons[0]} alt="token icon" className={`${imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} rounded-full border border-gray-300`} />
         <img
           src={metadata?.data?.icons[1]}
           alt="token icon"
-          className={`${imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} -ml-3`}
+          className={`${imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} -ml-3 rounded-full border border-gray-300`}
         />
       </div>
     );

@@ -6,7 +6,6 @@ import { Address, useContractRead } from "wagmi";
 import TokenMetadata, { addLpMetadata } from "lib/utils/metadata/tokenMetadata";
 import ProtocolMetadata from "lib/utils/metadata/protocolMetadata";
 import StrategyMetadata, { addGenericStrategyDescription } from "lib/utils/metadata/strategyMetadata";
-import { Description } from "@headlessui/react/dist/components/description/description";
 
 function getLocalMetadata(address: string): IpfsMetadata {
   switch (address) {
@@ -146,7 +145,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
         },
-        name: "DAI Senior Yield Tranche"
+        name: "DAI Senior Tranche"
       }
     case "0x6cE9c05E159F8C4910490D8e8F7a63e95E6CEcAF":
       return {
@@ -166,7 +165,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
         },
-        name: "DAI Junior Yield Tranche"
+        name: "DAI Junior Tranche"
       }
     case "0xcdc3CbF94114406a0b59aDA090807838369ced2b":
       return {
@@ -180,7 +179,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
         },
-        name: "USDC Senior Yield Tranche"
+        name: "USDC Senior Tranche"
       }
     case "0x52Aef3ea0D3F93766D255A1bb0aA7F1C4885E622":
       return {
@@ -194,7 +193,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
         },
-        name: "USDC Junior Yield Tranche"
+        name: "USDC Junior Tranche"
       }
     case "0x11E10B12e8DbF7aE44EE50873c09e5C7c3e01385":
       return {
@@ -208,7 +207,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **built-in protection on deposits**.`
         },
-        name: "USDT Senior Yield Tranche"
+        name: "USDT Senior Tranche"
       }
     case "0x3D04Aade5388962C9A4f83B636a3a8ED63ea5b4D":
       return {
@@ -222,7 +221,7 @@ function getLocalMetadata(address: string): IpfsMetadata {
           ---
           This strategy allows you to take advantage of Clearpool’s institutional on-chain capital market opportunities, with **boosted returns**.`
         },
-        name: "USDT Junior Yield Tranche"
+        name: "USDT Junior Tranche"
       }
     case "0x95Ca391fB08F612Dc6b0CbDdcb6708C21d5A8295":
       return {
@@ -256,6 +255,10 @@ function getFactoryMetadata(adapter, token, ipfsMetadata): IpfsMetadata {
     ipfsMetadata.protocol = ProtocolMetadata.aave;
     ipfsMetadata.token = { name: token.symbol, description: "None available" }
     ipfsMetadata.strategy = { name: "Aave Lending", description: addGenericStrategyDescription("lending", "Aave") }
+  } else if (adapter?.name?.includes("Aura")) {
+    ipfsMetadata.protocol = ProtocolMetadata.aura;
+    ipfsMetadata.token = { name: token.symbol, description: "None available" }
+    ipfsMetadata.strategy = { name: "Aura Compounding", description: addGenericStrategyDescription("lpCompounding", "Aura") }
   } else if (adapter?.name?.includes("Compound")) {
     ipfsMetadata.protocol = ProtocolMetadata.compound;
     ipfsMetadata.token = { name: token.symbol, description: "None available" }

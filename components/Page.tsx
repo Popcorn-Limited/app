@@ -19,7 +19,7 @@ export default function Page({ children }: PageProps) {
 
   const { pathname } = useRouter();
 
-  const compactRoutes = ["/", "/portfolio", "/sweet-vaults"];
+  const compactRoutes = ["/", "/portfolio"];
 
   return (
     <div className="w-full md:w-10/12 laptop:w-11/12 2xl:w-8/12 mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">

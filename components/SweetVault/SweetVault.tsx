@@ -30,10 +30,11 @@ import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { validateInput } from "./internals/input";
 import { parseUnits } from "ethers/lib/utils.js";
 import toast from "react-hot-toast";
-import { getBalances, getTokenAllowance, quote } from "wido";
+import { getBalances, getTokenAllowance, quote, getSupportedTokens } from "wido";
 import MainActionButton from "components/MainActionButton";
 import InputTokenWithError from "components/InputTokenWithError";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import FeeBreakdown from "./FeeBreakdown";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -42,7 +43,19 @@ const VAULT_APY_RESOLVER = {
   "Yearn": "yearnAsset",
   "Origin": "ousd",
   "Flux": "llama",
-  "Idle": "idle"
+  "Idle": "idle",
+  "Aura": "aura",
+  "Balancer": "balancer",
+}
+
+const PROTOCOL_ICONS = {
+  "Beefy": "beefy",
+  "Yearn": "yearn-finance",
+  "Origin": "origin-defi",
+  "Flux": "flux-finance",
+  "Idle": "idle",
+  "Aura": "aura",
+  "Balancer": "balancer",
 }
 
 function getTagColor(tag: VaultTag): string {
@@ -63,16 +76,26 @@ function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vau
       <NetworkSticker chainId={chainId} />
       <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
     </div>
-    <Title level={2} as="span" className="text-gray-900 mt-1">
+    <h2 className="text-gray-900 text-2xl font-bold mt-1">
       {vault?.metadata?.name || vault?.metadata?.token?.name || token?.name}
-    </Title>
-    <div className="bg-red-500 bg-opacity-[15%] py-1 px-3 text-gray-800 rounded-md">{vault?.metadata?.protocol?.name}</div>
+    </h2>
+    <div className="bg-[#ebe7d466] border border-[#ebe7d4cc] rounded-lg py-1 px-3 flex flex-row items-center">
+      <img
+        src={`https://icons.llamao.fi/icons/protocols/${PROTOCOL_ICONS[vault?.metadata?.protocol?.name]}?w=48&h=48`}
+        className="w-6 h-6 mr-1 rounded-full border border-[#ebe7d4cc]"
+      />
+      <p className="mt-1 text-[#55503D] font-medium">{vault?.metadata?.protocol?.name}</p>
+    </div>
     {/* {vault?.metadata?.tags && vault?.metadata?.tags.length > 0 &&
       <>
         {vault?.metadata?.tags.map((tag) => <TagBatch key={tag} tag={tag} />)}
       </>
     } */}
   </div>
+}
+
+function getOutput(amount: number, priceTokenIn: number, priceTokenOut: number) {
+
 }
 
 const WIDO_TOKEN_MANAGER = "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD"
@@ -114,33 +137,37 @@ function SweetVault({
   const [pps, setPps] = useState<number>(0);
 
   const [inputBalance, setInputBalance] = useState<number>(0);
-  const [outputPreview, setOutputPreview] = useState<number>(0);
   const [availableToken, setAvailableToken] = useState<any[]>([])
 
   const isDeposit = inputToken?.address !== vaultAddress
   const showApproveButton = (isDeposit ? (Number(vaultAllowance?.value) / (10 ** vault?.decimals)) : inputToken?.allowance) < inputBalance;
 
   useEffect(() => {
-    if (totalAssets && totalSupply && price
-      && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
-      setPps(Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString()));
-    }
-  }, [totalAssets, totalSupply, price])
-
-  useEffect(() => {
     async function addAvailableToken() {
       const allowances = await Promise.all(inputTokens.map(balance =>
         getTokenAllowance({ chainId: chainId, fromToken: balance.address, toToken: WIDO_TOKEN_MANAGER, toChainId: chainId, accountAddress: account })))
-      setAvailableToken(
-        inputTokens.map((token, i) => {
-          return {
-            ...token,
-            allowance: Number(allowances[i]) / (10 ** token.decimals),
-          }
-        }))
+      const _inputTokens = inputTokens.map((token, i) => {
+        return {
+          ...token,
+          allowance: Number(allowances[i]) / (10 ** token.decimals),
+        }
+      })
+      setAvailableToken([..._inputTokens, { ...asset, price: Number(price?.value) / (10 ** asset?.decimals), allowance: 0 }])
     }
     if (account !== undefined) addAvailableToken();
   }, [account, inputTokens])
+
+  useEffect(() => {
+    if (pps === 0) quote({
+      fromChainId: Number(chainId),  // Chain Id of from token
+      fromToken: vaultAddress,  // Token address of from token
+      toChainId: Number(chainId),  // Chain Id of to token
+      toToken: "0x6B175474E89094C44Da98b954EedeAC495271d0F",  // Token address of to token
+      amount: parseUnits("1", vault?.decimals).toString(),  // Token amount of from token
+      slippagePercentage: 0.01,  // Acceptable max slippage for the swap
+      user: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb", // Address of user placing the order.
+    }).then(res => setPps(Number(res.price)))
+  }, [vault])
 
   const handleChangeInput = ({ currentTarget: { value } }) => {
     setInputBalance(validateInput(value).isValid ? (value as any) : 0);
@@ -169,6 +196,11 @@ function SweetVault({
     },
   });
 
+  function getOutput(amount: number, priceTokenIn: number, priceTokenOut: number) {
+    console.log(amount, priceTokenIn, priceTokenOut)
+    return (amount * priceTokenIn) / priceTokenOut;
+  }
+
   async function handleDeposit() {
     if ((inputBalance || 0) == 0) return;
     // Early exit if value is ZERO
@@ -189,106 +221,114 @@ function SweetVault({
     signer.sendTransaction({ data: quoteResult.data, to: WIDO_ROUTER, value: "0" }).then(res => console.log(res))
   }
 
+  console.log({ outputToken })
+
   if (!vaultMetadata || !isDeployer) return <></>
   if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString) && !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (
     <Accordion
       header={
-        <Fragment>
-          <nav className="flex items-center justify-between mb-8 select-none">
+        <div className="flex flex-row flex-wrap items-center justify-between">
+
+          <div className="flex items-center justify-between select-none w-full md:w-1/3">
             <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
-            <AnimatedChevron className="hidden md:flex" />
-          </nav>
-          <div className="flex flex-row flex-wrap items-center mt-0 md:mt-6 justify-between">
-            <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
-              <p className="text-primaryLight font-normal">Your Wallet</p>
-              <p className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  <BalanceOf
-                    account={account}
-                    chainId={chainId}
-                    address={asset?.address}
-                    render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, asset?.decimals) : "-"}</>}
-                  />
-                </Title>
-                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{asset?.symbol}</span>
-              </p>
-            </div>
-            <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
-              <p className="text-primaryLight font-normal">Your Deposit</p>
-              <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  {account ?
-                    formatNumber((pps * Number(vaultBalance?.value?.toString())) / (10 ** (asset?.decimals)))
-                    : "-"}
-                </Title>
-                <span className="text-secondaryLight text-lg md:text-2xl flex md:inline">{asset?.symbol}</span>
-              </div>
-            </div>
-            <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
-              <p className="font-normal text-primaryLight">vAPY</p>
-              <Title as="td" level={2} fontWeight="font-normal">
-                <Apy
-                  address={vaultAddress}
+            <p>{/*vaultAddress*/}</p>
+          </div>
+
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="text-primaryLight font-normal">Your Wallet</p>
+            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                <BalanceOf
+                  account={account}
                   chainId={chainId}
-                  resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
-                  render={(apy) => {
-                    return (
-                      <Apy
-                        address={vaultMetadata.staking}
-                        resolver={"multiRewardStaking"}
-                        render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
-                          <section className="flex items-center gap-1 text-primary">
-                            {formatAndRoundBigNumber(
-                              HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
-                              18,
-                            )} %
-                            <InfoIconWithTooltip
-                              title="APR Breakdown"
-                              content={
-                                <ul className="text-sm">
-                                  <li>
-                                    Staking APY:{" "}
-                                    {formatAndRoundBigNumber(
-                                      HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
-                                      18,
-                                    )}
-                                    %
-                                  </li>
-                                  <li>
-                                    Vault APY:{" "}
-                                    {formatAndRoundBigNumber(
-                                      HUNDRED.mul(apy?.data?.value || constants.Zero),
-                                      18,
-                                    )}
-                                    %
-                                  </li>
-                                </ul>
-                              }
-                            />
-                          </section>
-                        ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
-                        }
-                        chainId={chainId}
-                      />
-                    );
-                  }}
+                  address={asset?.address}
+                  render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, asset?.decimals) : "-"}</>}
                 />
               </Title>
-            </div>
-
-            <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
-              <p className="leading-6 text-primaryLight">TVL</p>
-              <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-                <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
-                  {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
-                </SweetVaultTVL>
-              </Title>
-            </div>
-
+              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
+            </p>
           </div>
-        </Fragment>
+
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="text-primaryLight font-normal">Your Deposit</p>
+            <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                {account ?
+                  formatNumber((pps * Number(vaultBalance?.value?.toString())) / (10 ** (asset?.decimals)))
+                  : "-"}
+              </Title>
+              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
+            </div>
+          </div>
+
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="font-normal text-primaryLight">vAPY</p>
+            <Title as="td" level={2} fontWeight="font-normal">
+              <Apy
+                address={vaultAddress}
+                chainId={chainId}
+                resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
+                render={(apy) => {
+                  return (
+                    <Apy
+                      address={vaultMetadata.staking}
+                      resolver={"multiRewardStaking"}
+                      render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
+                        <section className="flex items-center gap-1 text-primary">
+                          {formatAndRoundBigNumber(
+                            HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
+                            18,
+                          )} %
+                          <InfoIconWithTooltip
+                            title="APR Breakdown"
+                            content={
+                              <ul className="text-sm">
+                                <li>
+                                  Staking APY:{" "}
+                                  {formatAndRoundBigNumber(
+                                    HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
+                                    18,
+                                  )}
+                                  %
+                                </li>
+                                <li>
+                                  Vault APY:{" "}
+                                  {formatAndRoundBigNumber(
+                                    HUNDRED.mul(apy?.data?.value || constants.Zero),
+                                    18,
+                                  )}
+                                  %
+                                </li>
+                              </ul>
+                            }
+                          />
+                        </section>
+                      ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
+                      }
+                      chainId={chainId}
+                    />
+                  );
+                }}
+              />
+            </Title>
+          </div>
+
+          <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
+            <p className="leading-6 text-primaryLight">TVL</p>
+            <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
+              <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
+                {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
+              </SweetVaultTVL>
+            </Title>
+          </div>
+
+          <div className="hidden md:flex md:w-1/12 md:flex-row md:justify-end">
+            <AnimatedChevron className="w-7 h-7" />
+          </div>
+
+        </div>
       }
     >
       <div className="flex flex-col md:flex-row mt-8 gap-8">
@@ -307,43 +347,42 @@ function SweetVault({
               allowSelection={outputToken?.address === vault?.address}
               allowInput
             />
-            <>
-              <div className="relative py-4">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-customLightGray" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-4">
-                    <ArrowDownIcon
-                      className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
-                      aria-hidden="true"
-                      onClick={() => {
-                        if (outputToken.address === vault.address) {
-                          setInputToken(vault);
-                          setOutputToken(asset)
-                        } else {
-                          setInputToken(asset);
-                          setOutputToken(vault)
-                        }
-                      }}
-                    />
-                  </span>
-                </div>
+            <div className="relative py-4">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-customLightGray" />
               </div>
-              <InputTokenWithError
-                captionText={"Output Amount"}
-                onSelectToken={option => setOutputToken(option)}
-                onMaxClick={() => { }}
-                chainId={1}
-                value={outputPreview}
-                onChange={() => { }}
-                selectedToken={outputToken}
-                errorMessage={""}
-                tokenList={inputToken.address === vault?.address ? availableToken : []}
-                allowSelection={inputToken.address === vault?.address}
-                allowInput={true}
-              />
-            </>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-4">
+                  <ArrowDownIcon
+                    className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
+                    aria-hidden="true"
+                    onClick={() => {
+                      if (outputToken.address === vault.address) {
+                        setInputToken(vault);
+                        setOutputToken(asset)
+                      } else {
+                        setInputToken(asset);
+                        setOutputToken(vault)
+                      }
+                    }}
+                  />
+                </span>
+              </div>
+            </div>
+            <InputTokenWithError
+              captionText={"Output Amount"}
+              onSelectToken={option => setOutputToken(option)}
+              onMaxClick={() => { }}
+              chainId={1}
+              value={getOutput(inputBalance, Number(inputToken?.price), pps)}
+              onChange={() => { }}
+              selectedToken={outputToken}
+              errorMessage={""}
+              tokenList={inputToken.address === vault?.address ? [...availableToken, asset] : []}
+              allowSelection={inputToken.address === vault?.address}
+              allowInput={false}
+            />
+            <FeeBreakdown vault={vaultAddress} />
             <MainActionButton
               label={showApproveButton ? "Approve" : (isDeposit ? "Deposit" : "Withdraw")}
               type="button"

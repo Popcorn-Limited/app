@@ -16,7 +16,7 @@ function Title({
   level?: 1 | 2;
 }>) {
   const Wrapper = ComponentWraper as any;
-  const headingCx = level === 1 ? "text-3xl md:text-4xl" : " text-2xl";
+  const headingCx = level === 1 ? "text-3xl md:text-4xl" : " text-xl";
   return <Wrapper className={`${headingCx} ${fontWeight} ${className}`}>{children}</Wrapper>;
 }
 

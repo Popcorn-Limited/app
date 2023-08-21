@@ -2,6 +2,30 @@
   "1": {
     "chainId": "1",
     "contracts": {
+      "0x20a61b948e33879ce7f23e535cc7baa3bc66c5a9": {
+        "abi": null,
+        "address": "0x20a61b948e33879ce7f23e535cc7baa3bc66c5a9",
+        "metadata": {
+          "icons": [
+            "https://assets.coingecko.com/coins/images/29551/large/R_logo_CMC.png?1679621963",
+            "/images/tokens/dai.webp"
+          ],
+          "name": "R / DAI LP",
+          "symbol": "R-Dai-Lp"
+        }
+      },
+      "rDaiLp": {
+        "abi": null,
+        "address": "0x20a61b948e33879ce7f23e535cc7baa3bc66c5a9",
+        "metadata": {
+          "icons": [
+            "https://assets.coingecko.com/coins/images/29551/large/R_logo_CMC.png?1679621963",
+            "/images/tokens/dai.webp"
+          ],
+          "name": "R / DAI LP",
+          "symbol": "R-Dai-Lp"
+        }
+      },
       "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3": {
         "abi": null,
         "address": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",

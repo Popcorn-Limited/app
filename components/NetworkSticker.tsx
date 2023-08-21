@@ -8,23 +8,13 @@ interface NetworkStickerProps {
 
 export const NetworkSticker: FC<NetworkStickerProps> = ({ chainId }) => {
   return (
-    <div className="absolute top-0 -left-2 md:-left-4">
-      <div className="hidden md:block">
-        <Image
-          src={networkLogos[chainId]}
-          alt={ChainId[chainId]}
-          height="24"
-          width="24"
-        />
-      </div>
-      <div className="md:hidden">
-        <Image
-          src={networkLogos[chainId]}
-          alt={ChainId[chainId]}
-          height="12"
-          width="12"
-        />
-      </div>
+    <div className="absolute top-0 -left-2 md:-left-3">
+      <Image
+        src={networkLogos[chainId]}
+        alt={ChainId[chainId]}
+        height="20"
+        width="20"
+      />
     </div>
   );
 };

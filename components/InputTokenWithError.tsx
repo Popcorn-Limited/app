@@ -1,7 +1,7 @@
 import type { HTMLProps } from "react";
 import { constants } from "ethers";
 
-import { formatAndRoundBigNumber } from "lib/utils";
+import { formatAndRoundBigNumber, formatNumber } from "lib/utils";
 import SelectToken from "components/SelectToken";
 import InputNumber from "./InputNumber";
 import { Token } from "lib/types";
@@ -31,6 +31,7 @@ function InputTokenWithError({
   getTokenUrl?: string;
   allowInput?: boolean;
 } & HTMLProps<HTMLInputElement>) {
+
   return (
     <>
       {captionText && <p className="text-primary">{captionText}</p>}
@@ -58,7 +59,7 @@ function InputTokenWithError({
               </svg>
             </div>
             <p className="text-secondaryLight group-hover/max:text-primary mt-0.5">
-              {`${formatAndRoundBigNumber(selectedToken?.balance || ZERO, selectedToken?.decimals || 18)}`}
+              {`${formatNumber((Number(selectedToken?.balance || ZERO) / (10 ** selectedToken?.decimals || 18)))}`}
             </p>
           </>}
         </div>

@@ -25,7 +25,7 @@ export default function StakingOverviewPage(): JSX.Element {
         </div>
       </div>
       <NetworkFilter supportedNetworks={supportedNetworks} selectNetwork={selectNetwork} />
-      <div className="border-t border-t-customLightGray border-opacity-40">
+      <div className="border-t border-t-customLightGray border-opacity-40 mt-8">
         <div className="w-full">
           <div className="h-full ">
             {stakingPools.map((staking) => (

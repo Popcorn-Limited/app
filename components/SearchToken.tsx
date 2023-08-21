@@ -54,7 +54,7 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
               }}
             >
               <span className="relative mr-2">
-                <TokenIcon token={quickOption?.address} imageSize="w-5 h-5" chainId={chainId} />
+                <TokenIcon token={quickOption?.address} icon={quickOption?.icon} imageSize="w-5 h-5" chainId={chainId} />
               </span>
               <span>{quickOption.name}</span>
             </button>
