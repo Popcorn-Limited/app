@@ -7,7 +7,6 @@ import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { successStyle, errorStyle } from "styles/toastStyles";
 import { Address, useAccount, useContractRead, useSigner } from "wagmi";
 import NoSSR from "react-no-ssr";
 import MainActionButton from "components/MainActionButton";
@@ -24,7 +23,7 @@ import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
-import { showSuccessToast, showErrorToast } from "lib/utils/resolvers/toast-resolvers";
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
