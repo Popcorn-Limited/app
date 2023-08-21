@@ -7,6 +7,7 @@ import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { successStyle, errorStyle } from "styles/toastStyles";
 import { Address, useAccount, useContractRead, useSigner } from "wagmi";
 import NoSSR from "react-no-ssr";
 import MainActionButton from "components/MainActionButton";
@@ -22,6 +23,8 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
+import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
+import { showSuccessToast, showErrorToast } from "lib/utils/resolvers/toast-resolvers";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -101,37 +104,13 @@ export default function VePOP() {
     setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
   }
 
-  function roundToFixed(value, decimals) {
-    const multiplier = Math.pow(10, decimals);
-    return Math.round(value * multiplier) / multiplier;
-  }
-
-  function normalizeVotes(votes) {
-    let roundedVotes = votes.map(vote => roundToFixed(vote, 0));
-    const totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
-
-    if (totalVotes <= 100) return roundedVotes;
-
-    // Calculate the excess votes
-    const excessVotes = totalVotes - 100;
-
-    // Find the index of the largest vote
-    const maxIndex = roundedVotes.indexOf(Math.max(...roundedVotes));
-
-    // Adjust the largest vote by subtracting the excess
-    roundedVotes[maxIndex] -= excessVotes;
-
-    return roundedVotes;
-  }
-
   function handleVotes() {
     const gaugeController = new Contract(
       "0xF9D1E727E1530373654522F293ad01897173142F",
       ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
       signer
-    )
+    );
 
-    // Normalize the votes to ensure they never exceed 100% in total
     const normalizedVotes = normalizeVotes(votes);
 
     let addr = new Array<string>(8);
@@ -142,15 +121,21 @@ export default function VePOP() {
       v = [];
 
       for (let n = 0; n < 8; n++) {
-        const l = i * 8
+        const l = i * 8;
         addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
         v[n] = normalizedVotes[n + l] === undefined ? 0 : normalizedVotes[n + l];
       }
+
       gaugeController.vote_for_many_gauge_weights(addr, v)
+        .then(() => {
+          showSuccessToast();
+        })
+        .catch(error => {
+          showErrorToast(error);
+        });
+
     }
   }
-
-
 
   return (
     <NoSSR>
