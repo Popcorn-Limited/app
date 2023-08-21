@@ -1,4 +1,4 @@
-import { ChainId, networkMap } from "lib/utils";
+import { ChainId, formatNumber, networkMap } from "lib/utils";
 import MainActionButton from "components/MainActionButton";
 import TokenIcon from "components/TokenIcon";
 import { StakingType } from "hooks/staking/useAllStakingAddresses";
@@ -9,6 +9,22 @@ import { Staking, Contract } from "lib";
 import { ValueOfBalance } from "lib/Erc20";
 import { Address } from "wagmi";
 import { NetworkSticker } from "components/NetworkSticker";
+import { usePrice } from "lib/Price";
+import { useBalanceOf } from "lib/Erc20/hooks";
+
+const ignoreList = [
+  "0x633b32573793A67cE41A7D0fFe66e78Cd3379C45", // Unknown poly?
+  "0x633b32573793A67cE41A7D0fFe66e78Cd3379C45", // Arrakis Eth
+  "0x584732f867a4533BC349d438Fba4fc2aEE5f5f83", // 3x
+  "0x27A9B8065Af3A678CD121A435BEA9253C53Ab428", // butter
+]
+
+const POP = {
+  1: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
+  10: "0x6F0fecBC276de8fC69257065fE47C5a03d986394",
+  137: "0xC5B57e9a1E7914FDA753A88f24E5703e617Ee50c",
+}
+
 
 interface StakeCardProps {
   stakingAddress: string;
@@ -17,6 +33,20 @@ interface StakeCardProps {
 }
 
 const StakeCard: React.FC<StakeCardProps> = ({ stakingAddress, stakingType, chainId }) => {
+  const { data: price } = usePrice(stakingType === StakingType.PopLocker ? {
+    address: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
+    chainId: 1,
+    resolver: "llama"
+  } :
+    {
+      address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+      chainId: 1,
+      resolver: "llama"
+    })
+  const { data: tokenStaked } = useBalanceOf(stakingType === StakingType.PopLocker ?
+    { address: POP[chainId], chainId, account: stakingAddress } :
+    { address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8", chainId, account: stakingAddress });
+
   const router = useRouter();
 
   function onSelectPool() {
@@ -26,6 +56,7 @@ const StakeCard: React.FC<StakeCardProps> = ({ stakingAddress, stakingType, chai
     );
   }
 
+  if (ignoreList.includes(stakingAddress)) return <></>
   return (
     <Staking.StakingToken address={stakingAddress} chainId={chainId}>
       {(stakingToken) => (
@@ -39,7 +70,6 @@ const StakeCard: React.FC<StakeCardProps> = ({ stakingAddress, stakingType, chai
                   {/*eslint-enable */}
                 </ContentLoader>
               </div>
-
               <div
                 className={`border-b border-b-customLightGray border-opacity-40 cursor-pointer hover:scale-102 hover:border-opacity-60 
                 transition duration-500 ease-in-out transform relative ${metadata === undefined ? "hidden" : ""}`}
@@ -66,22 +96,13 @@ const StakeCard: React.FC<StakeCardProps> = ({ stakingAddress, stakingType, chai
                     <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
                       <p className="text-primaryLight leading-6">vAPR</p>
                       <p className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
-                        <Staking.Apy chainId={chainId} address={stakingAddress} />
+                        0.00 %
                       </p>
                     </div>
                     <div className="w-1/2 md:w-1/4 mt-6 md:mt-0">
                       <p className="text-primaryLight leading-6">TVL</p>
                       <div className="text-primary text-2xl md:text-3xl leading-6 md:leading-8">
-                        {/* Somehow the Convex Staking Contract breaks on optimism. Therefore we simply check the balanceOf pop token in the staking contract */}
-                        {chainId === ChainId.Optimism ? (
-                          <ValueOfBalance
-                            chainId={chainId}
-                            address={"0x6F0fecBC276de8fC69257065fE47C5a03d986394"}
-                            account={stakingAddress as Address}
-                          />
-                        ) : (
-                          <Tvl chainId={chainId} address={stakingAddress} />
-                        )}
+                        $ {formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}
                       </div>
                     </div>
                     <div className="w-full md:w-1/2 mt-6 md:mt-0">
