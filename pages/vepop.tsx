@@ -22,6 +22,8 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
+import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -106,7 +108,9 @@ export default function VePOP() {
       "0xF9D1E727E1530373654522F293ad01897173142F",
       ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
       signer
-    )
+    );
+
+    const normalizedVotes = normalizeVotes(votes);
 
     let addr = new Array<string>(8);
     let v = new Array<number>(8);
@@ -116,11 +120,19 @@ export default function VePOP() {
       v = [];
 
       for (let n = 0; n < 8; n++) {
-        const l = i * 8
+        const l = i * 8;
         addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
-        v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
+        v[n] = normalizedVotes[n + l] === undefined ? 0 : normalizedVotes[n + l];
       }
+
       gaugeController.vote_for_many_gauge_weights(addr, v)
+        .then(() => {
+          showSuccessToast();
+        })
+        .catch(error => {
+          showErrorToast(error);
+        });
+
     }
   }
 
@@ -208,7 +220,7 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="hidden lg:block space-y-4">
+        <section className="hidden sm:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
             <Gauge key={gauge.address} gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
           )
@@ -216,14 +228,22 @@ export default function VePOP() {
           }
         </section>
 
-        <section className="lg:hidden">
+        <section className="sm:hidden">
           <p className="text-primary">Gauge Voting not available on mobile.</p>
         </section>
 
-        <div className="hidden lg:block absolute left-0 bottom-10 w-full ">
+        <div className="hidden sm:block absolute left-0 bottom-10 w-full ">
           <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
-              Voting power used: <span className="text-[#05BE64]">{veBal ? ((1 - avVotes / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"}%</span>
+              Voting power used: <span className="text-[#05BE64]">
+                {
+                  veBal && veBal.value
+                    ? Math.abs((1 - avVotes / (Number(veBal.value) / 1e18)) * 100) < 0.005
+                      ? "0"
+                      : ((1 - avVotes / (Number(veBal.value) / 1e18)) * 100).toFixed(2)
+                    : "0"
+                }%
+              </span>
             </p>
             <button
               className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
