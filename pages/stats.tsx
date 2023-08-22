@@ -307,12 +307,11 @@ export default function Vaults() {
             snapshotPips,
             duneDexVolume,
             tvlByTime,
+            popPriceResult
         ] = await Promise.all([
             balancer.pools.find(balancerPoolId),
             axios.get<DuneQueryResult<{
-                FDV: number
                 TotalSupply: number
-                price: number
                 CirculatingSupply: number
                 MarketCap: number
             }>>('https://api.dune.com/api/v1/query/2521095/results', duneOpts),
@@ -347,19 +346,31 @@ export default function Vaults() {
                     }
                 }[]
             }>('https://api.llama.fi/protocol/popcorn'),
+            axios.get<{
+                coins: {
+                    "optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394": {
+                        price: number,
+                        decimals: number,
+                        symbol: string,
+                        timestamp: number,
+                        confidence: number,
+                    }
+                }
+            }>('https://coins.llama.fi/prices/current/optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'),
         ])
 
         const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
         const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
         const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
+        const popPrice = popPriceResult.data.coins['optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'].price
 
         setStatistics({
             ...statistics,
-            fdv: duneTokenResult.data.result.rows[0].FDV,
+            fdv: duneTokenResult.data.result.rows[0].TotalSupply * popPrice,
             totalSupply: duneTokenResult.data.result.rows[0].TotalSupply,
-            popPrice: duneTokenResult.data.result.rows[0].price,
+            popPrice: popPrice,
             liquidSupply: duneTokenResult.data.result.rows[0].CirculatingSupply,
-            marketCap: duneTokenResult.data.result.rows[0].MarketCap,
+            marketCap: duneTokenResult.data.result.rows[0].CirculatingSupply * popPrice,
             walletsPopMoreZero: duneHoldersWithPop.data.result.rows[0].total_holders,
             walletsPopMoreHundred: duneHoldersWithPopMoreHundred.data.result.rows[0].total_holders,
             walletsPopMoreThousand: duneHoldersWithPopMoreThousand.data.result.rows[0].total_holders,
@@ -432,27 +443,27 @@ export default function Vaults() {
                     <div className={`bg-[#FAF9F4] border border-warmGray rounded-[1rem] p-6 grid col-span-full md:grid-cols-6 gap-6`}>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Total Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.totalSupply.toLocaleString()}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Liquid Supply</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>{statistics.liquidSupply.toLocaleString()}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>FDV</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.fdv.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Market Cap</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.marketCap.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>POP Price</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>${statistics.popPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className={`flex flex-col`}>
                             <p className={`text-[1rem]`}>Burned POP</p>
-                            <h2 className={`text-[1.5rem] md:text-[1.25rem] lg:text-[1.5rem] font-bold`}>Coming Soon</h2>
+                            <h2 className={`text-[1.5rem] md:text-[1rem] lg:text-[1.25rem] xl:text-[1.5rem] font-bold`}>Coming Soon</h2>
                         </div>
                     </div>
                     <div className={`flex flex-col bg-[#FAF9F4] border border-warmGray rounded-[1rem]`}>
@@ -467,27 +478,27 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>POP in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>{statistics.popInBalPool.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.popInBalPool.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>WETH in 80/20 BAL pool</p>
-                                    <p className={`font-bold text-right`}>{statistics.wethInBalPool.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.wethInBalPool.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>BAL LPs</p>
-                                    <p className={`font-bold text-right`}>{statistics.balLp.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.balLp.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>vePOP (staked LPs)</p>
-                                    <p className={`font-bold text-right`}>{statistics.vePop.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.vePop.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>cPOP emissions</p>
-                                    <p className={`font-bold text-right`}>{statistics.cPopEmissions.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopEmissions.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>cPOP exercised</p>
-                                    <p className={`font-bold text-right`}>{(statistics.cPopExercised * 100).toLocaleString()}%</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*(statistics.cPopExercised * 100).toLocaleString() %*/}</p>
                                 </div>
                             </div>
                             <div className={`flex justify-center`} ref={liquidPopMarketChartElem} />
@@ -520,7 +531,7 @@ export default function Vaults() {
                             <div className={`flex flex-col grow-[1]`}>
                                 <div className={`flex justify-between`}>
                                     <p>Total Revenue</p>
-                                    <p className={`font-bold text-right`}>${statistics.totalRevenue.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon{/*statistics.totalRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Sweet Vault Fees</p>
@@ -528,7 +539,7 @@ export default function Vaults() {
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>cPOP Revenue</p>
-                                    <p className={`font-bold text-right`}>${statistics.cPopRevenue.toLocaleString()}</p>
+                                    <p className={`font-bold text-right`}>Coming Soon {/*statistics.cPopRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
                                     <p>Total Users</p>

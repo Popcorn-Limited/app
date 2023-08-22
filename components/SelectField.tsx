@@ -36,13 +36,13 @@ export default function SelectField({
                 {value?.image && (
                     <img className={`w-6 h-6 rounded-[50%]`} src={value.image} />
                 )}
-                <div className={`text-white`}>
+                <div className={`text-primary`}>
                     {value?.label}
                 </div>
                 {!isOpened ? (
-                    <ChevronDownIcon className={`text-white w-5`} />
+                    <ChevronDownIcon className={`text-primary w-5`} />
                 ) : (
-                    <ChevronUpIcon className={`text-white w-5`} />
+                    <ChevronUpIcon className={`text-primary w-5`} />
                 )}
             </button>
 
