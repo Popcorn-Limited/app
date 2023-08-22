@@ -142,27 +142,14 @@ export default function VePOP() {
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
-        <section className="lg:py-10 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
-
-          <div className="bg-[#C391FF] rounded-lg h-64 w-full p-6 mb-10 flex lg:hidden justify-end items-end ">
-            <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
-              <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#9B55FF" />
-            </svg>
-          </div>
-
-          <div className="lg:w-1/2">
-            <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-14 mb-4 lg:mb-8">
-              Lock <span className="underline text-[#C391FF]">POP LP</span> for vePOP, <br /> voting power, and oPOP rewards
+        <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
+          <div className="lg:w-[1050px]">
+            <h1 className="banner-text">
+              Lock <span className="banner-highlight-text">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
             </h1>
-            <p className="text-base text-primaryDark">
-              User your vePOP to vote on how much oPOP each vault receives. You can edit your vote only once every 10 days.
+            <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
+              Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
             </p>
-          </div>
-
-          <div className="bg-[#C391FF] rounded-lg h-64 w-112 p-6 hidden lg:flex justify-end items-end ">
-            <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
-              <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#9B55FF" />
-            </svg>
           </div>
         </section>
 
