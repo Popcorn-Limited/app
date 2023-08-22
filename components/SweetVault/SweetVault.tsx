@@ -15,7 +15,7 @@ import Accordion from "../Accordion";
 import TokenIcon from "components/TokenIcon";
 import { FetchTokenResult } from "wagmi/dist/actions";
 import { NetworkSticker } from "components/NetworkSticker";
-import { useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
+import { useAllowance, useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
 import { usePrice } from "lib/Price";
 import { useTotalAssets } from "lib/Vault/hooks";
 import { formatNumber } from "lib/utils/formatBigNumber";
@@ -25,6 +25,8 @@ import useVaultMetadata, { VaultMetadata, VaultTag } from "lib/Vault/hooks/useVa
 
 import { SweetVaultTVL } from "lib/Vault/AllSweetVaultsTVL";
 import useAdapterToken from "hooks/useAdapter";
+import InputTokenWithError from "components/InputTokenWithError";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -49,7 +51,7 @@ const PROTOCOL_ICONS = {
 }
 
 export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vault: VaultMetadata, chainId: ChainId }) {
-  const protocolIcon = PROTOCOL_ICONS[vault?.metadata?.protocol?.name] 
+  const protocolIcon = PROTOCOL_ICONS[vault?.metadata?.protocol?.name]
   return <div className="flex items-center gap-4">
     <div className="relative">
       <NetworkSticker chainId={chainId} />
@@ -68,210 +70,184 @@ export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResu
   </div>
 }
 
+function VaultInputs({ inputTokenState, outputTokenState, inputBalanceState }) {
+  const { inputToken, setInputToken } = inputTokenState;
+  const { outputToken, setOutputToken } = outputTokenState;
+  const { inputBalance, setInputBalance } = inputBalanceState;
+
+  function handleChangeInput(e) {
+    setInputBalance(e.currentTarget.value);
+  }
+
+  <>
+    <InputTokenWithError
+      captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
+      onSelectToken={option => setInputToken(option)}
+      onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(inputToken.balance) / (10 ** inputToken.decimals) } })}
+      chainId={1}
+      value={inputBalance}
+      onChange={handleChangeInput}
+      selectedToken={inputToken}
+      errorMessage={""}
+      tokenList={availableToken}
+      allowSelection={outputToken?.address === vault?.address}
+      allowInput
+    />
+    <div className="relative py-4">
+      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <div className="w-full border-t border-customLightGray" />
+      </div>
+      <div className="relative flex justify-center">
+        <span className="bg-white px-4">
+          <ArrowDownIcon
+            className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
+            aria-hidden="true"
+            onClick={() => {
+              if (outputToken.address === vault.address) {
+                setInputToken(vault);
+                setOutputToken(asset)
+              } else {
+                setInputToken(asset);
+                setOutputToken(vault)
+              }
+            }}
+          />
+        </span>
+      </div>
+    </div>
+    <InputTokenWithError
+      captionText={"Output Amount"}
+      onSelectToken={option => setOutputToken(option)}
+      onMaxClick={() => { }}
+      chainId={1}
+      value={getOutput(inputBalance, Number(inputToken?.price), pps)}
+      onChange={() => { }}
+      selectedToken={outputToken}
+      errorMessage={""}
+      tokenList={inputToken.address === vault?.address ? [...availableToken, asset] : []}
+      allowSelection={inputToken.address === vault?.address}
+      allowInput={false}
+    />
+  </>
+}
+
+
+function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account }: { vaultAddress: string, gaugeAddress?: string, chainId: ChainId, account?: string }) {
+  const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
+  const { data: asset } = useVaultToken(vaultAddress, chainId);
+
+  const { data: price } = usePrice({ address: asset?.address as Address, chainId });
+  const { data: totalAssets } = useTotalAssets({ address: vaultAddress as Address, chainId });
+  const { data: totalSupply } = useTotalSupply({ address: vaultAddress as Address, chainId });
+  const [pps, setPps] = useState<number>(0);
+
+  useEffect(() => {
+    if (totalAssets && totalSupply && price
+      && Number(totalAssets?.value) > 0 && Number(totalSupply?.value) > 0) {
+      setPps((Number(totalAssets?.value) / Number(totalSupply?.value)) * (Number(price?.value) / (10 ** asset?.decimals)));
+    }
+  }, [totalAssets, totalSupply, price])
+
+  const { data: assetBalance } = useBalanceOf({ address: asset?.address as Address, chainId, account });
+  const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
+  const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
+
+  const { data: assetAllowance } = useAllowance({ address: asset?.address, chainId, account: vaultAddress });
+  const { data: vaultAllowance } = useAllowance({ address: vault?.address, chainId, account: gaugeAddress }); // TODO - might also need to approve wido
+
+  const [baseToken, setBaseToken] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (vault?.address && asset?.address && price?.value && pps > 0) {
+      const _baseToken = [
+        {
+          ...asset,
+          allowance: Number(assetAllowance?.value) / (10 ** asset?.decimals) || 0,
+          balance: Number(assetBalance?.value) / (10 ** asset?.decimals) || 0,
+          price: Number(price?.value) / (10 ** asset?.decimals),
+          chainId: chainId,
+          icon: undefined,
+          target: { type: "Vault", address: vaultAddress }
+        }, // asset
+        {
+          ...vault,
+          allowance: Number(vaultAllowance?.value) / (10 ** vault?.decimals) || 0,
+          balance: Number(vaultBalance?.value) / (10 ** vault?.decimals) || 0,
+          price: pps,
+          chainId: chainId,
+          icon: undefined,
+          isVault: true,
+          target: { type: "Gauge", address: gaugeAddress }
+        }, // vault
+      ]
+      if (gaugeAddress) _baseToken.push({
+        ...vault,
+        name: "Staked " + vault?.name,
+        symbol: "stk-" + vault?.symbol,
+        allowance: Number(constants.MaxUint256),
+        balance: Number(stakedBalance?.value) / (10 ** vault?.decimals) || 0,
+        price: pps,
+        chainId: chainId,
+        icon: undefined,
+        target: { type: "Gauge", address: gaugeAddress },
+      }) // staked vault
+
+      setBaseToken(_baseToken);
+    }
+  }, [vault, asset, price, pps])
+
+  return baseToken;
+}
+
+
+
 function SweetVault({
   vaultAddress,
+  gaugeAddress,
   chainId,
   searchString,
   selectedTags,
   deployer,
 }: {
-  chainId: ChainId
-  vaultAddress: string
-  searchString: string
-  selectedTags: string[]
+  chainId: ChainId,
+  vaultAddress: string,
+  gaugeAddress: string,
+  searchString: string,
+  selectedTags: string[],
   deployer?: string
 }) {
   const { address: account } = useAccount();
-  const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
-  const { data: token } = useVaultToken(vaultAddress, chainId);
-  const { data: adapter } = useAdapterToken(vaultAddress, chainId);
-  const vaultMetadata = useVaultMetadata(vaultAddress, token, adapter, chainId);
-  const isDeployer = deployer ? vaultMetadata?.creator === deployer : true;
-  const usesStaking = vaultMetadata?.staking?.toLowerCase() !== constants.AddressZero.toLowerCase();
+  const baseToken = useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId });
+  const vaultMetadata = useVaultMetadata(vaultAddress, chainId);
+  const asset = baseToken[0];
+  const vault = baseToken[1];
 
-  const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
-  const { data: stakedBalance } = useBalanceOf({ address: vaultMetadata?.staking as Address, chainId, account });
-  const balance = usesStaking ? stakedBalance : vaultBalance
+  const [inputToken, setInputToken] = useState<any>(asset)
+  const [outputToken, setOutputToken] = useState<any>(gaugeAddress ? baseToken[2] : vault)
 
-  const { data: price } = usePrice({ address: token?.address as Address, chainId });
-  const { data: totalAssets } = useTotalAssets({ address: vaultAddress as Address, chainId, account });
-  const { data: totalSupply } = useTotalSupply({ address: vaultAddress as Address, chainId, account });
-  const [pps, setPps] = useState<number>(0);
+  const [inputBalance, setInputBalance] = useState<number>(0);
 
-
-  useEffect(() => {
-    if (totalAssets && totalSupply && price
-      && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
-      setPps(Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString()));
-    }
-  }, [balance, totalAssets, totalSupply, price])
-
-  if (!vaultMetadata || !isDeployer) return <></>
-  if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString) && !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
+  // Error Loading
+  if (!vaultMetadata) return <></>
+  // Vault is not in search term
+  if (searchString !== "" &&
+    !vault?.name.toLowerCase().includes(searchString) &&
+    !vault?.symbol.toLowerCase().includes(searchString) &&
+    !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
+  // Vault is not in selected tags
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
+
   return (
     <Accordion
-      header={
-        <div className="flex flex-row flex-wrap items-center justify-between w-full text-start">
-
-          <div className="flex items-center justify-between select-none w-full md:w-1/3">
-            <AssetWithName token={token} vault={vaultMetadata} chainId={chainId} />
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="text-primaryLight font-normal">Your Wallet</p>
-            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                <BalanceOf
-                  account={account}
-                  chainId={chainId}
-                  address={token?.address}
-                  render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, token?.decimals) : "-"}</>}
-                />
-              </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
-            </p>
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="text-primaryLight font-normal">Your Deposit</p>
-            <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {account ?
-                  formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
-                  : "-"}
-              </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
-            </div>
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="font-normal text-primaryLight">vAPY</p>
-            <Title as="td" level={2} fontWeight="font-normal">
-              <Apy
-                address={vaultAddress}
-                chainId={chainId}
-                resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
-                render={(apy) => {
-                  return (
-                    <Apy
-                      address={vaultMetadata.staking}
-                      resolver={"multiRewardStaking"}
-                      render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
-                        <section className="flex items-center gap-1 text-primary">
-                          {formatAndRoundBigNumber(
-                            HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
-                            18,
-                          )} %
-                          <InfoIconWithTooltip
-                            title="APR Breakdown"
-                            content={
-                              <ul className="text-sm">
-                                <li>
-                                  Staking APY:{" "}
-                                  {formatAndRoundBigNumber(
-                                    HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
-                                    18,
-                                  )}
-                                  %
-                                </li>
-                                <li>
-                                  Vault APY:{" "}
-                                  {formatAndRoundBigNumber(
-                                    HUNDRED.mul(apy?.data?.value || constants.Zero),
-                                    18,
-                                  )}
-                                  %
-                                </li>
-                              </ul>
-                            }
-                          />
-                        </section>
-                      ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
-                      }
-                      chainId={chainId}
-                    />
-                  );
-                }}
-              />
-            </Title>
-          </div>
-
-          <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
-            <p className="leading-6 text-primaryLight">TVL</p>
-            <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-              <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
-                {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
-              </SweetVaultTVL>
-            </Title>
-          </div>
-
-        </div>
-      }
+      header={<div>{vault?.name}</div>}
     >
-      <div className="flex flex-col md:flex-row mt-8 gap-8">
-        <div className="flex flex-col w-full md:w-4/12 gap-8">
-          <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-            <DepositWithdraw
-              chainId={chainId}
-              vault={vaultAddress}
-              asset={token?.address}
-              staking={vaultMetadata?.staking}
-              getTokenUrl={vaultMetadata?.metadata?.getTokenUrl}
-              pps={pps}
-            />
-          </section>
-        </div>
-        <div className="md:hidden flex w-full">
-          <Accordion
-            initiallyOpen={false}
-            containerClassName="w-full bg-white p-6"
-            header={
-              <Fragment>
-                <div className="w-full flex flex-row justify-between">
-                  <p className="font-normal text-customBrown">Learn</p>
-                  <div className="flex self-center">
-                    <RightArrowIcon color="827D69" />
-                  </div>
-                </div>
-              </Fragment>
-            }>
-            <section className="bg-white rounded-lg w-full md:w-8/12 mt-6">
-              <div className="flex flex-row items-center">
-                <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
-                <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
-                  {token?.name}
-                </Title>
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
-              </div>
-            </section>
-          </Accordion>
-        </div>
-        <section className="bg-white rounded-lg border border-customLightGray w-full md:w-8/12 p-6 md:p-8 hidden md:flex flex-col">
-          <div className="flex flex-row items-center">
-            <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
-            <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
-              {token?.name}
-            </Title>
-          </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
-          </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# Protocol Adapter \n${vaultMetadata?.metadata?.protocol?.description}`} />
-          </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
-          </div>
-        </section>
+      <div className="flex flex-col">
+        <VaultInputs
+          inputTokenState={[inputToken, setInputToken]}
+          outputTokenState={[outputToken, setOutputToken]}
+          inputBalanceState={[inputBalance, setInputBalance]}
+        />
+
       </div>
     </Accordion>
   )

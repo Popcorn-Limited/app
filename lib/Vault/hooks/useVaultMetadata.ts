@@ -6,6 +6,8 @@ import { Address, useContractRead } from "wagmi";
 import TokenMetadata, { addLpMetadata } from "lib/utils/metadata/tokenMetadata";
 import ProtocolMetadata from "lib/utils/metadata/protocolMetadata";
 import StrategyMetadata, { addGenericStrategyDescription } from "lib/utils/metadata/strategyMetadata";
+import useVaultToken from "hooks/useVaultToken";
+import useAdapterToken from "hooks/useAdapter";
 
 function getLocalMetadata(address: string): IpfsMetadata {
   switch (address) {
@@ -322,7 +324,10 @@ function useGetIpfsMetadata(address: string, adapter, token, cid?: string): Ipfs
 }
 
 
-export default function useVaultMetadata(vaultAddress, token, adapter, chainId): VaultMetadata {
+export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
+  const { data: token } = useVaultToken(vaultAddress, chainId);
+  const { data: adapter = undefined } = useAdapterToken(vaultAddress, chainId);
+
   const registry = useVaultRegistry(chainId);
   const { data } = useContractRead({
     address: registry?.address as Address,

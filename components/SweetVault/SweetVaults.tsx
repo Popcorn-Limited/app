@@ -13,13 +13,13 @@ import NetworkFilter from "components/NetworkFilter";
 
 export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
-  ChainId.Ethereum,
-  ChainId.Polygon,
-  ChainId.Optimism,
-  ChainId.Arbitrum,
-  ChainId.BNB,
+  // ChainId.Ethereum,
+  // ChainId.Polygon,
+  // ChainId.Optimism,
+  // ChainId.Arbitrum,
+  // ChainId.BNB,
   // ChainId.Fantom,
-  ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Localhost] : [])
+  ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Localhost, ChainId.Goerli] : [])
 ]
 
 export default function SweetVaults({
@@ -52,7 +52,7 @@ export default function SweetVaults({
             Sweet Vaults
           </h1>
           <p className="text-base text-primaryDark">
-            Add liquidity to earn stablecoin rewards <br className="hidden md:block"/>
+            Add liquidity to earn stablecoin rewards <br className="hidden md:block" />
             and be a part at creating social impact.
           </p>
 
@@ -105,6 +105,7 @@ export default function SweetVaults({
               searchString={searchString}
               selectedTags={selectedTags.length === tags.length ? [] : selectedTags}
               deployer={deployer}
+              gaugeAddress={vault.gauge}
             />
           )
         })}
