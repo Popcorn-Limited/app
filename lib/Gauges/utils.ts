@@ -1,6 +1,7 @@
 import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
@@ -48,9 +49,17 @@ export function useCreateLock(address: string, amount: number | string, days: nu
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: (tx) => {
+      showSuccessToast("Lock created successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
 export function useIncreaseLockAmount(address: string, amount: number | string) {
@@ -62,9 +71,17 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: (tx) => {
+      showSuccessToast("Lock amount increased successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
 export function useIncreaseLockTime(address: string, unlockTime: number) {
@@ -76,9 +93,17 @@ export function useIncreaseLockTime(address: string, unlockTime: number) {
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: (tx) => {
+      showSuccessToast("Lock time increased successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
 export function useWithdrawLock(address: string) {
@@ -90,7 +115,16 @@ export function useWithdrawLock(address: string) {
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: (tx) => {
+      showSuccessToast("Withdrawal successful!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
+

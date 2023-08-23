@@ -16,6 +16,7 @@ import UnstakePreview from "./UnstakePreview";
 import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
 const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
 const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
@@ -32,7 +33,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount()
-  
+
   const [showModal, setShowModal] = show;
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
@@ -54,14 +55,12 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   } = useApproveBalance(POP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
-        successMessage: "POP approved!",
-        errorMessage: "Something went wrong",
+        onSuccess: () => showSuccessToast("POP approved!"),
+        onError: (error) => showErrorToast(error),
       });
     },
-    onError: () => {
-      toast.error("User rejected the transaction", {
-        position: "top-center",
-      });
+    onError: (error) => {
+      showErrorToast(error);
     },
   });
 
