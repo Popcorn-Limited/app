@@ -3,23 +3,20 @@ import { useAccount } from "wagmi";
 import NoSSR from "react-no-ssr";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SweetVault from "./SweetVault";
-import HeroSection from "../HeroSection";
 import { ChainId } from "../../lib/utils/connectors";
 import AllSweetVaultsTVL from "../../lib/Vault/AllSweetVaultsTVL";
 import AllSweetVaultDeposits from "lib/Vault/AllSweetVautDeposits";
-import { VaultTag } from "lib/Vault/hooks";
-import { Tabs } from "components/Tabs";
 import NetworkFilter from "components/NetworkFilter";
 
 export const SUPPORTED_NETWORKS = [
   ChainId.ALL,
-  // ChainId.Ethereum,
-  // ChainId.Polygon,
-  // ChainId.Optimism,
-  // ChainId.Arbitrum,
+  ChainId.Ethereum,
+  ChainId.Polygon,
+  ChainId.Optimism,
+  ChainId.Arbitrum,
   // ChainId.BNB,
   // ChainId.Fantom,
-  ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Localhost, ChainId.Goerli] : [])
+  ChainId.Goerli
 ]
 
 export default function SweetVaults({
@@ -47,6 +44,11 @@ export default function SweetVaults({
           <p className="text-base text-primaryDark">
             Add liquidity to earn stablecoin rewards and be a part at creating social impact.
           </p>
+          <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
+            Mint the token needed for testing on Goerli here: <br />
+            <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br/>
+            <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
+          </div>
         </div>
 
         <div className="flex flex-row items-center mt-8 w-full md:w-1/3">

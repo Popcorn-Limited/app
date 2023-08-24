@@ -14,7 +14,7 @@ const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f
   "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
 ]
 
-const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
+const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
 
 
 const PopSweetVaults: NextPage = () => {
@@ -38,7 +38,7 @@ const PopSweetVaults: NextPage = () => {
     ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } }),
     ...gauges.map(gauge => { return { address: gauge.vault, chainId: ChainId.Goerli, gauge: gauge.address } })
   ]
-  
+
   return (
     <SweetVaults
       vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
