@@ -150,6 +150,11 @@ export default function VePOP() {
             <p className="text-base text-primaryDark">
               User your vePOP to vote on how much oPOP each vault receives. You can edit your vote only once every 10 days.
             </p>
+            <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
+              Mint the token needed for testing on Goerli here: <br />
+              <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
+              <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
+            </div>
           </div>
         </section>
 
