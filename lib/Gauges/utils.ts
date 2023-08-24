@@ -2,6 +2,7 @@ import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
+import { toast } from 'react-hot-toast';
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
@@ -71,12 +72,16 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     chainId: Number(5),
   });
 
+  // const loadingToastId = toast.loading('Increasing lock amount...');
+
   const result = useContractWrite({
     ...config,
     onSuccess: (tx) => {
+      // toast.dismiss(loadingToastId); // Dismiss loading toast
       showSuccessToast("Lock amount increased successfully!");
     },
     onError: (error) => {
+      // toast.dismiss(loadingToastId); // Dismiss loading toast
       showErrorToast(error);
     }
   });
