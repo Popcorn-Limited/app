@@ -1,30 +1,35 @@
 import { Fragment, useEffect, useState } from "react";
-import { Address, useAccount, useToken } from "wagmi";
-import { constants } from "ethers";
+import { Address, useAccount, useNetwork, useSwitchNetwork, useToken } from "wagmi";
+import { Contract, constants } from "ethers";
 
 import { BalanceOf } from "lib/Erc20";
 import useVaultToken from "hooks/useVaultToken";
 
-import { ChainId, formatAndRoundBigNumber } from "lib/utils";
+import { ChainId, RPC_PROVIDERS, formatAndRoundBigNumber } from "lib/utils";
 import Title from "components/content/Title";
 import { Apy } from "lib/Staking";
 import MarkdownRenderer from "./MarkdownRenderer";
-import AnimatedChevron from "./AnimatedChevron";
-import DepositWithdraw from "./DepositWithdraw";
 import Accordion from "../Accordion";
 import TokenIcon from "components/TokenIcon";
-import { FetchTokenResult } from "wagmi/dist/actions";
 import { NetworkSticker } from "components/NetworkSticker";
-import { useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
+import { useAllowance, useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
 import { usePrice } from "lib/Price";
 import { useTotalAssets } from "lib/Vault/hooks";
-import { formatNumber } from "lib/utils/formatBigNumber";
-import RightArrowIcon from "components/SVGIcons/RightArrowIcon";
-import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
+import { formatAndRoundNumber, formatNumber } from "lib/utils/formatBigNumber";
 import useVaultMetadata, { VaultMetadata, VaultTag } from "lib/Vault/hooks/useVaultMetadata";
 
 import { SweetVaultTVL } from "lib/Vault/AllSweetVaultsTVL";
 import useAdapterToken from "hooks/useAdapter";
+import InputTokenWithError from "components/InputTokenWithError";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import MainActionButton from "components/MainActionButton";
+import TabSelector from "components/TabSelector";
+import useApproveBalance from "hooks/useApproveBalance";
+import useWaitForTx from "lib/utils/hooks/useWaitForTx";
+import toast from "react-hot-toast";
+import { useVaultDeposit, useVaultRedeem } from "lib/Vault/hooks/interactions";
+import { useGaugeDeposit, useGaugeWithdraw } from "lib/Gauges/utils";
+import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -48,12 +53,12 @@ const PROTOCOL_ICONS = {
   "Balancer": "balancer",
 }
 
-export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResult; vault: VaultMetadata, chainId: ChainId }) {
-  const protocolIcon = PROTOCOL_ICONS[vault?.metadata?.protocol?.name] 
+export function AssetWithName({ token, vault, chainId }: { token: any; vault: VaultMetadata, chainId: ChainId }) {
+  const protocolIcon = PROTOCOL_ICONS[vault?.metadata?.protocol?.name]
   return <div className="flex items-center gap-4">
     <div className="relative">
       <NetworkSticker chainId={chainId} />
-      <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
+      <TokenIcon token={token?.address} icon={token?.icon} chainId={chainId} imageSize="w-8 h-8" />
     </div>
     <h2 className="text-gray-900 text-2xl font-bold mt-1">
       {vault?.metadata?.name || vault?.metadata?.token?.name || token?.name}
@@ -68,68 +73,346 @@ export function AssetWithName({ token, vault, chainId }: { token: FetchTokenResu
   </div>
 }
 
+function noOp() { }
+
+function VaultInputs({ tokenOptions, hasGauge }) {
+  const { waitForTx } = useWaitForTx();
+  const { address: account } = useAccount();
+  const { chain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
+
+  const [inputToken, setInputToken] = useState<any>()
+  const [outputToken, setOutputToken] = useState<any>()
+
+  const [inputBalance, setInputBalance] = useState<number>(0);
+
+  const asset = tokenOptions[0];
+  const vault = tokenOptions[1];
+  const gauge = hasGauge ? tokenOptions[2] : undefined;
+
+  useEffect(() => {
+    if (tokenOptions.length > 0 && !inputToken?.address && !outputToken?.address) {
+      // set default input/output tokens
+      setInputToken(tokenOptions[0])
+      setOutputToken(hasGauge ? gauge : vault)
+    }
+  }, [tokenOptions])
+
+  const isDeposit = outputToken?.address === (gauge || vault).address
+
+  function handleChangeInput(e) {
+    setInputBalance(Number(e.currentTarget.value));
+  }
+
+  function switchTokens() {
+    if (isDeposit) {
+      // Switch to Withdraw
+      setInputToken(hasGauge ? gauge : vault);
+      setOutputToken(asset)
+    } else {
+      // Switch to Deposit
+      setInputToken(asset);
+      setOutputToken(hasGauge ? gauge : vault)
+    }
+  }
+
+  const {
+    writeAsync: approve = noOp,
+  } = useApproveBalance(inputToken?.address, inputToken?.target.address, vault?.chainId, {
+    onSuccess: (tx) => {
+      waitForTx(tx, {
+        successMessage: "Assets approved!",
+        errorMessage: "Something went wrong",
+      });
+    },
+    onError: () => {
+      toast.error("User rejected the transaction", {
+        position: "top-center",
+      });
+    },
+  });
+
+  const {
+    writeAsync: approveVault = noOp,
+  } = useApproveBalance(vault?.address, vault?.target.address, vault?.chainId, {
+    onSuccess: (tx) => {
+      waitForTx(tx, {
+        successMessage: "Vault approved!",
+        errorMessage: "Something went wrong",
+      });
+    },
+    onError: () => {
+      toast.error("User rejected the transaction", {
+        position: "top-center",
+      });
+    },
+  });
+
+  const { writeAsync: vaultDeposit } = useVaultDeposit(vault?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
+  const { writeAsync: vaultRedeem } = useVaultRedeem(vault?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
+  const { writeAsync: gaugeDeposit } = useGaugeDeposit(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
+  const { writeAsync: gaugeWithdraw } = useGaugeWithdraw(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
+
+  async function depositAndStake() {
+    const oldBal = vault?.balance
+
+    let tx = await vaultDeposit()
+    await tx.wait(1)
+
+    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)"], RPC_PROVIDERS[vault?.chainId]);
+    const newBal = await vaultContract.balanceOf(account)
+    const depositAmount = Number(newBal) - Number(oldBal)
+
+    gaugeDeposit({ args: [depositAmount] })
+  }
+
+  async function unstakeAndWithdraw() {
+    const oldBal = vault?.balance
+
+    let tx = await gaugeWithdraw()
+    await tx.wait(1)
+
+    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)"], RPC_PROVIDERS[vault?.chainId]);
+    const newBal = await vaultContract.balanceOf(vault?.address)
+    const withdrawAmount = (Number(newBal) / (10 ** vault?.decimals)) - Number(oldBal)
+
+    vaultRedeem({ args: [withdrawAmount] })
+  }
+
+  function sufficientAllowance(token: any) {
+    return token.allowance > 0 && token.allowance >= inputBalance
+  }
+
+  async function handleMainAction() {
+    if (inputBalance === 0) return;
+
+    if (chain.id !== Number(vault.chainId)) switchNetwork?.(Number(vault.chainId));
+
+    switch (inputToken.address) {
+      case asset.address:
+        console.log("in asset")
+        if (outputToken.address === vault.address) {
+          console.log("out vault")
+          if (!sufficientAllowance(inputToken)) await approve()
+          gaugeDeposit()
+        }
+        else if (outputToken.address === gauge.address) {
+          console.log("out gauge")
+          if (!sufficientAllowance(inputToken)) await approve()
+          if (!sufficientAllowance(vault)) await approveVault()
+          depositAndStake()
+        }
+        else {
+          console.log("out error")
+          // wrong output token
+          return
+        }
+        break;
+      case vault.address:
+        console.log("in vault")
+        if (outputToken.address === asset.address) {
+          console.log("out asset")
+          vaultRedeem()
+        }
+        else if (outputToken.address === gauge.address) {
+          console.log("out gauge")
+          if (!sufficientAllowance(vault)) await approveVault()
+          gaugeDeposit()
+        }
+        else {
+          console.log("out error")
+          // wrong output token
+          return
+        }
+        break;
+      case gauge.address:
+        console.log("in gauge")
+        if (outputToken.address === asset.address) {
+          console.log("out asset")
+          unstakeAndWithdraw()
+        }
+        else if (outputToken.address === vault.address) {
+          console.log("out vault")
+          gaugeWithdraw()
+        }
+        else {
+          console.log("out error")
+          // wrong output token
+          return
+        }
+        break;
+    }
+  }
+
+  if (!inputToken || !outputToken) return <></>
+  return <>
+    <TabSelector
+      className="mb-6"
+      availableTabs={["Deposit", "Withdraw"]}
+      activeTab={isDeposit ? "Deposit" : "Withdraw"}
+      setActiveTab={switchTokens}
+    />
+    <InputTokenWithError
+      captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
+      onSelectToken={option => setInputToken(option)}
+      onMaxClick={() => handleChangeInput({ currentTarget: { value: inputToken.balance / (10 ** inputToken.decimals) } })}
+      chainId={vault.chainId}
+      value={inputBalance}
+      onChange={handleChangeInput}
+      selectedToken={inputToken}
+      errorMessage={""}
+      tokenList={[]}
+      allowSelection={false}
+      allowInput
+    />
+    <div className="relative py-4">
+      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <div className="w-full border-t border-customLightGray" />
+      </div>
+      <div className="relative flex justify-center">
+        <span className="bg-white px-4">
+          <ArrowDownIcon
+            className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
+            aria-hidden="true"
+            onClick={switchTokens}
+          />
+        </span>
+      </div>
+    </div>
+    <InputTokenWithError
+      captionText={"Output Amount"}
+      onSelectToken={option => setOutputToken(option)}
+      onMaxClick={() => { }}
+      chainId={vault.chainId}
+      value={(inputBalance * (Number(inputToken.price)) / Number(outputToken.price)) || 0}
+      onChange={() => { }}
+      selectedToken={outputToken}
+      errorMessage={""}
+      tokenList={[]}
+      allowSelection={false}
+      allowInput={false}
+    />
+    <div className="mt-8">
+      <MainActionButton label={isDeposit ? "Deposit" : "Withdraw"} handleClick={handleMainAction} />
+    </div>
+  </>
+}
+
+
+function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account }:
+  { vaultAddress: string, gaugeAddress?: string, chainId: ChainId, account?: string }) {
+  const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
+  const { data: gauge } = useToken({ address: gaugeAddress as Address, chainId })
+  const { data: asset } = useVaultToken(vaultAddress, chainId);
+
+  const { data: price } = usePrice({ address: asset?.address as Address, chainId });
+  const { data: totalAssets } = useTotalAssets({ address: vaultAddress as Address, chainId });
+  const { data: totalSupply } = useTotalSupply({ address: vaultAddress as Address, chainId });
+  const [pps, setPps] = useState<number>(1);
+
+  useEffect(() => {
+    if (totalAssets && totalSupply && price
+      && Number(totalAssets?.value) > 0 && Number(totalSupply?.value) > 0 && pps === 0) {
+      setPps((Number(totalAssets?.value) / Number(totalSupply?.value)) * (Number(price?.value) / (10 ** asset?.decimals)));
+    }
+  }, [totalAssets, totalSupply, price])
+
+  const { data: assetBalance } = useBalanceOf({ address: asset?.address as Address, chainId, account });
+  const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
+  const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
+
+  const { data: assetAllowance } = useAllowance({ address: asset?.address, chainId, account: vaultAddress });
+  const { data: vaultAllowance } = useAllowance({ address: vault?.address, chainId, account: gaugeAddress }); // TODO - might also need to approve wido
+
+  const [baseToken, setBaseToken] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (vault?.address && asset?.address && price?.value && pps > 0 && baseToken.length === 0) {
+      const _baseToken = [
+        {
+          ...asset,
+          allowance: Number(assetAllowance?.value) || 0,
+          balance: Number(assetBalance?.value) || 0,
+          price: Number(price?.value) / (10 ** asset?.decimals) || 1,
+          chainId: chainId,
+          icon: "/images/tokens/eth.png",
+          target: { type: "Vault", address: vaultAddress }
+        }, // asset
+        {
+          ...vault,
+          allowance: Number(vaultAllowance?.value) || 0,
+          balance: Number(vaultBalance?.value) || 0,
+          price: pps,
+          chainId: chainId,
+          icon: undefined,
+          isVault: true,
+          target: { type: "Gauge", address: gaugeAddress }
+        }, // vault
+      ]
+      if (gaugeAddress) _baseToken.push({
+        ...gauge,
+        allowance: Number(constants.MaxUint256),
+        balance: Number(stakedBalance?.value) || 0,
+        price: pps,
+        chainId: chainId,
+        icon: undefined,
+        target: { type: "Gauge", address: gaugeAddress },
+      }) // staked vault
+
+      setBaseToken(_baseToken);
+    }
+  }, [vault, asset, price, pps])
+
+  return baseToken;
+}
+
 function SweetVault({
   vaultAddress,
+  gaugeAddress,
   chainId,
   searchString,
   selectedTags,
   deployer,
 }: {
-  chainId: ChainId
-  vaultAddress: string
-  searchString: string
-  selectedTags: string[]
+  chainId: ChainId,
+  vaultAddress: string,
+  gaugeAddress: string,
+  searchString: string,
+  selectedTags: string[],
   deployer?: string
 }) {
   const { address: account } = useAccount();
-  const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
-  const { data: token } = useVaultToken(vaultAddress, chainId);
-  const { data: adapter } = useAdapterToken(vaultAddress, chainId);
-  const vaultMetadata = useVaultMetadata(vaultAddress, token, adapter, chainId);
-  const isDeployer = deployer ? vaultMetadata?.creator === deployer : true;
-  const usesStaking = vaultMetadata?.staking?.toLowerCase() !== constants.AddressZero.toLowerCase();
+  const baseToken = useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account });
+  const vaultMetadata = useVaultMetadata(vaultAddress, chainId);
+  const asset = baseToken[0];
+  const vault = baseToken[1];
+  const gauge = gaugeAddress ? baseToken[2] : undefined;
 
-  const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
-  const { data: stakedBalance } = useBalanceOf({ address: vaultMetadata?.staking as Address, chainId, account });
-  const balance = usesStaking ? stakedBalance : vaultBalance
-
-  const { data: price } = usePrice({ address: token?.address as Address, chainId });
-  const { data: totalAssets } = useTotalAssets({ address: vaultAddress as Address, chainId, account });
-  const { data: totalSupply } = useTotalSupply({ address: vaultAddress as Address, chainId, account });
-  const [pps, setPps] = useState<number>(0);
-
-
-  useEffect(() => {
-    if (totalAssets && totalSupply && price
-      && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
-      setPps(Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString()));
-    }
-  }, [balance, totalAssets, totalSupply, price])
-
-  if (!vaultMetadata || !isDeployer) return <></>
-  if (searchString !== "" && !vault?.name.toLowerCase().includes(searchString) && !vault?.symbol.toLowerCase().includes(searchString) && !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
+  // Is loading / error
+  if (!vaultMetadata || baseToken.length === 0) return <></>
+  // Vault is not in search term
+  if (searchString !== "" &&
+    !vault?.name.toLowerCase().includes(searchString) &&
+    !vault?.symbol.toLowerCase().includes(searchString) &&
+    !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
+  // Vault is not in selected tags
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (
     <Accordion
       header={
-        <div className="flex flex-row flex-wrap items-center justify-between w-full text-start">
+        <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
           <div className="flex items-center justify-between select-none w-full md:w-1/3">
-            <AssetWithName token={token} vault={vaultMetadata} chainId={chainId} />
+            <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
           </div>
 
           <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
             <p className="text-primaryLight font-normal">Your Wallet</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                <BalanceOf
-                  account={account}
-                  chainId={chainId}
-                  address={token?.address}
-                  render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, token?.decimals) : "-"}</>}
-                />
+                {formatAndRoundNumber(asset?.balance, asset?.decimals)}
               </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
+              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
             </p>
           </div>
 
@@ -137,11 +420,12 @@ function SweetVault({
             <p className="text-primaryLight font-normal">Your Deposit</p>
             <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {account ?
-                  formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
-                  : "-"}
+                {account ? (gaugeAddress ?
+                  formatAndRoundNumber(gauge.balance, gauge.decimals) :
+                  formatAndRoundNumber(vault.balance, vault.decimals)
+                ) : "-"}
               </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
+              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
             </div>
           </div>
 
@@ -200,9 +484,10 @@ function SweetVault({
           <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
             <p className="leading-6 text-primaryLight">TVL</p>
             <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-              <SweetVaultTVL vaultAddress={vaultAddress} chainId={chainId}>
-                {(tvl) => <>{`$ ${formatNumber(tvl)}`}</>}
-              </SweetVaultTVL>
+              $ {formatNumber((gaugeAddress ?
+                gauge.balance / (10 ** gauge.decimals) :
+                vault.balance / (10 ** vault.decimals))
+                * vault.price)}
             </Title>
           </div>
 
@@ -210,68 +495,34 @@ function SweetVault({
       }
     >
       <div className="flex flex-col md:flex-row mt-8 gap-8">
-        <div className="flex flex-col w-full md:w-4/12 gap-8">
-          <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-            <DepositWithdraw
-              chainId={chainId}
-              vault={vaultAddress}
-              asset={token?.address}
-              staking={vaultMetadata?.staking}
-              getTokenUrl={vaultMetadata?.metadata?.getTokenUrl}
-              pps={pps}
+
+        <section className="flex flex-col w-full md:w-4/12 gap-8">
+          <div className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
+            <VaultInputs
+              tokenOptions={baseToken}
+              hasGauge={!!gaugeAddress}
             />
-          </section>
-        </div>
-        <div className="md:hidden flex w-full">
-          <Accordion
-            initiallyOpen={false}
-            containerClassName="w-full bg-white p-6"
-            header={
-              <Fragment>
-                <div className="w-full flex flex-row justify-between">
-                  <p className="font-normal text-customBrown">Learn</p>
-                  <div className="flex self-center">
-                    <RightArrowIcon color="827D69" />
-                  </div>
-                </div>
-              </Fragment>
-            }>
-            <section className="bg-white rounded-lg w-full md:w-8/12 mt-6">
-              <div className="flex flex-row items-center">
-                <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
-                <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
-                  {token?.name}
-                </Title>
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
-              </div>
-              <div className="mt-8">
-                <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
-              </div>
-            </section>
-          </Accordion>
-        </div>
+          </div>
+        </section>
+
         <section className="bg-white rounded-lg border border-customLightGray w-full md:w-8/12 p-6 md:p-8 hidden md:flex flex-col">
           <div className="flex flex-row items-center">
-            <TokenIcon token={token?.address} chainId={chainId} imageSize="w-8 h-8" />
+            <TokenIcon token={asset?.address} icon={asset?.icon} chainId={chainId} imageSize="w-8 h-8" />
             <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
-              {token?.name}
+              {asset?.name}
             </Title>
           </div>
           <div className="mt-8">
             <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
           </div>
           <div className="mt-8">
-            <MarkdownRenderer content={`# Protocol Adapter \n${vaultMetadata?.metadata?.protocol?.description}`} />
+            <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
           </div>
           <div className="mt-8">
             <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
           </div>
         </section>
+
       </div>
     </Accordion>
   )

@@ -10,14 +10,14 @@ import { BigNumberWithFormatted } from "lib/types";
 import Slider from "rc-slider";
 import { useState } from "react";
 
-const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
+const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
 
 
 export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, index: number, votes: [number, Function], veBal: BigNumberWithFormatted }): JSX.Element {
   const [avVotes, handleAvVotes] = votes;
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
-  const vaultMetadata = useVaultMetadata(gauge.vault, token, adapter, gauge.chainId);
+  const vaultMetadata = useVaultMetadata(gauge.vault, gauge.chainId);
 
   const { data: currentGaugeWeight } = useCurrentGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
   const { data: upcomingGaugeWeight } = useUpcomingGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })

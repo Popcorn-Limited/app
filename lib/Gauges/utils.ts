@@ -1,6 +1,8 @@
 import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
+import { ChainId } from "lib/utils";
+import { BigNumber } from "ethers";
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
@@ -88,6 +90,34 @@ export function useWithdrawLock(address: string) {
     functionName: "withdraw",
     args: [],
     chainId: Number(5),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useGaugeDeposit(address: string, chainId: ChainId, amount: number | string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function deposit(uint256 amount) external"],
+    functionName: "deposit",
+    args: [String(amount)],
+    chainId: Number(chainId),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useGaugeWithdraw(address: string, chainId: ChainId, amount: number | string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function withdraw(uint256 amount) external"],
+    functionName: "withdraw",
+    args: [String(amount)],
+    chainId: Number(chainId),
   });
 
   return useContractWrite({
