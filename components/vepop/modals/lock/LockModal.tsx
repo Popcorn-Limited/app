@@ -14,8 +14,8 @@ import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
+const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
+const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 
 function noOp() { }
 
