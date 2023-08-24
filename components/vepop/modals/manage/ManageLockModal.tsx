@@ -17,7 +17,7 @@ import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 
-const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
 const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 
 function noOp() { }
@@ -51,10 +51,10 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
-        successMessage: "POP approved!",
+        successMessage: "POP LP approved!",
         errorMessage: "Something went wrong",
       });
     },
@@ -65,7 +65,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
             {step === 2 &&
               <>
                 <IncreaseStakePreview amount={amount} lockedBal={lockedBal} />
-                <MainActionButton label={showApproveButton ? "Approve POP" : "Increase Lock Amount"} handleClick={handleMainAction} />
+                <MainActionButton label={showApproveButton ? "Approve POP LP" : "Increase Lock Amount"} handleClick={handleMainAction} />
               </>
             }
           </>

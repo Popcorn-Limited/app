@@ -12,8 +12,8 @@ export default function SelectManagementOption({ setStep, setManagementOption }:
       <div>
         <h2 className="text-start text-5xl">Update your Lock</h2>
         <p className="text-start text-primaryDark">
-          Increase your vePOP by locking more POP or increasing the lock time for your locked POP balance.
-          Alternatively Unlock your locked POP.
+          Increase your vePOP by locking more POP LP or increasing the lock time for your locked POP LP balance.
+          Alternatively Unlock your locked POP LP.
         </p>
       </div>
       <div className="space-y-4">

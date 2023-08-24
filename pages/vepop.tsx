@@ -25,7 +25,7 @@ import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
-const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
 const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
 const OPOP = "0xdca3d7dFFd966A98CF0F7eBcC9135832169381F1"
@@ -38,7 +38,7 @@ export default function VePOP() {
   const { address: account } = useAccount()
   const { data: signer } = useSigner({ chainId: 5 })
 
-  const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
+  const { data: popLpBal } = useBalanceOf({ chainId: 5, address: POP_LP, account })
   const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
@@ -74,7 +74,7 @@ export default function VePOP() {
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP approved!",
@@ -158,7 +158,7 @@ export default function VePOP() {
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">My POP LP</p>
-              <p className="font-bold">{popBal?.formatted}</p>
+              <p className="font-bold">{popLpBal?.formatted}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">My Locked POP LP</p>

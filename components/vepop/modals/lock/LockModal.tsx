@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
 
-const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
 const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 
 function noOp() { }
@@ -35,7 +35,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP approved!",
@@ -49,7 +49,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
 
         <div className="space-y-4">
           {step < 3 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 3 && <MainActionButton label={showApproveButton ? "Approve POP" : "Lock POP"} handleClick={handleLock} />}
+          {step === 3 && <MainActionButton label={showApproveButton ? "Approve POP LP" : "Lock POP LP"} handleClick={handleLock} />}
           {step === 0 && <SecondaryActionButton label="Skip" handleClick={() => setStep(2)} />}
           {step === 1 || step === 3 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>

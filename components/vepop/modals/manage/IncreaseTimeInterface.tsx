@@ -9,7 +9,6 @@ import { BigNumber, constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
 import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 
-const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
 
 function LockTimeButton({ label, isActive, handleClick }: { label: string, isActive: boolean, handleClick: Function }): JSX.Element {
   return (
