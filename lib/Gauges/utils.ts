@@ -39,14 +39,13 @@ export function getVotePeriodEndTime(): number {
 }
 
 export function useCreateLock(address: string, amount: number | string, days: number) {
-  const _amount = parseUnits(String(amount));
   const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
 
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
-    args: [_amount, unlockTime],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false }), unlockTime],
     chainId: Number(5),
   });
 
@@ -60,7 +59,7 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     address,
     abi: ["function increase_amount(uint256) external"],
     functionName: "increase_amount",
-    args: [parseUnits(String(amount))],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(5),
   });
 
@@ -102,7 +101,7 @@ export function useGaugeDeposit(address: string, chainId: ChainId, amount: numbe
     address,
     abi: ["function deposit(uint256 amount) external"],
     functionName: "deposit",
-    args: [String(amount)],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
   });
 
@@ -116,7 +115,7 @@ export function useGaugeWithdraw(address: string, chainId: ChainId, amount: numb
     address,
     abi: ["function withdraw(uint256 amount) external"],
     functionName: "withdraw",
-    args: [String(amount)],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
   });
 

@@ -30,7 +30,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
   const [days, setDays] = useState(7);
 
   const { waitForTx } = useWaitForTx();
-  const { write: createLock } = useCreateLock(VOTING_ESCROW, amount, days);
+  const { write: createLock } = useCreateLock(VOTING_ESCROW, (amount * (10 ** 18) || 0), days);
   const {
     write: approve = noOp,
     isSuccess: isApproveSuccess,

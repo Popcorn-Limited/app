@@ -7,7 +7,7 @@ export function useVaultDeposit(address: string, chainId: ChainId, amount: numbe
     address,
     abi: ["function deposit(uint256 assetAmount) external"],
     functionName: "deposit",
-    args: [String(amount)],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
   });
 
@@ -22,7 +22,7 @@ export function useVaultRedeem(address: string, chainId: ChainId, amount: number
     address,
     abi: ["function redeem(uint256 burnAmount) external"],
     functionName: "redeem",
-    args: [String(amount)],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
   });
 

@@ -63,10 +63,11 @@ export default function LockPopInterface({ amountState, daysState }:
           selectedToken={
             {
               ...popLp,
-              balance: popLpBal?.value || constants.Zero,
+              balance: Number(popLpBal?.value || 0),
             } as any
           }
           errorMessage={errorMessage}
+          allowInput
           tokenList={[]}
           getTokenUrl="https://app.balancer.fi/#/goerli/pool/0x29d7a7e0d781c957696697b94d4bc18c651e358e0002000000000000000008a0" // temp link
         />
