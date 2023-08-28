@@ -16,9 +16,13 @@ import UnstakePreview from "./UnstakePreview";
 import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
+import { getVeAddresses } from "lib/utils/addresses";
 
-const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
-const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
+const {
+  BalancerPool: POP_LP,
+  VotingEscrow: VOTING_ESCROW,
+} = getVeAddresses();
 
 function noOp() { }
 
@@ -32,7 +36,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount()
-  
+
   const [showModal, setShowModal] = show;
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
@@ -58,10 +62,8 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
         errorMessage: "Something went wrong",
       });
     },
-    onError: () => {
-      toast.error("User rejected the transaction", {
-        position: "top-center",
-      });
+    onError: (error) => {
+      showErrorToast(error);
     },
   });
 

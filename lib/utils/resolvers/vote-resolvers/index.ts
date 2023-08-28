@@ -4,19 +4,23 @@ export function roundToFixed(value, decimals) {
 }
 
 export function normalizeVotes(votes) {
-    let roundedVotes = votes.map(vote => roundToFixed(vote, 0));
-    const totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
+    let roundedVotes = votes.map(vote => Math.round(vote));
+    roundedVotes = roundedVotes.map(vote => Math.min(10000, Math.max(1, vote)));
 
-    if (totalVotes <= 100) return roundedVotes;
+    let totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
+    while (totalVotes > 10000) {
+        const maxIndex = roundedVotes.indexOf(Math.max(...roundedVotes));
+        roundedVotes[maxIndex] -= totalVotes - 10000;
+        totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
+    }
 
-    // Calculate the excess votes
-    const excessVotes = totalVotes - 100;
-
-    // Find the index of the largest vote
-    const maxIndex = roundedVotes.indexOf(Math.max(...roundedVotes));
-
-    // Adjust the largest vote by subtracting the excess
-    roundedVotes[maxIndex] -= excessVotes;
+    roundedVotes = roundedVotes.map(value => value * 10);
+    if (roundedVotes.reduce((sum, vote) => sum + vote, 0) > 10000) {
+        roundedVotes[roundedVotes.indexOf(Math.max(...roundedVotes))] -= 10;
+    }
 
     return roundedVotes;
 }
+
+
+

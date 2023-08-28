@@ -6,8 +6,9 @@ import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 import { useExerciseOPop } from "lib/OPop/useExerciseOPop";
 import ExerciseOPopInterface from "./ExerciseOPopInterface";
 import OptionInfo from "./OptionInfo";
+import { getVeAddresses } from "lib/utils/addresses";
 
-const OPOP_ORACLE = "0x22aC7dE4B8E2359dF0650cE29Aa438F9cB59478b"
+const { BalancerOracle: OPOP_ORACLE } = getVeAddresses();
 
 export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.Element {
   const { chain } = useNetwork();

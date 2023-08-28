@@ -9,9 +9,9 @@ import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
 import { BigNumberWithFormatted } from "lib/types";
 import Slider from "rc-slider";
 import { useState } from "react";
+import { getVeAddresses } from "lib/utils/addresses";
 
-const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
-
+const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, index: number, votes: [number, Function], veBal: BigNumberWithFormatted }): JSX.Element {
   const [avVotes, handleAvVotes] = votes;

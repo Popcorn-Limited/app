@@ -4,6 +4,7 @@ import useNetworkFilter from "hooks/useNetworkFilter";
 import { useAllVaults } from "hooks/vaults";
 import { ChainId } from "lib/utils";
 import useGauges from "lib/Gauges/useGauges";
+import { getVeAddresses } from "lib/utils/addresses";
 
 
 const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
@@ -14,8 +15,7 @@ const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f
   "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
 ]
 
-const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
-
+const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 const PopSweetVaults: NextPage = () => {
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS);

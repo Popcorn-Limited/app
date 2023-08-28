@@ -1,6 +1,9 @@
 import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
+import { toast } from 'react-hot-toast';
+import { useState, useEffect } from "react";
 import { ChainId } from "lib/utils";
 import { BigNumber } from "ethers";
 
@@ -38,23 +41,39 @@ export function getVotePeriodEndTime(): number {
   return epochEndTime;
 }
 
-export function useCreateLock(address: string, amount: number | string, days: number) {
-  const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
+export function useCreateLock(address: `0x${string}`, amount: number | string, days: number) {
+  const _amount = parseUnits(String(amount));
+  const [unlockTime, setUnlockTime] = useState<number>(0);
+
+  useEffect(() => {
+    // This will run once when the component is mounted or whenever `days` changes
+    const newUnlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
+    setUnlockTime(newUnlockTime);
+  }, [days]);
+
 
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
-    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false }), unlockTime],
+    args: [_amount, unlockTime],
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Lock created successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
-export function useIncreaseLockAmount(address: string, amount: number | string) {
+export function useIncreaseLockAmount(address: `0x${string}`, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function increase_amount(uint256) external"],
@@ -63,12 +82,21 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     chainId: Number(5),
   });
 
-  return useContractWrite({
+
+  const result = useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Lock amount increased successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
-export function useIncreaseLockTime(address: string, unlockTime: number) {
+export function useIncreaseLockTime(address: `0x${string}`, unlockTime: number) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function increase_unlock_time(uint256) external"],
@@ -77,12 +105,20 @@ export function useIncreaseLockTime(address: string, unlockTime: number) {
     chainId: Number(5),
   });
 
-  return useContractWrite({
+  const result = useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Lock time increased successfully!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
-export function useWithdrawLock(address: string) {
+export function useWithdrawLock(address: `0x${string}`) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function withdraw() external"],
@@ -91,12 +127,21 @@ export function useWithdrawLock(address: string) {
     chainId: Number(5),
   });
 
-  return useContractWrite({
+
+  const result = useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Withdrawal successful!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
+
+  return result;
 }
 
-export function useGaugeDeposit(address: string, chainId: ChainId, amount: number | string) {
+export function useGaugeDeposit(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function deposit(uint256 amount) external"],
@@ -110,7 +155,7 @@ export function useGaugeDeposit(address: string, chainId: ChainId, amount: numbe
   });
 }
 
-export function useGaugeWithdraw(address: string, chainId: ChainId, amount: number | string) {
+export function useGaugeWithdraw(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function withdraw(uint256 amount) external"],

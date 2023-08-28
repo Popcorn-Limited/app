@@ -98,3 +98,31 @@ export type Token = {
   price?: BigNumber;
   [key: string]: any;
 };
+
+export type veAddresses = {
+  POP: `0x${string}`;
+  WETH: `0x${string}`;
+  BalancerPool: `0x${string}`;
+  BalancerOracle: `0x${string}`;
+  oPOP: `0x${string}`;
+  VaultRegistry: `0x${string}`;
+  Vault1POP: `0x${string}`;
+  Vault2WETH: `0x${string}`;
+  Minter: `0x${string}`;
+  TokenAdmin: `0x${string}`;
+  VotingEscrow: `0x${string}`;
+  GaugeController: `0x${string}`;
+  GaugeFactory: `0x${string}`;
+  SmartWalletChecker: `0x${string}`;
+  VotingEscrowDelegation: `0x${string}`;
+  Vault1POPGauge: `0x${string}`;
+  Vault2WETHGauge: `0x${string}`;
+};
+
+
+
+
+
+
+
+
