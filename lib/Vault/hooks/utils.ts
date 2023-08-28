@@ -43,7 +43,7 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
           balance: Number(assetBalance?.value) || 0,
           price: Number(price?.value) / (10 ** asset?.decimals) || 1,
           chainId: chainId,
-          icon: "/images/tokens/eth.png",
+          icon: asset?.icon,
           target: { type: "Vault", address: vaultAddress }
         }, // asset
         {
