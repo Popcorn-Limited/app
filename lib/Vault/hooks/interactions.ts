@@ -1,8 +1,9 @@
 import { BigNumber } from "ethers";
 import { ChainId } from "lib/utils";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
-export function useVaultDeposit(address: string, chainId: ChainId, amount: number | string) {
+export function useVaultDeposit(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function deposit(uint256 assetAmount) external"],
@@ -13,11 +14,17 @@ export function useVaultDeposit(address: string, chainId: ChainId, amount: numbe
 
   return useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Vault Deposit Success!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
 }
 
 
-export function useVaultRedeem(address: string, chainId: ChainId, amount: number | string) {
+export function useVaultRedeem(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function redeem(uint256 burnAmount) external"],
@@ -28,5 +35,11 @@ export function useVaultRedeem(address: string, chainId: ChainId, amount: number
 
   return useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Vault Redeem Success!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
 }

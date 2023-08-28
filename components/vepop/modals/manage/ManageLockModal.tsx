@@ -17,9 +17,12 @@ import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
+import { getAddresses } from "lib/utils/addresses";
 
-const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
-const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
+const {
+  BalancerPool: POP_LP,
+  VotingEscrow: VOTING_ESCROW,
+} = getAddresses();
 
 function noOp() { }
 

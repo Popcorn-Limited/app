@@ -7,8 +7,9 @@ import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
 import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
+import { getAddresses } from "lib/utils/addresses";
 
-const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
+const { BalancerPool: POP_LP } = getAddresses();
 
 export default function IncreaseStakeInterface({ amountState, lockedBal }:
   { amountState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {

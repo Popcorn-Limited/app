@@ -24,12 +24,16 @@ import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
+import { getAddresses } from "lib/utils/addresses";
 
-const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
-const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
-const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
-const OPOP = "0xdca3d7dFFd966A98CF0F7eBcC9135832169381F1"
-const OPOP_ORACLE = "0x22aC7dE4B8E2359dF0650cE29Aa438F9cB59478b"
+const {
+  BalancerPool: POP_LP,
+  VotingEscrow: VOTING_ESCROW,
+  GaugeController: GAUGE_CONTROLLER,
+  oPOP: OPOP,
+  BalancerOracle: OPOP_ORACLE,
+} = getAddresses();
+
 const OPOP_MINTER = ""
 
 export default function VePOP() {
@@ -105,7 +109,7 @@ export default function VePOP() {
 
   function handleVotes() {
     const gaugeController = new Contract(
-      "0xF9D1E727E1530373654522F293ad01897173142F",
+      GAUGE_CONTROLLER,
       ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
       signer
     );
@@ -125,6 +129,8 @@ export default function VePOP() {
         v[n] = normalizedVotes[n + l] === undefined ? 0 : normalizedVotes[n + l];
       }
 
+      console.log(addr, v);
+
       gaugeController.vote_for_many_gauge_weights(addr, v)
         .then(() => {
           showSuccessToast();
@@ -142,29 +148,19 @@ export default function VePOP() {
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
-<<<<<<< HEAD
         <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
           <div className="lg:w-[1050px]">
             <h1 className="banner-text">
               Lock <span className="banner-highlight-text">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
-=======
-        <section className="lg:py-10 lg:border-b border-[#F0EEE0]">
-          <div className="w-full">
-            <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-12 mb-4 lg:mb-8">
-              Lock <span className="underline text-[#C391FF]">POP LP</span> for vePOP, <br /> voting power, and oPOP rewards
->>>>>>> upstream/feat/vepop-page
             </h1>
             <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
               Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
             </p>
-<<<<<<< HEAD
-=======
             <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
               Mint the token needed for testing on Goerli here: <br />
               <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
               <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
             </div>
->>>>>>> upstream/feat/vepop-page
           </div>
         </section>
 
