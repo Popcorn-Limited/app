@@ -130,6 +130,7 @@ export default function VePOP() {
       }
 
       console.log(addr, v);
+      console.log(votes, normalizedVotes);
 
       gaugeController.vote_for_many_gauge_weights(addr, v)
         .then(() => {
