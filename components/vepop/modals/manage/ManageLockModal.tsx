@@ -18,8 +18,8 @@ import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
+const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 
 function noOp() { }
 
@@ -52,11 +52,11 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
-        onSuccess: () => showSuccessToast("POP approved!"),
-        onError: (error) => showErrorToast(error),
+        successMessage: "POP LP approved!",
+        errorMessage: "Something went wrong",
       });
     },
     onError: (error) => {
@@ -64,7 +64,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
             {step === 2 &&
               <>
                 <IncreaseStakePreview amount={amount} lockedBal={lockedBal} />
-                <MainActionButton label={showApproveButton ? "Approve POP" : "Increase Lock Amount"} handleClick={handleMainAction} />
+                <MainActionButton label={showApproveButton ? "Approve POP LP" : "Increase Lock Amount"} handleClick={handleMainAction} />
               </>
             }
           </>

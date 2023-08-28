@@ -28,6 +28,10 @@ export function formatAndRoundBigNumber(value: BigNumber, decimals: number): str
   return `Invalid val: ${value}`;
 }
 
+export function formatAndRoundNumber(value: number, decimals: number): string {
+  return formatNumber(value / (10 ** decimals))
+}
+
 export function formatNumber(value: number): string {
   if (value > MILLION) {
     return `${(value / MILLION).toLocaleString(undefined, {

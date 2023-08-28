@@ -20,9 +20,9 @@ import { usePrice } from "lib/Price";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { validateInput } from "components/AssetInputWithAction/internals/input";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const OPOP = "0x57de6369E9e1fd485584B78A29b501B1CA65EB29"
-const OPOP_ORACLE = "0x4b4a8479CDFaB077BA4D0926041D10098f18bFe7"
+const POP = "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35"
+const OPOP = "0xdca3d7dFFd966A98CF0F7eBcC9135832169381F1"
+const OPOP_ORACLE = "0x22aC7dE4B8E2359dF0650cE29Aa438F9cB59478b"
 
 export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }:
   { amountState: [number, Dispatch<SetStateAction<number>>], maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {

@@ -1,9 +1,14 @@
 import { parseUnits } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
+<<<<<<< HEAD
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { toast } from 'react-hot-toast';
 import { useState, useEffect } from "react";
+=======
+import { ChainId } from "lib/utils";
+import { BigNumber } from "ethers";
+>>>>>>> upstream/feat/vepop-page
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
@@ -40,6 +45,7 @@ export function getVotePeriodEndTime(): number {
 }
 
 export function useCreateLock(address: string, amount: number | string, days: number) {
+<<<<<<< HEAD
   const _amount = parseUnits(String(amount));
   const [unlockTime, setUnlockTime] = useState<number>(0);
 
@@ -49,12 +55,15 @@ export function useCreateLock(address: string, amount: number | string, days: nu
     setUnlockTime(newUnlockTime);
   }, [days]);
 
+=======
+  const unlockTime = Math.floor(Date.now() / 1000) + (86400 * days);
+>>>>>>> upstream/feat/vepop-page
 
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
-    args: [_amount, unlockTime],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false }), unlockTime],
     chainId: Number(5),
   });
 
@@ -76,7 +85,7 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     address,
     abi: ["function increase_amount(uint256) external"],
     functionName: "increase_amount",
-    args: [parseUnits(String(amount))],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(5),
     enabled: false,
   });
@@ -142,3 +151,33 @@ export function useWithdrawLock(address: string) {
   return result;
 }
 
+<<<<<<< HEAD
+=======
+export function useGaugeDeposit(address: string, chainId: ChainId, amount: number | string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function deposit(uint256 amount) external"],
+    functionName: "deposit",
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
+    chainId: Number(chainId),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+
+export function useGaugeWithdraw(address: string, chainId: ChainId, amount: number | string) {
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: ["function withdraw(uint256 amount) external"],
+    functionName: "withdraw",
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
+    chainId: Number(chainId),
+  });
+
+  return useContractWrite({
+    ...config,
+  });
+}
+>>>>>>> upstream/feat/vepop-page

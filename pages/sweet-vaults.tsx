@@ -3,6 +3,7 @@ import SweetVaults, { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaul
 import useNetworkFilter from "hooks/useNetworkFilter";
 import { useAllVaults } from "hooks/vaults";
 import { ChainId } from "lib/utils";
+import useGauges from "lib/Gauges/useGauges";
 
 
 const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
@@ -13,6 +14,7 @@ const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f
   "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
 ]
 
+const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
 
 
 const PopSweetVaults: NextPage = () => {
@@ -25,13 +27,16 @@ const PopSweetVaults: NextPage = () => {
   const { data: arbVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Arbitrum) ? ChainId.Arbitrum : undefined);
   const { data: bscVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.BNB) ? ChainId.BNB : undefined);
 
+  const { data: gauges = [] } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
+
   const allVaults = [
     ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
     ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
     ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
     ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
-    ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } })
+    ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } }),
+    ...gauges.map(gauge => { return { address: gauge.vault, chainId: ChainId.Goerli, gauge: gauge.address } })
   ]
 
   return (

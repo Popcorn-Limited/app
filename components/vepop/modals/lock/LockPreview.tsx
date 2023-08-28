@@ -23,7 +23,7 @@ export default function LockPreview({ amount, days }: { amount: number, days: nu
       </div>
 
       <div className="w-full bg-customLightGray border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP early results in a penalty of up to 75% of your POP</p>
+        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP LP early results in a penalty of up to 75% of your POP LP</p>
       </div>
 
     </div >

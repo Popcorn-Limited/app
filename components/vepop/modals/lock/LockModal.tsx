@@ -14,8 +14,8 @@ import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
+const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
 
 function noOp() { }
 
@@ -30,12 +30,12 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
   const [days, setDays] = useState(7);
 
   const { waitForTx } = useWaitForTx();
-  const { write: createLock } = useCreateLock(VOTING_ESCROW, amount, days);
+  const { write: createLock } = useCreateLock(VOTING_ESCROW, (amount * (10 ** 18) || 0), days);
   const {
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP approved!",
@@ -49,7 +49,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
 
         <div className="space-y-4">
           {step < 3 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 3 && <MainActionButton label={showApproveButton ? "Approve POP" : "Lock POP"} handleClick={handleLock} />}
+          {step === 3 && <MainActionButton label={showApproveButton ? "Approve POP LP" : "Lock POP LP"} handleClick={handleLock} />}
           {step === 0 && <SecondaryActionButton label="Skip" handleClick={() => setStep(2)} />}
           {step === 1 || step === 3 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>

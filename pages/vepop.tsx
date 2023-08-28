@@ -25,11 +25,11 @@ import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
-const VOTING_ESCROW = "0x11c8AE8cB6779da8282B5837a018862d80e285Df"
-const GAUGE_CONTROLLER = "0xF9D1E727E1530373654522F293ad01897173142F"
-const OPOP = "0x57de6369E9e1fd485584B78A29b501B1CA65EB29"
-const OPOP_ORACLE = "0x4b4a8479CDFaB077BA4D0926041D10098f18bFe7"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
+const VOTING_ESCROW = "0xadFF00203dB2C0231853197660C28510B39952C8"
+const GAUGE_CONTROLLER = "0xD51d19b42b36b884aBE50A83Cc1a26B15C8054DD"
+const OPOP = "0xdca3d7dFFd966A98CF0F7eBcC9135832169381F1"
+const OPOP_ORACLE = "0x22aC7dE4B8E2359dF0650cE29Aa438F9cB59478b"
 const OPOP_MINTER = ""
 
 export default function VePOP() {
@@ -38,7 +38,7 @@ export default function VePOP() {
   const { address: account } = useAccount()
   const { data: signer } = useSigner({ chainId: 5 })
 
-  const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
+  const { data: popLpBal } = useBalanceOf({ chainId: 5, address: POP_LP, account })
   const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
   const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
@@ -74,7 +74,7 @@ export default function VePOP() {
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP approved!",
@@ -142,14 +142,29 @@ export default function VePOP() {
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
       <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
+<<<<<<< HEAD
         <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
           <div className="lg:w-[1050px]">
             <h1 className="banner-text">
               Lock <span className="banner-highlight-text">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
+=======
+        <section className="lg:py-10 lg:border-b border-[#F0EEE0]">
+          <div className="w-full">
+            <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-12 mb-4 lg:mb-8">
+              Lock <span className="underline text-[#C391FF]">POP LP</span> for vePOP, <br /> voting power, and oPOP rewards
+>>>>>>> upstream/feat/vepop-page
             </h1>
             <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
               Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
             </p>
+<<<<<<< HEAD
+=======
+            <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
+              Mint the token needed for testing on Goerli here: <br />
+              <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
+              <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
+            </div>
+>>>>>>> upstream/feat/vepop-page
           </div>
         </section>
 
@@ -158,7 +173,7 @@ export default function VePOP() {
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">My POP LP</p>
-              <p className="font-bold">{popBal?.formatted}</p>
+              <p className="font-bold">{popLpBal?.formatted}</p>
             </span>
             <span className="flex flex-row items-center justify-between">
               <p className="">My Locked POP LP</p>

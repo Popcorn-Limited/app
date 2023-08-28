@@ -13,11 +13,11 @@ export default function IncreaseStakePreview({ amount, lockedBal }: { amount: nu
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p className="text-[#141416]">{amount > 0 ? amount.toFixed(2) : "0"} POP</p>
+          <p className="text-[#141416]">{amount > 0 ? amount.toFixed(2) : "0"} POP LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Total Locked</p>
-          <p className="text-[#141416]">{lockedBal ? totalLocked.toFixed(2) : ""} POP</p>
+          <p className="text-[#141416]">{lockedBal ? totalLocked.toFixed(2) : ""} POP LP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
@@ -30,7 +30,7 @@ export default function IncreaseStakePreview({ amount, lockedBal }: { amount: nu
       </div>
 
       <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP early results in a penalty of up to 75% of your POP</p>
+        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP LP early results in a penalty of up to 75% of your POP LP</p>
       </div>
 
     </div >

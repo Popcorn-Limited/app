@@ -4,26 +4,26 @@ import { useBalanceOf } from "lib/Erc20/hooks";
 import { Address, useAccount, useToken } from "wagmi";
 import InputTokenWithError from "components/InputTokenWithError";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
-import { BigNumber, constants } from "ethers";
+import { constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
 import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
 
-const POP = "0xC1fB217e01e67016FF4fF6A46ace54712e124d42"
+const POP_LP = "0x29d7a7E0d781C957696697B94D4Bc18C651e358E"
 
 export default function IncreaseStakeInterface({ amountState, lockedBal }:
   { amountState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {
   const { address: account } = useAccount()
 
-  const { data: pop } = useToken({ chainId: 5, address: POP as Address });
-  const { data: popBal } = useBalanceOf({ chainId: 5, address: POP, account })
+  const { data: popLp } = useToken({ chainId: 5, address: POP_LP as Address });
+  const { data: popLpBal } = useBalanceOf({ chainId: 5, address: POP_LP, account })
 
   const [amount, setAmount] = amountState
 
   const errorMessage = useMemo(() => {
-    return (amount || 0) > Number(popBal?.formatted) ? "* Balance not available" : "";
-  }, [amount, popBal?.formatted]);
+    return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
+  }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(safeRound(popBal?.value || constants.Zero, 18));
+  const handleMaxClick = () => setAmount(safeRound(popLpBal?.value || constants.Zero, 18));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? Number(value as any) : 0);
@@ -46,13 +46,14 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
           defaultValue={amount}
           selectedToken={
             {
-              ...pop,
-              balance: popBal?.value || constants.Zero,
+              ...popLp,
+              balance: Number(popLpBal?.value || 0),
             } as any
           }
           errorMessage={errorMessage}
+          allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014/add-liquidity" // temp link
+          getTokenUrl="https://app.balancer.fi/#/goerli/pool/0x29d7a7e0d781c957696697b94d4bc18c651e358e0002000000000000000008a0" // temp link
         />
       </div>
 
