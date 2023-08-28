@@ -49,8 +49,6 @@ export function useCreateLock(address: string, amount: number | string, days: nu
     setUnlockTime(newUnlockTime);
   }, [days]);
 
-  console.log(_amount);
-  console.log(unlockTime);
 
   const { config } = usePrepareContractWrite({
     address,
@@ -58,12 +56,6 @@ export function useCreateLock(address: string, amount: number | string, days: nu
     functionName: "create_lock",
     args: [_amount, unlockTime],
     chainId: Number(5),
-    onError(error) {
-      console.log('Create Lock Error', error)
-    },
-    onSettled() {
-      console.log('Create Lock Settled')
-    }
   });
 
   const result = useContractWrite({
@@ -86,24 +78,16 @@ export function useIncreaseLockAmount(address: string, amount: number | string) 
     functionName: "increase_amount",
     args: [parseUnits(String(amount))],
     chainId: Number(5),
-    onError(error) {
-      console.log('Increase Lock Error', error)
-    },
-    onSettled() {
-      console.log('Increase Lock Settled')
-    }
+    enabled: false,
   });
 
-  // const loadingToastId = toast.loading('Increasing lock amount...');
 
   const result = useContractWrite({
     ...config,
-    onSuccess: (tx) => {
-      // toast.dismiss(loadingToastId); // Dismiss loading toast
+    onSuccess: () => {
       showSuccessToast("Lock amount increased successfully!");
     },
     onError: (error) => {
-      // toast.dismiss(loadingToastId); // Dismiss loading toast
       showErrorToast(error);
     }
   });
@@ -118,12 +102,7 @@ export function useIncreaseLockTime(address: string, unlockTime: number) {
     functionName: "increase_unlock_time",
     args: [unlockTime],
     chainId: Number(5),
-    onError(error) {
-      console.log('Increase Time Error', error)
-    },
-    onSettled() {
-      console.log('Increase Time Settled')
-    }
+    enabled: false,
   });
 
   const result = useContractWrite({
@@ -146,13 +125,9 @@ export function useWithdrawLock(address: string) {
     functionName: "withdraw",
     args: [],
     chainId: Number(5),
-    onError(error) {
-      console.log('Withdraw Lock Error', error)
-    },
-    onSettled() {
-      console.log('Withdraw Lock Settled')
-    }
+    enabled: false,
   });
+
 
   const result = useContractWrite({
     ...config,
