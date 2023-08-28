@@ -24,7 +24,7 @@ import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
-import { getAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "lib/utils/addresses";
 
 const {
   BalancerPool: POP_LP,
@@ -32,7 +32,7 @@ const {
   GaugeController: GAUGE_CONTROLLER,
   oPOP: OPOP,
   BalancerOracle: OPOP_ORACLE,
-} = getAddresses();
+} = getVeAddresses();
 
 const OPOP_MINTER = ""
 

@@ -13,12 +13,12 @@ import useApproveBalance from "hooks/useApproveBalance";
 import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
-import { getAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "lib/utils/addresses";
 
 const {
   BalancerPool: POP_LP,
   VotingEscrow: VOTING_ESCROW
-} = getAddresses()
+} = getVeAddresses()
 
 function noOp() { }
 

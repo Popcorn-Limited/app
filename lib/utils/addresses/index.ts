@@ -1,6 +1,6 @@
-import { Addresses } from "lib/types";
+import { veAddresses } from "lib/types";
 
-const rawAddresses = {
+const veAddresses = {
     POP: "0xf46292650335BB8Fa56FAb05CcE227E50011Fb35",
     WETH: "0xba383A6649a8C849fc9274181D7B077D2b84FA95",
     BalancerPool: "0x29d7a7E0d781C957696697B94D4Bc18C651e358E",
@@ -20,6 +20,6 @@ const rawAddresses = {
     Vault2WETHGauge: "0x6351a986f4BA341C2649026B467e75C4C434B000"
 };
 
-export function getAddresses(): Addresses {
-    return rawAddresses as Addresses;
+export function getVeAddresses(): veAddresses {
+    return veAddresses as veAddresses;
 }

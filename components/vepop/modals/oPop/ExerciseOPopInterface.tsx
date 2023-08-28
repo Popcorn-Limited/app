@@ -19,13 +19,13 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import { usePrice } from "lib/Price";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { validateInput } from "components/AssetInputWithAction/internals/input";
-import { getAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "lib/utils/addresses";
 
 const {
   POP: POP,
   oPOP: OPOP,
   BalancerOracle: OPOP_ORACLE,
-} = getAddresses();
+} = getVeAddresses();
 
 export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }:
   { amountState: [number, Dispatch<SetStateAction<number>>], maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {

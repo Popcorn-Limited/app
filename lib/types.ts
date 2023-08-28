@@ -99,7 +99,7 @@ export type Token = {
   [key: string]: any;
 };
 
-export type Addresses = {
+export type veAddresses = {
   POP: `0x${string}`;
   WETH: `0x${string}`;
   BalancerPool: `0x${string}`;

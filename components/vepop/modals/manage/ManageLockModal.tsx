@@ -17,12 +17,12 @@ import IncreaseTimePreview from "./IncreaseTimePreview";
 import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
-import { getAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "lib/utils/addresses";
 
 const {
   BalancerPool: POP_LP,
   VotingEscrow: VOTING_ESCROW,
-} = getAddresses();
+} = getVeAddresses();
 
 function noOp() { }
 

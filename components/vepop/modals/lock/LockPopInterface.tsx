@@ -7,9 +7,9 @@ import InputTokenWithError from "components/InputTokenWithError";
 import { safeRound } from "lib/utils";
 import { constants } from "ethers";
 import { validateInput } from "components/SweetVault/internals/input";
-import { getAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "lib/utils/addresses";
 
-const { BalancerPool: POP_LP } = getAddresses();
+const { BalancerPool: POP_LP } = getVeAddresses();
 
 function LockTimeButton({ label, isActive, handleClick }: { label: string, isActive: boolean, handleClick: Function }): JSX.Element {
   return (
