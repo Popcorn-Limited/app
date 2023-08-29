@@ -232,6 +232,18 @@ function getLocalMetadata(address: string): IpfsMetadata {
         strategy: StrategyMetadata.oeth,
         getTokenUrl: "https://app.oeth.com/",
       }
+    case "0x3B070e9568c8381Df4B200C6f44418cb183911c7":
+      return {
+        token: TokenMetadata.pop,
+        protocol: ProtocolMetadata.popcorn,
+        strategy: { name: "Strategy", description: "Not found" },
+      }
+    case "0xb7C628257065F295519a85dD35fD04014f4A8B17":
+      return {
+        token: TokenMetadata.weth,
+        protocol: ProtocolMetadata.popcorn,
+        strategy: { name: "Strategy", description: "Not found" },
+      }
     default:
       return {
         token: { name: "Token", description: "Not found" },
