@@ -61,6 +61,14 @@ const baseMetadata: TokenMetadata = {
   stEth: {
     name: "Staked Ether",
     description: "Staked Ether is Lidos Liquid Staking Derivative. It allows users to stake their Ether to earn staking rewards without having to run a validator node. Lido is a liquid staking protocol that aims to make staking accessible to all. It is a DAO that manages the staking of ETH and the issuance of stETH."
+  },
+  pop:{
+    name: "POP",
+    description: "POP is a governance token for the Popcorn Protocol. Popcorn is a decentralized protocol that allows users to earn yield on their Assets."
+  },
+  weth:{
+    name: "WETH",
+    description: "Wrapped Ether, or WETH, is an ERC-20 token that represents Ether on the Ethereum blockchain. It is used to make Ether compatible with ERC-20 tokens and therefore allows it to be used in smart contracts and on decentralized exchanges."
   }
 };
 

@@ -36,7 +36,11 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
         <div className="flex flex-row flex-wrap items-center justify-between w-full">
 
           <div className="flex items-center justify-between w-4/12">
-            <AssetWithName token={token} vault={vaultMetadata} chainId={gauge.chainId} />
+            <AssetWithName
+              token={token}
+              vault={vaultMetadata}
+              chainId={gauge.chainId}
+            />
           </div>
 
           <div className="w-8/12 text-start">
