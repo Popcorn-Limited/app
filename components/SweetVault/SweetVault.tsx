@@ -181,7 +181,7 @@ function VaultInputs({ tokenOptions, hasGauge }) {
   }
 
   function sufficientAllowance(token: any) {
-    return token.allowance > 0 && token.allowance >= inputBalance
+    return token.allowance > 0 && token.allowance >= (inputBalance * (10 ** inputToken?.decimals))
   }
 
   async function handleMainAction() {
