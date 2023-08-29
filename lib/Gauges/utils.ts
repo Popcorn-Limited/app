@@ -42,7 +42,6 @@ export function getVotePeriodEndTime(): number {
 }
 
 export function useCreateLock(address: `0x${string}`, amount: number | string, days: number) {
-  const _amount = parseUnits(String(amount));
   const [unlockTime, setUnlockTime] = useState<number>(0);
 
   useEffect(() => {
@@ -51,12 +50,11 @@ export function useCreateLock(address: `0x${string}`, amount: number | string, d
     setUnlockTime(newUnlockTime);
   }, [days]);
 
-
   const { config } = usePrepareContractWrite({
     address,
     abi: ["function create_lock(uint256,uint256) external"],
     functionName: "create_lock",
-    args: [_amount, unlockTime],
+    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false }), unlockTime],
     chainId: Number(5),
   });
 
