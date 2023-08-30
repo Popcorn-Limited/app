@@ -154,8 +154,6 @@ function VaultInputs({ tokenOptions, hasGauge }) {
   const { writeAsync: gaugeDeposit } = useGaugeDeposit(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
   const { writeAsync: gaugeWithdraw } = useGaugeWithdraw(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
 
-
-
   async function depositAndStake() {
     console.log("depositAndStake")
     const oldBal = vault?.balance
@@ -191,7 +189,7 @@ function VaultInputs({ tokenOptions, hasGauge }) {
 
   async function unstakeAndWithdraw() {
     const oldBal = vault?.balance
-
+    
     let tx = await gaugeWithdraw()
     await tx.wait(1)
 
