@@ -108,8 +108,6 @@ export default function VePOP() {
   }
 
 
-
-
   function sendVotesTx() {
     const gaugeController = new Contract(
       GAUGE_CONTROLLER,
@@ -126,13 +124,10 @@ export default function VePOP() {
 
       for (let n = 0; n < 8; n++) {
         const l = i * 8;
-        addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
         v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
-      }
+        addr[n] = gauges[n + l] === undefined || votes[n + l] === 0 ? constants.AddressZero : gauges[n + l].address;
 
-      console.log("addr", addr);
-      console.log("v", v);
-      console.log("votes", votes);
+      }
 
       gaugeController.vote_for_many_gauge_weights(addr, v)
         .then(() => {
@@ -223,7 +218,7 @@ export default function VePOP() {
 
         <section className="hidden sm:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} totalVotes={totalVotes} setTotalVotes={setTotalVotes} handleVotes={handleVotes} veBal={veBal} />
+            <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} />
           )
             : <p>Loading Gauges...</p>
           }
