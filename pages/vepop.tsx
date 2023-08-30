@@ -22,7 +22,6 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
-import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 
@@ -52,8 +51,8 @@ export default function VePOP() {
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
-  const [avVotes, setAvVotes] = useState(0);
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
+  const [totalVotes, setTotalVotes] = useState(0);
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
@@ -92,29 +91,29 @@ export default function VePOP() {
     },
   });
 
-  useEffect(() => {
-    if (veBal) setAvVotes((Number(veBal?.value) / 1e18))
-  }, [])
 
+  function handleVotes(val: number, index: number) {
+    setVotes((prevVotes) => {
+      const updatedVotes = [...prevVotes];
+      const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
 
-  function handleAvVotes(val: number, index: number) {
-    const newVotes = [...votes]
-    const newAvVotes = avVotes - (val - newVotes[index])
+      if (updatedTotalVotes <= 10000) {
+        updatedVotes[index] = val;
+        setTotalVotes(updatedTotalVotes);
+        return updatedVotes;
+      }
 
-    newVotes[index] = val
-    setVotes(newVotes)
-
-    setAvVotes(newAvVotes < 0 ? 0 : newAvVotes)
+      return prevVotes;
+    });
   }
 
-  function handleVotes() {
+
+  function sendVotesTx() {
     const gaugeController = new Contract(
       GAUGE_CONTROLLER,
       ["function vote_for_many_gauge_weights(address[8],uint256[8]) external"],
       signer
     );
-
-    const normalizedVotes = normalizeVotes(votes);
 
     let addr = new Array<string>(8);
     let v = new Array<number>(8);
@@ -125,12 +124,10 @@ export default function VePOP() {
 
       for (let n = 0; n < 8; n++) {
         const l = i * 8;
-        addr[n] = gauges[n + l] === undefined ? constants.AddressZero : gauges[n + l].address;
-        v[n] = normalizedVotes[n + l] === undefined ? 0 : normalizedVotes[n + l];
-      }
+        v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
+        addr[n] = gauges[n + l] === undefined || votes[n + l] === 0 ? constants.AddressZero : gauges[n + l].address;
 
-      console.log(addr, v);
-      console.log(votes, normalizedVotes);
+      }
 
       gaugeController.vote_for_many_gauge_weights(addr, v)
         .then(() => {
@@ -221,7 +218,7 @@ export default function VePOP() {
 
         <section className="hidden sm:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Gauge key={gauge.address} gauge={gauge} index={index} votes={[avVotes, handleAvVotes]} veBal={veBal} />
+            <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} />
           )
             : <p>Loading Gauges...</p>
           }
@@ -237,16 +234,16 @@ export default function VePOP() {
               Voting power used: <span className="text-[#05BE64]">
                 {
                   veBal && veBal.value
-                    ? Math.abs((1 - avVotes / (Number(veBal.value) / 1e18)) * 100) < 0.005
-                      ? "0"
-                      : ((1 - avVotes / (Number(veBal.value) / 1e18)) * 100).toFixed(2)
+                    ? (votes.reduce((a, b) => a + b, 0) / 100).toFixed(2)
                     : "0"
                 }%
               </span>
             </p>
+
+
             <button
               className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
-              onClick={handleVotes}
+              onClick={sendVotesTx}
             >
               Submit Votes
             </button>

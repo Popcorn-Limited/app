@@ -42,11 +42,11 @@ export default function SweetVaults({
             Sweet Vaults
           </h1>
           <p className="text-base text-primaryDark">
-            Add liquidity to earn stablecoin rewards and be a part at creating social impact.
+            Add liquidity into vaults for the most competitive returns across DeFi.
           </p>
           <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
             Mint the token needed for testing on Goerli here: <br />
-            <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br/>
+            <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
             <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
           </div>
         </div>

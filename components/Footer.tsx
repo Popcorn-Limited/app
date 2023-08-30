@@ -40,10 +40,6 @@ const Footer = () => {
   return (
     <footer className="grid grid-cols-12 smmd:gap-14 pb-10 mt-20 font-landing px-6 md:px-8">
       <div className="col-span-12 lg:col-span-3 order-1 smmd:order-1">
-        <div className="bg-customYellow rounded-lg py-3 text-center font-medium text-black">
-          Subscribe to our newsletter
-        </div>
-        <NewsletterSubscription title="Sign up" buttonLabel="Submit" />
       </div>
       <div className="col-span-12 smmd:col-span-6 flex flex-col justify-between order-3 smmd:order-2 mt-12 smmd:mt-0">
         <p className=" text-primaryDark leading-6 order-2 smmd:order-1 mt-8 smmd:mt-0">
@@ -57,13 +53,13 @@ const Footer = () => {
           >
             <TwitterIcon color={twitterColor} size={iconSize} />
           </a>
-          {/* <a
+          <a
             href="https://discord.gg/w9zeRTSZsq"
             onMouseEnter={() => onHoverIcon(setDiscordColor)}
             onMouseLeave={() => onLeaveIcon(setDiscordColor)}
           >
             <DiscordIcon color={discordColor} size={iconSize} />
-          </a> */}
+          </a>
           <a
             href="https://t.me/popcorndaochat"
             onMouseEnter={() => onHoverIcon(setTelegramColor)}
@@ -103,18 +99,32 @@ const Footer = () => {
               Popcorn
             </Link>
             <Link
-              href="/docs/Popcorn_whitepaper_v1.pdf"
+              href="https://github.com/Popcorn-Limited/app/issues/docs.pop.network"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
-              Whitepaper
+              Docs
             </Link>
             <Link
-              href="https://popcorn-dao.gitbook.io/popcorndao-gitbook/about-popcorn/welcome-to-popcorn"
+              href="https://docs.pop.network/security/audits"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
-              Gitbook
+              Audits
+            </Link>
+            <Link
+              href="https://immunefi.com/bounty/popcorn/"
+              target="_blank"
+              className=" text-primary hover:text-black leading-6 mt-4"
+            >
+              Bug Bounty
+            </Link>
+            <Link
+              href="https://github.com/Popcorn-Limited"
+              target="_blank"
+              className=" text-primary hover:text-black leading-6 mt-4"
+            >
+              Github
             </Link>
             <Link
               href="/disclaimer"
