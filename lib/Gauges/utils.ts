@@ -142,7 +142,7 @@ export function useWithdrawLock(address: `0x${string}`) {
 export function useGaugeDeposit(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
-    abi: ["function deposit(uint256 amount) external"],
+    abi: ["function deposit(uint256 assetAmount) external"],
     functionName: "deposit",
     args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
@@ -150,13 +150,20 @@ export function useGaugeDeposit(address: `0x${string}`, chainId: ChainId, amount
 
   return useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Gauge Deposit Success!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
 }
+
 
 export function useGaugeWithdraw(address: `0x${string}`, chainId: ChainId, amount: number | string) {
   const { config } = usePrepareContractWrite({
     address,
-    abi: ["function withdraw(uint256 amount) external"],
+    abi: ["function withdraw(uint256 assetAmount) external"],
     functionName: "withdraw",
     args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
     chainId: Number(chainId),
@@ -164,5 +171,11 @@ export function useGaugeWithdraw(address: `0x${string}`, chainId: ChainId, amoun
 
   return useContractWrite({
     ...config,
+    onSuccess: () => {
+      showSuccessToast("Gauge Withdraw Success!");
+    },
+    onError: (error) => {
+      showErrorToast(error);
+    }
   });
 }
