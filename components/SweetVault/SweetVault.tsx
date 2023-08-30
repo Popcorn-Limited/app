@@ -78,7 +78,7 @@ function noOp() { }
 
 function VaultInputs({ tokenOptions, hasGauge }) {
   const { waitForTx } = useWaitForTx();
-  const { address: account } = useAccount();
+  const { address: account, connector } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
@@ -154,17 +154,39 @@ function VaultInputs({ tokenOptions, hasGauge }) {
   const { writeAsync: gaugeDeposit } = useGaugeDeposit(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
   const { writeAsync: gaugeWithdraw } = useGaugeWithdraw(gauge?.address, vault?.chainId, (inputBalance * (10 ** inputToken?.decimals) || 0));
 
-  async function depositAndStake() {
-    const oldBal = vault?.balance
 
+
+  async function depositAndStake() {
+    console.log("depositAndStake")
+    const oldBal = vault?.balance
+    console.log("deposit")
     let tx = await vaultDeposit()
+    console.log("wait")
     await tx.wait(1)
 
-    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)"], RPC_PROVIDERS[vault?.chainId]);
+    console.log("contract")
+    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)", "function approve(address spender, uint256 amount) public"], RPC_PROVIDERS[vault?.chainId]);
+    console.log("newBal")
     const newBal = await vaultContract.balanceOf(account)
     const depositAmount = Number(newBal) - Number(oldBal)
+    console.log("depositAmount", Number(depositAmount).toLocaleString("fullwide", { useGrouping: false }))
 
-    gaugeDeposit({ args: [depositAmount] })
+    console.log("getSigner")
+    const signer = await connector.getSigner()
+
+
+    console.log(vault.allowance, depositAmount)
+    if (!(vault.allowance > 0 && vault.allowance >= depositAmount)) {
+      console.log("approve")
+      let tx = await vaultContract.connect(signer).approve(gauge?.address, "115792089237316195423570985008687907853269984665640")
+      console.log("wait approve")
+      await tx.wait(1)
+    }
+
+    const gaugeContract = new Contract(gauge?.address, ["function deposit(uint256 amount) external"], RPC_PROVIDERS[vault?.chainId]);
+    console.log("gauge deposit")
+    gaugeContract.connect(signer).deposit(Number(depositAmount).toLocaleString("fullwide", { useGrouping: false }))
+
   }
 
   async function unstakeAndWithdraw() {
@@ -177,11 +199,11 @@ function VaultInputs({ tokenOptions, hasGauge }) {
     const newBal = await vaultContract.balanceOf(vault?.address)
     const withdrawAmount = Number(newBal) - Number(oldBal)
 
-    vaultRedeem({ args: [withdrawAmount] })
+    vaultRedeem({ args: [Number(withdrawAmount).toLocaleString("fullwide", { useGrouping: false })] })
   }
 
   function sufficientAllowance(token: any) {
-    return token.allowance > 0 && token.allowance >= (inputBalance * (10 ** inputToken?.decimals))
+    return token.allowance > 0 && token.allowance >= (inputBalance * (10 ** token?.decimals))
   }
 
   async function handleMainAction() {
@@ -200,6 +222,7 @@ function VaultInputs({ tokenOptions, hasGauge }) {
         else if (outputToken.address === gauge.address) {
           console.log("out gauge")
           if (!sufficientAllowance(inputToken)) await approve()
+          console.log(vault.allowance, (inputBalance * (10 ** vault?.decimals)))
           if (!sufficientAllowance(vault)) await approveVault()
           depositAndStake()
         }
@@ -355,7 +378,7 @@ function SweetVault({
             <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
                 {account ? (gaugeAddress ?
-                  formatAndRoundNumber(gauge.balance, gauge.decimals) :
+                  formatAndRoundNumber(gauge.balance, vault.decimals) :
                   formatAndRoundNumber(vault.balance, vault.decimals)
                 ) : "-"}
               </Title>
@@ -419,7 +442,7 @@ function SweetVault({
             <p className="leading-6 text-primaryLight">TVL</p>
             <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
               $ {formatNumber((gaugeAddress ?
-                gauge.balance / (10 ** gauge.decimals) :
+                gauge.balance / (10 ** vault.decimals) :
                 vault.balance / (10 ** vault.decimals))
                 * vault.price)}
             </Title>
