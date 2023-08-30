@@ -4,23 +4,34 @@ export function roundToFixed(value, decimals) {
 }
 
 export function normalizeVotes(votes) {
-    let roundedVotes = votes.map(vote => Math.round(vote));
-    roundedVotes = roundedVotes.map(vote => Math.min(10000, Math.max(1, vote)));
+    // Take absolute values of the input votes
+    let absoluteVotes = votes.map(vote => Math.abs(vote));
 
-    let totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
-    while (totalVotes > 10000) {
-        const maxIndex = roundedVotes.indexOf(Math.max(...roundedVotes));
-        roundedVotes[maxIndex] -= totalVotes - 10000;
-        totalVotes = roundedVotes.reduce((sum, vote) => sum + vote, 0);
+    // Calculate total sum
+    let totalSum = absoluteVotes.reduce((sum, vote) => sum + vote, 0);
+
+    // If total is 0, return an array of zeros
+    if (totalSum === 0) {
+        return absoluteVotes.map(() => 0);
     }
 
-    roundedVotes = roundedVotes.map(value => value * 10);
-    if (roundedVotes.reduce((sum, vote) => sum + vote, 0) > 10000) {
-        roundedVotes[roundedVotes.indexOf(Math.max(...roundedVotes))] -= 10;
-    }
+    // Normalize the votes based on their proportion to total
+    let normalizedVotes = absoluteVotes.map(vote => (vote / totalSum) * 10000);
 
-    return roundedVotes;
+    // Adjust for rounding errors to ensure total equals 10,000
+    let error = 10000 - normalizedVotes.reduce((sum, vote) => sum + Math.round(vote), 0);
+    let maxIndex = normalizedVotes.indexOf(Math.max(...normalizedVotes));
+    normalizedVotes[maxIndex] += error;
+
+    // Round the values and ensure all are between 1 and 10,000
+    let resultVotes = normalizedVotes.map(vote => {
+        let rounded = Math.round(vote);
+        return Math.min(10000, Math.max(1, rounded));
+    });
+
+    return resultVotes;
 }
+
 
 
 

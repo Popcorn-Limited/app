@@ -1,4 +1,4 @@
-import { parseUnits } from "ethers/lib/utils.js";
+import { parseEther } from "ethers/lib/utils.js";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
@@ -76,7 +76,7 @@ export function useIncreaseLockAmount(address: `0x${string}`, amount: number | s
     address,
     abi: ["function increase_amount(uint256) external"],
     functionName: "increase_amount",
-    args: [Number(amount).toLocaleString("fullwide", { useGrouping: false })],
+    args: [parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false }))],
     chainId: Number(5),
   });
 

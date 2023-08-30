@@ -13,7 +13,7 @@ import { getVeAddresses } from "lib/utils/addresses";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
-export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, index: number, votes: [number, Function], veBal: BigNumberWithFormatted }): JSX.Element {
+export default function Gauge({ gauge, index, votes, totalVotes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], totalVotes: number, setTotalVotes: Function, handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
   const [avVotes, handleAvVotes] = votes;
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
@@ -25,9 +25,10 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
   const [amount, setAmount] = useState(0);
 
   function onChange(value) {
-    if (value > avVotes + amount) value = avVotes + amount;
-    handleAvVotes(value, index);
-    setAmount(value);
+    if (totalVotes - amount + value <= 10000) {
+      handleVotes(value, index);
+      setAmount(value);
+    }
   }
 
   return (
@@ -75,10 +76,11 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
               </div>
 
               <div className="w-3/12">
-                <p className=" text-primary text-xl">
-                  {veBal ? ((amount / (Number(veBal?.value) / 1e18)) * 100).toFixed(2) : "0"} %
+                <p className="text-primary text-xl">
+                  {(amount / 100).toFixed(2)}%
                 </p>
               </div>
+
 
               <div className="w-3/12">
                 <Slider
@@ -94,7 +96,7 @@ export default function Gauge({ gauge, index, votes, veBal }: { gauge: Gauge, in
                   }}
                   value={amount}
                   onChange={(val) => onChange(val)}
-                  max={Number(veBal?.value) / 1e18}
+                  max={10000}
                 />
               </div>
             </div>
