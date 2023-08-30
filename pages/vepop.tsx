@@ -22,7 +22,6 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
-import { normalizeVotes } from "lib/utils/resolvers/vote-resolvers";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 
@@ -92,23 +91,23 @@ export default function VePOP() {
     },
   });
 
-  // useEffect(() => {
-  //   if (veBal) setAvVotes((Number(veBal?.value) / 1e18))
-  // }, [])
-
 
   function handleVotes(val: number, index: number) {
-    const newVotes = [...votes];
-    let totalVotes = newVotes.reduce((a, b) => a + b, 0) - newVotes[index] + val;
+    setVotes((prevVotes) => {
+      const updatedVotes = [...prevVotes];
+      const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
 
-    // Check if the updated total votes exceeds 100%
-    if (totalVotes <= 10000) {
-      console.log("totalVotes", totalVotes);
-      setTotalVotes(totalVotes);
-      newVotes[index] = val;
-      setVotes(newVotes);
-    }
+      if (updatedTotalVotes <= 10000) {
+        updatedVotes[index] = val;
+        setTotalVotes(updatedTotalVotes);
+        return updatedVotes;
+      }
+
+      return prevVotes;
+    });
   }
+
+
 
 
   function sendVotesTx() {

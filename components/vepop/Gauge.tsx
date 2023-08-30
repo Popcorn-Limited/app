@@ -13,8 +13,7 @@ import { getVeAddresses } from "lib/utils/addresses";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
-export default function Gauge({ gauge, index, votes, totalVotes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], totalVotes: number, setTotalVotes: Function, handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
-  const [avVotes, handleAvVotes] = votes;
+export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
   const vaultMetadata = useVaultMetadata(gauge.vault, gauge.chainId);
@@ -25,11 +24,16 @@ export default function Gauge({ gauge, index, votes, totalVotes, handleVotes, ve
   const [amount, setAmount] = useState(0);
 
   function onChange(value) {
-    if (totalVotes - amount + value <= 10000) {
+    const currentVoteForThisGauge = votes[index];
+    const potentialNewTotalVotes = votes.reduce((a, b) => a + b, 0) - currentVoteForThisGauge + value;
+
+    if (potentialNewTotalVotes <= 10000) {
       handleVotes(value, index);
       setAmount(value);
     }
   }
+
+
 
   return (
     <Accordion
