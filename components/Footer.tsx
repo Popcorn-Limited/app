@@ -54,7 +54,9 @@ const Footer = () => {
             <TwitterIcon color={twitterColor} size={iconSize} />
           </a>
           <a
-            href="https://discord.gg/w9zeRTSZsq"
+            href="https://discord.gg/vSccCMaVZn"
+            target="_blank"
+            rel="noopener noreferrer"
             onMouseEnter={() => onHoverIcon(setDiscordColor)}
             onMouseLeave={() => onLeaveIcon(setDiscordColor)}
           >
