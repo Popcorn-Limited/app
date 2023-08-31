@@ -31,9 +31,8 @@ const {
   GaugeController: GAUGE_CONTROLLER,
   oPOP: OPOP,
   BalancerOracle: OPOP_ORACLE,
+  Minter: OPOP_MINTER
 } = getVeAddresses();
-
-const OPOP_MINTER = ""
 
 export default function VePOP() {
   const { waitForTx } = useWaitForTx();
@@ -71,7 +70,7 @@ export default function VePOP() {
     return formattedTime;
   }
 
-  const { write: claimOPop } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
+  const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
 
   const {
     write: approve = noOp,
@@ -216,7 +215,7 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="hidden sm:block space-y-4">
+        <section className="hidden md:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
             <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} />
           )
@@ -224,11 +223,11 @@ export default function VePOP() {
           }
         </section>
 
-        <section className="sm:hidden">
+        <section className="md:hidden">
           <p className="text-primary">Gauge Voting not available on mobile.</p>
         </section>
 
-        <div className="hidden sm:block absolute left-0 bottom-10 w-full ">
+        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
           <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
               Voting power used: <span className="text-[#05BE64]">
