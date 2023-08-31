@@ -1,4 +1,4 @@
-import Accordion from "components/Accordion";
+import { Accordion, MobileAccordion } from "components/Accordion";
 import { AssetWithName } from "components/SweetVault/SweetVault";
 import useAdapterToken from "hooks/useAdapter";
 import useVaultToken from "hooks/useVaultToken";
@@ -8,10 +8,28 @@ import useUpcomingGaugeWeight from "lib/Gauges/useUpcomingGaugeWeight";
 import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
 import { BigNumberWithFormatted } from "lib/types";
 import Slider from "rc-slider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getVeAddresses } from "lib/utils/addresses";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
+
+function useIsMobile(breakpoint: number = 768): boolean {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 
 export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
@@ -33,10 +51,12 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
     }
   }
 
+  const isMobile = useIsMobile();
 
+  const AccordionComponent = isMobile ? MobileAccordion : Accordion;
 
   return (
-    <Accordion
+    <AccordionComponent
       header={
         <div className="flex flex-row flex-wrap items-center justify-between w-full">
 
@@ -128,5 +148,5 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
           </span>
         </div>
       </div>
-    </Accordion>)
+    </AccordionComponent>)
 }
