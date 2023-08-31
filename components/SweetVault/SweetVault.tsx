@@ -166,6 +166,7 @@ function VaultInputs({ tokenOptions, hasGauge }) {
     const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)", "function approve(address spender, uint256 amount) public"], RPC_PROVIDERS[vault?.chainId]);
     console.log("newBal")
     const newBal = await vaultContract.balanceOf(account)
+    console.log(newBal, Number(newBal), oldBal, Number(oldBal))
     const depositAmount = Number(newBal) - Number(oldBal)
     console.log("depositAmount", Number(depositAmount).toLocaleString("fullwide", { useGrouping: false }))
 
@@ -184,20 +185,26 @@ function VaultInputs({ tokenOptions, hasGauge }) {
     const gaugeContract = new Contract(gauge?.address, ["function deposit(uint256 amount) external"], RPC_PROVIDERS[vault?.chainId]);
     console.log("gauge deposit")
     gaugeContract.connect(signer).deposit(Number(depositAmount).toLocaleString("fullwide", { useGrouping: false }))
-
   }
 
   async function unstakeAndWithdraw() {
     const oldBal = vault?.balance
-    
+    console.log("gaugeWithdraw")
     let tx = await gaugeWithdraw()
+    console.log("wait")
     await tx.wait(1)
 
-    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)"], RPC_PROVIDERS[vault?.chainId]);
-    const newBal = await vaultContract.balanceOf(vault?.address)
+    const vaultContract = new Contract(vault?.address, ["function balanceOf(address) view returns (uint256)", "function redeem(uint256 amount) external"], RPC_PROVIDERS[vault?.chainId]);
+    console.log("newBal")
+    const newBal = await vaultContract.balanceOf(account)
     const withdrawAmount = Number(newBal) - Number(oldBal)
+    console.log("withdrawAmount", Number(withdrawAmount).toLocaleString("fullwide", { useGrouping: false }))
 
-    vaultRedeem({ args: [Number(withdrawAmount).toLocaleString("fullwide", { useGrouping: false })] })
+    console.log("signer")
+    const signer = await connector.getSigner()
+
+    console.log("redeem")
+    vaultContract.connect(signer).redeem(Number(withdrawAmount).toLocaleString("fullwide", { useGrouping: false }))
   }
 
   function sufficientAllowance(token: any) {
@@ -220,7 +227,6 @@ function VaultInputs({ tokenOptions, hasGauge }) {
         else if (outputToken.address === gauge.address) {
           console.log("out gauge")
           if (!sufficientAllowance(inputToken)) await approve()
-          console.log(vault.allowance, (inputBalance * (10 ** vault?.decimals)))
           if (!sufficientAllowance(vault)) await approveVault()
           depositAndStake()
         }
@@ -352,134 +358,133 @@ function SweetVault({
     !vaultMetadata?.metadata?.protocol?.name.toLowerCase().includes(searchString)) return <></>
   // Vault is not in selected tags
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
-  return (
-    <Accordion
-      header={
-        <div className="w-full flex flex-row flex-wrap items-center justify-between">
+  return (<Accordion
+    header={
+      <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
-          <div className="flex items-center justify-between select-none w-full md:w-1/3">
-            <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="text-primaryLight font-normal">Your Wallet</p>
-            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {formatAndRoundNumber(asset?.balance, asset?.decimals)}
-              </Title>
-              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
-            </p>
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="text-primaryLight font-normal">Your Deposit</p>
-            <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
-              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {account ? (gaugeAddress ?
-                  formatAndRoundNumber(gauge.balance, vault.decimals) :
-                  formatAndRoundNumber(vault.balance, vault.decimals)
-                ) : "-"}
-              </Title>
-              <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
-            </div>
-          </div>
-
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
-            <p className="font-normal text-primaryLight">vAPY</p>
-            <Title as="td" level={2} fontWeight="font-normal">
-              <Apy
-                address={vaultAddress}
-                chainId={chainId}
-                resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
-                render={(apy) => {
-                  return (
-                    <Apy
-                      address={vaultMetadata.staking}
-                      resolver={"multiRewardStaking"}
-                      render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
-                        <section className="flex items-center gap-1 text-primary">
-                          {formatAndRoundBigNumber(
-                            HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
-                            18,
-                          )} %
-                          <InfoIconWithTooltip
-                            title="APR Breakdown"
-                            content={
-                              <ul className="text-sm">
-                                <li>
-                                  Staking APY:{" "}
-                                  {formatAndRoundBigNumber(
-                                    HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
-                                    18,
-                                  )}
-                                  %
-                                </li>
-                                <li>
-                                  Vault APY:{" "}
-                                  {formatAndRoundBigNumber(
-                                    HUNDRED.mul(apy?.data?.value || constants.Zero),
-                                    18,
-                                  )}
-                                  %
-                                </li>
-                              </ul>
-                            }
-                          />
-                        </section>
-                      ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
-                      }
-                      chainId={chainId}
-                    />
-                  );
-                }}
-              />
-            </Title>
-          </div>
-
-          <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
-            <p className="leading-6 text-primaryLight">TVL</p>
-            <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-              $ {formatNumber((gaugeAddress ?
-                gauge.balance / (10 ** vault.decimals) :
-                vault.balance / (10 ** vault.decimals))
-                * vault.price)}
-            </Title>
-          </div>
-
+        <div className="flex items-center justify-between select-none w-full md:w-1/3">
+          <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
         </div>
-      }
-    >
-      <div className="flex flex-col md:flex-row mt-8 gap-8">
 
-        <section className="flex flex-col w-full md:w-4/12 gap-8">
-          <div className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-            <VaultInputs
-              tokenOptions={baseToken}
-              hasGauge={!!gaugeAddress}
-            />
-          </div>
-        </section>
-
-        <section className="bg-white rounded-lg border border-customLightGray w-full md:w-8/12 p-6 md:p-8 hidden md:flex flex-col">
-          <div className="flex flex-row items-center">
-            <TokenIcon token={asset?.address} icon={asset?.icon} chainId={chainId} imageSize="w-8 h-8" />
-            <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
-              {asset?.name}
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="text-primaryLight font-normal">Your Wallet</p>
+          <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {formatAndRoundNumber(asset?.balance, asset?.decimals)}
             </Title>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
+          </p>
+        </div>
+
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="text-primaryLight font-normal">Your Deposit</p>
+          <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {account ? (gaugeAddress ?
+                formatAndRoundNumber(gauge.balance, vault.decimals) :
+                formatAndRoundNumber(vault.balance, vault.decimals)
+              ) : "-"}
+            </Title>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
           </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
-          </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
-          </div>
-          <div className="mt-8">
-            <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
-          </div>
-        </section>
+        </div>
+
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="font-normal text-primaryLight">vAPY</p>
+          <Title as="td" level={2} fontWeight="font-normal">
+            <Apy
+              address={vaultAddress}
+              chainId={chainId}
+              resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
+              render={(apy) => {
+                return (
+                  <Apy
+                    address={vaultMetadata.staking}
+                    resolver={"multiRewardStaking"}
+                    render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
+                      <section className="flex items-center gap-1 text-primary">
+                        {formatAndRoundBigNumber(
+                          HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
+                          18,
+                        )} %
+                        <InfoIconWithTooltip
+                          title="APR Breakdown"
+                          content={
+                            <ul className="text-sm">
+                              <li>
+                                Staking APY:{" "}
+                                {formatAndRoundBigNumber(
+                                  HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
+                                  18,
+                                )}
+                                %
+                              </li>
+                              <li>
+                                Vault APY:{" "}
+                                {formatAndRoundBigNumber(
+                                  HUNDRED.mul(apy?.data?.value || constants.Zero),
+                                  18,
+                                )}
+                                %
+                              </li>
+                            </ul>
+                          }
+                        />
+                      </section>
+                    ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
+                    }
+                    chainId={chainId}
+                  />
+                );
+              }}
+            />
+          </Title>
+        </div>
+
+        <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
+          <p className="leading-6 text-primaryLight">TVL</p>
+          <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
+            $ {formatNumber((gaugeAddress ?
+              gauge.balance / (10 ** vault.decimals) :
+              vault.balance / (10 ** vault.decimals))
+              * vault.price)}
+          </Title>
+        </div>
 
       </div>
-    </Accordion>
+    }
+  >
+    <div className="flex flex-col md:flex-row mt-8 gap-8">
+
+      <section className="flex flex-col w-full md:w-4/12 gap-8">
+        <div className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
+          <VaultInputs
+            tokenOptions={baseToken}
+            hasGauge={!!gaugeAddress}
+          />
+        </div>
+      </section>
+
+      <section className="bg-white rounded-lg border border-customLightGray w-full md:w-8/12 p-6 md:p-8 hidden md:flex flex-col">
+        <div className="flex flex-row items-center">
+          <TokenIcon token={asset?.address} icon={asset?.icon} chainId={chainId} imageSize="w-8 h-8" />
+          <Title level={2} as="span" className="text-gray-900 mt-1.5 ml-3">
+            {asset?.name}
+          </Title>
+        </div>
+        <div className="mt-8">
+          <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.token?.name} \n${vaultMetadata?.metadata?.token?.description}`} />
+        </div>
+        <div className="mt-8">
+          <MarkdownRenderer content={`# ${vaultMetadata?.metadata?.protocol?.name} \n${vaultMetadata?.metadata?.protocol?.description}`} />
+        </div>
+        <div className="mt-8">
+          <MarkdownRenderer content={`# Strategies \n${vaultMetadata?.metadata?.strategy?.description}`} />
+        </div>
+      </section>
+
+    </div>
+  </Accordion>
   )
 }
 

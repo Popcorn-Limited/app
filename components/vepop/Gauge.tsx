@@ -33,8 +33,6 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
     }
   }
 
-
-
   return (
     <Accordion
       header={

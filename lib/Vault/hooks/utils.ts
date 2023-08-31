@@ -28,7 +28,7 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
   const { data: assetBalance } = useBalanceOf({ address: asset?.address as Address, chainId, account });
   const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
   const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
-
+  
   const { data: assetAllowance } = useAllowance({ address: asset?.address, chainId, account: vaultAddress });
   const { data: vaultAllowance } = useAllowance({ address: vault?.address, chainId, account: gaugeAddress }); // TODO - might also need to approve wido
 
@@ -59,6 +59,7 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
       ]
       if (gaugeAddress) _baseToken.push({
         ...gauge,
+        decimals: vault?.decimals,
         allowance: Number(constants.MaxUint256),
         balance: Number(stakedBalance?.value) || 0,
         price: pps,
