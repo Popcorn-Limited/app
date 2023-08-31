@@ -43,7 +43,7 @@ const Footer = () => {
       </div>
       <div className="col-span-12 smmd:col-span-6 flex flex-col justify-between order-3 smmd:order-2 mt-12 smmd:mt-0">
         <p className=" text-primaryDark leading-6 order-2 smmd:order-1 mt-8 smmd:mt-0">
-          Popcorn is an audited, non-custodial DeFi wealth manager with yield-generating products that simultaneously fund nonprofits and social impact organizations.
+          Popcorn is a DeFi yield-optimizing protocol with customizable asset strategies that instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
         </p>
         <div className="flex justify-between smmd:justify-start smmd:gap-7 order-1 smmd:order-2">
           <a
@@ -127,7 +127,7 @@ const Footer = () => {
               Github
             </Link>
             <Link
-              href="/disclaimer"
+              href="https://app.pop.network/disclaimer"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
@@ -137,15 +137,22 @@ const Footer = () => {
         </div>
 
         <div>
-          <p className="text-gray-900 font-medium leading-6 tracking-1">Bug Bounty</p>
+          <p className="text-gray-900 font-medium leading-6 tracking-1">VaultCraft</p>
           <div className="flex flex-col">
             <Link
-              href="https://immunefi.com/bounty/popcorn"
+              href="app.vaultcraft.io"
               passHref
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
-              Immunefi
+              VaultCraft Interface
+            </Link>
+            <Link
+              href="https://docs.pop.network/products/vaultcraft/vaultcraft-sdk"
+              target="_blank"
+              className=" text-primary hover:text-black leading-6 mt-4"
+            >
+              VaultCraft SDK
             </Link>
           </div>
         </div>
