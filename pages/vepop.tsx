@@ -72,25 +72,6 @@ export default function VePOP() {
 
   const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
 
-  const {
-    write: approve = noOp,
-    isSuccess: isApproveSuccess,
-    isLoading: isApproveLoading,
-  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
-    onSuccess: (tx) => {
-      waitForTx(tx, {
-        successMessage: "POP approved!",
-        errorMessage: "Something went wrong",
-      });
-    },
-    onError: () => {
-      toast.error("User rejected the transaction", {
-        position: "top-center",
-      });
-    },
-  });
-
-
   function handleVotes(val: number, index: number) {
     setVotes((prevVotes) => {
       const updatedVotes = [...prevVotes];
