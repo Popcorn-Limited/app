@@ -1,5 +1,20 @@
 import { ToastOptions, ToastPosition } from 'react-hot-toast';
 
+export const loadingStyle: ToastOptions = {
+    style: {
+        border: '1px solid #A5A08C',
+        padding: '16px',
+        color: '#A5A08C',
+        fontSize: '18px',
+        backgroundColor: '#FFFFFF'
+    },
+    iconTheme: {
+        primary: '#A5A08C',
+        secondary: '#FFFFFF'
+    },
+    position: 'top-center' as ToastPosition
+};
+
 export const successStyle: ToastOptions = {
     style: {
         border: '1px solid #34C759',

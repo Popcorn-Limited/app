@@ -117,6 +117,7 @@ export type veAddresses = {
   VotingEscrowDelegation: `0x${string}`;
   Vault1POPGauge: `0x${string}`;
   Vault2WETHGauge: `0x${string}`;
+  VaultRouter: `0x${string}`;
 };
 
 

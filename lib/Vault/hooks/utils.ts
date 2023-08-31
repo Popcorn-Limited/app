@@ -29,9 +29,6 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
   const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
   const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
   
-  const { data: assetAllowance } = useAllowance({ address: asset?.address, chainId, account: vaultAddress });
-  const { data: vaultAllowance } = useAllowance({ address: vault?.address, chainId, account: gaugeAddress }); // TODO - might also need to approve wido
-
   const [baseToken, setBaseToken] = useState<any[]>([]);
 
   useEffect(() => {
@@ -39,7 +36,6 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
       const _baseToken = [
         {
           ...asset,
-          allowance: Number(assetAllowance?.value) || 0,
           balance: Number(assetBalance?.value) || 0,
           price: Number(price?.value) / (10 ** asset?.decimals) || 1,
           chainId: chainId,
@@ -48,7 +44,6 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
         }, // asset
         {
           ...vault,
-          allowance: Number(vaultAllowance?.value) || 0,
           balance: Number(vaultBalance?.value) || 0,
           price: pps,
           chainId: chainId,
@@ -60,12 +55,11 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
       if (gaugeAddress) _baseToken.push({
         ...gauge,
         decimals: vault?.decimals,
-        allowance: Number(constants.MaxUint256),
         balance: Number(stakedBalance?.value) || 0,
         price: pps,
         chainId: chainId,
         icon: undefined,
-        target: { type: "Gauge", address: gaugeAddress },
+        target: { type: "VaultRouter", address: gaugeAddress },
       }) // staked vault
 
       setBaseToken(_baseToken);

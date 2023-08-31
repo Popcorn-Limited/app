@@ -1,12 +1,18 @@
 import { toast } from 'react-hot-toast';
-import { successStyle, errorStyle } from 'styles/toastStyles';
+import { loadingStyle, successStyle, errorStyle } from 'styles/toastStyles';
+
+export function showLoadingToast(message: string = 'Transaction loading!') {
+    toast.loading(message, loadingStyle);
+}
 
 export function showSuccessToast(message: string = 'Transaction successful!') {
+    toast.dismiss();
     toast.success(message, successStyle);
 }
 
 export function showErrorToast(error: any) {
     const errorMessage = extractRevertReason(error);
+    toast.dismiss();
     toast.error(errorMessage, errorStyle);
 }
 
