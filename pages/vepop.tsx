@@ -31,9 +31,8 @@ const {
   GaugeController: GAUGE_CONTROLLER,
   oPOP: OPOP,
   BalancerOracle: OPOP_ORACLE,
+  Minter: OPOP_MINTER
 } = getVeAddresses();
-
-const OPOP_MINTER = ""
 
 export default function VePOP() {
   const { waitForTx } = useWaitForTx();
@@ -52,7 +51,6 @@ export default function VePOP() {
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
-  const [totalVotes, setTotalVotes] = useState(0);
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
@@ -126,7 +124,6 @@ export default function VePOP() {
         const l = i * 8;
         v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
         addr[n] = gauges[n + l] === undefined || votes[n + l] === 0 ? constants.AddressZero : gauges[n + l].address;
-
       }
 
       gaugeController.vote_for_many_gauge_weights(addr, v)
