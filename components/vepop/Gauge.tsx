@@ -1,5 +1,5 @@
 import Accordion from "components/Accordion";
-import { AssetWithName } from "components/SweetVault/SweetVault";
+import { AssetWithName } from "components/SweetVault/AssetWithName";
 import useAdapterToken from "hooks/useAdapter";
 import useVaultToken from "hooks/useVaultToken";
 import useCurrentGaugeWeight from "lib/Gauges/useCurrentGaugeWeight";
@@ -32,6 +32,8 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
       setAmount(value);
     }
   }
+
+  console.log("PING", token);
 
   return (
     <Accordion
