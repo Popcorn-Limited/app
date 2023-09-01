@@ -117,7 +117,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
 
           <div className="flex flex-row items-center justify-between w-full">
             <div className="w-1/4">
-              <p className="text-primaryLight font-normal text-lg">
+              <p className="text-primaryLight font-normal text-md">
                 Value
                 <span className={`ml-2 ${isUpwardArrow ? 'text-green-500' : 'text-red-500'}`}>
                   {isUpwardArrow ? '↑' : '↓'}
@@ -126,7 +126,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <div className="w-1/4"></div>
             <div className="w-1/4"></div>
             <div className="w-1/4">
-              <p className="text-primaryLight font-normal text-lg">Value</p>
+              <p className="text-primaryLight font-normal text-md">Value</p>
             </div>
           </div>
 
