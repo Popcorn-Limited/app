@@ -20,6 +20,7 @@ import { usePrice } from "lib/Price";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { validateInput } from "components/AssetInputWithAction/internals/input";
 import { getVeAddresses } from "lib/utils/addresses";
+import { convertEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
 
 const {
   POP: POP,
@@ -84,6 +85,15 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
     setMaxPaymentAmount(amount);
     setAmount(getOPopAmount(amount));
   };
+
+  console.log("PING0", oPopPrice.value);
+
+  const ethValue = Number(oPopPrice?.value);
+  console.log("DING", ethValue);
+
+  convertEthToUsd(ethValue / 18).then(usdValue => {
+    console.log(`The USD value of ${ethValue} ETH is: $${usdValue.toFixed(2)}`);
+  }).catch(console.error);
 
 
   return (
