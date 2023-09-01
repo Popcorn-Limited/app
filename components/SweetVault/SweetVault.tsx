@@ -145,7 +145,7 @@ function SweetVault({
                   render={(data) => <>{account ? formatAndRoundBigNumber(data?.balance?.value, token?.decimals) : "-"}</>}
                 />
               </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
+              <span className="text-secondaryLight text-base inline">{token?.symbol?.slice(0, 12)}</span>
             </p>
           </div>
 
@@ -157,7 +157,7 @@ function SweetVault({
                   formatNumber((pps * Number(balance?.value?.toString())) / (10 ** (token?.decimals)))
                   : "-"}
               </Title>
-              <span className="text-secondaryLight text-base inline">{token?.symbol.slice(0, 12)}</span>
+              <span className="text-secondaryLight text-base inline">{token?.symbol?.slice(0, 12)}</span>
             </div>
           </div>
 
@@ -171,7 +171,7 @@ function SweetVault({
                 render={(apy) => {
                   return (
                     <Apy
-                      address={vaultMetadata.staking}
+                      address={vaultMetadata?.staking}
                       resolver={"multiRewardStaking"}
                       render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
                         <section className="flex items-center gap-1 text-primary">
