@@ -23,6 +23,9 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
 
   const [amount, setAmount] = useState(0);
 
+  const [isUpwardArrow, setIsUpwardArrow] = useState(true);
+
+
   function onChange(value) {
     const currentVoteForThisGauge = votes[index];
     const potentialNewTotalVotes = votes.reduce((a, b) => a + b, 0) - currentVoteForThisGauge + value;
@@ -38,9 +41,8 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
   return (
     <Accordion
       header={
-        <div className="flex flex-row flex-wrap items-center justify-between w-full">
-
-          <div className="flex items-center justify-between w-4/12">
+        <div className="w-full">
+          <div className="flex items-center justify-between w-full mb-4">
             <AssetWithName
               token={token}
               vault={vaultMetadata}
@@ -48,49 +50,52 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             />
           </div>
 
-          <div className="w-8/12 text-start">
 
-            <div className="flex flex-row items-center w-full">
-
-              <div className="w-3/12">
-                <p className="text-primaryLight font-normal">Current Votes</p>
+          <div className="flex flex-row items-center justify-between w-full">
+            <div className="w-1/4">
+              <p className="text-primaryLight font-normal">Total Votes</p>
+            </div>
+            <div className="w-1/4">
+              <p className="text-primaryLight font-normal">Total Bribes</p>
+            </div>
+            <div className="w-1/4">
+              <p className="text-primaryLight font-normal">Bribes/vePOP</p>
+            </div>
+            <div className="flex w-1/4 justify-between">
+              <div className="w-1/2">
+                <p className="text-primaryLight font-normal">My Votes</p>
               </div>
-
-              <div className="w-3/12">
-                <p className="text-primaryLight font-normal">Upcoming Votes</p>
-              </div>
-
-              <div className="w-3/12">
+              <div className="w-1/2">
                 <p className="text-primaryLight font-normal">My Vote %</p>
               </div>
-
-              <div className="w-3/12">
-                <p className="text-primaryLight font-normal">Vote</p>
-              </div>
             </div>
+          </div>
 
-            <div className="flex flex-row items-center">
 
-              <div className="w-3/12">
-                <p className=" text-primary text-xl">
+
+          <div className="flex flex-row items-center justify-between w-full">
+            <div className="w-1/4">
+              <p className="text-primary text-xl text-start">
+                0
+              </p>
+            </div>
+            <div className="w-1/4">
+              <p className="text-primary text-xl text-start">
+                {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
+              </p>
+            </div>
+            <div className="w-1/4">
+              <p className="text-primary text-xl">
+                {(amount / 100).toFixed(2)}%
+              </p>
+            </div>
+            <div className="flex w-1/4 justify-between">
+              <div className="w-1/2">
+                <p className="text-primary text-xl">
                   {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
                 </p>
               </div>
-
-              <div className="w-3/12">
-                <p className=" text-primary text-xl text-start">
-                  {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
-                </p>
-              </div>
-
-              <div className="w-3/12">
-                <p className="text-primary text-xl">
-                  {(amount / 100).toFixed(2)}%
-                </p>
-              </div>
-
-
-              <div className="w-3/12">
+              <div className="w-1/2 mt-2">
                 <Slider
                   railStyle={{ backgroundColor: '#645F4C', height: 4 }}
                   trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
@@ -110,9 +115,25 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             </div>
           </div>
 
-        </div>
+          <div className="flex flex-row items-center justify-between w-full">
+            <div className="w-1/4">
+              <p className="text-primaryLight font-normal text-lg">
+                Value
+                <span className={`ml-2 ${isUpwardArrow ? 'text-green-500' : 'text-red-500'}`}>
+                  {isUpwardArrow ? '↑' : '↓'}
+                </span>
+              </p>            </div>
+            <div className="w-1/4"></div>
+            <div className="w-1/4"></div>
+            <div className="w-1/4">
+              <p className="text-primaryLight font-normal text-lg">Value</p>
+            </div>
+          </div>
+
+        </ div>
       }
     >
+      {/* Accordion Content */}
       <div className="lg:flex lg:flex-row lg:space-x-8 space-y-4 lg:space-y-0 mt-8">
         <div className="border border-[#F0EEE0] rounded-lg bg-white lg:w-1/2 p-6">
           <span className="flex flex-row flex-wrap items-center justify-between">
@@ -121,7 +142,6 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
               {gauge.address}
             </p>
           </span>
-
         </div>
         <div className="border border-[#F0EEE0] rounded-lg bg-white lg:w-1/2 p-6">
           <span className="flex flex-row flex-wrap items-center justify-between">
@@ -132,5 +152,6 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
           </span>
         </div>
       </div>
-    </Accordion>)
+    </Accordion>
+  );
 }
