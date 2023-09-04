@@ -10,7 +10,7 @@ import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { Address, useAccount, useBalance, useNetwork, useSwitchNetwork, useToken } from "wagmi";
 import { useExerciseOPop } from "lib/OPop/useExerciseOPop";
 import InputTokenWithError from "components/InputTokenWithError";
-import { constants } from "ethers";
+import { constants, utils } from "ethers";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import InputNumber from "components/InputNumber";
 import TokenIcon from "components/TokenIcon";
@@ -91,9 +91,11 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const ethValue = Number(oPopPrice?.value);
   console.log("DING", ethValue);
 
-  convertEthToUsd(ethValue / 18).then(usdValue => {
-    console.log(`The USD value of ${ethValue} ETH is: $${usdValue.toFixed(2)}`);
+  const etherValue = utils.formatEther(ethValue);
+  convertEthToUsd(parseFloat(etherValue)).then(usdValue => {
+    console.log(`The USD value of ${etherValue} ETH is: $${usdValue.toFixed(6)}`);
   }).catch(console.error);
+
 
 
   return (
