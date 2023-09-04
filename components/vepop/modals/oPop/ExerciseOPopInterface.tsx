@@ -20,7 +20,7 @@ import { usePrice } from "lib/Price";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { validateInput } from "components/AssetInputWithAction/internals/input";
 import { getVeAddresses } from "lib/utils/addresses";
-import { convertEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
+import { useEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
 
 const {
   POP: POP,
@@ -86,22 +86,10 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
     setAmount(getOPopAmount(amount));
   };
 
-  console.log("PING0", oPopPrice.value);
-
-  const ethValue = Number(oPopPrice?.value);
-  console.log("DING", ethValue);
-
-  const etherValue = utils.formatEther(ethValue);
-  convertEthToUsd(parseFloat(etherValue)).then(usdValue => {
-    console.log(`The USD value of ${etherValue} ETH is: $${usdValue.toFixed(6)}`);
-  }).catch(console.error);
-
-
-
   return (
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oPOP</h2>
-      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(oPopPrice?.value, 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
+      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oPopPrice?.value), 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oPOP"}
