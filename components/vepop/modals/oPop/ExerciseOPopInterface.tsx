@@ -1,11 +1,5 @@
-import Modal from "components/Modal/Modal";
 import { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
-import MainActionButton from "components/MainActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
-import useWaitForTx from "lib/utils/hooks/useWaitForTx";
-import { useCreateLock } from "lib/Gauges/utils";
-import useApproveBalance from "hooks/useApproveBalance";
-import toast from "react-hot-toast";
+import { ethers } from "ethers";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { Address, useAccount, useBalance, useNetwork, useSwitchNetwork, useToken } from "wagmi";
 import { exerciseOPop } from "lib/OPop/useExerciseOPop";
@@ -45,7 +39,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
   const { data: oPop } = useToken({ chainId: 5, address: OPOP as Address });
   const { data: pop } = useToken({ chainId: 5, address: POP as Address });
-  const { data: weth } = useToken({ chainId: 5, address: "0xba383A6649a8C849fc9274181D7B077D2b84FA95" as Address }); // temp - WETH
+  const { data: weth } = useToken({ chainId: 5, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
 
 
   const handleMaxWeth = () => {

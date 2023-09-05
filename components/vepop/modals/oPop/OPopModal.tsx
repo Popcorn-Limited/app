@@ -42,7 +42,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
-    exerciseOPop(OPOP, account, amount, maxPaymentAmount);
+    exerciseOPop(OPOP, account, 1000, 100000000000000);
     setShowModal(false);
   }
 
