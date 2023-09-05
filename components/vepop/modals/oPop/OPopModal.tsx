@@ -10,6 +10,7 @@ import { getVeAddresses } from "lib/utils/addresses";
 import { useAllowance } from "lib/Erc20/hooks";
 import { approveBalance } from "hooks/useApproveBalance";
 import { Address } from "wagmi";
+import { utils } from "ethers";
 
 const { BalancerOracle: OPOP_ORACLE, WETH: WETH, oPOP: OPOP } = getVeAddresses();
 
@@ -42,10 +43,10 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
-    exerciseOPop(OPOP, account, 1000, 100000000000000);
+    // console.log("exercisePOP data", amount, maxPaymentAmount)
+    exerciseOPop(OPOP, account, amount, utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber());
     setShowModal(false);
   }
-
 
   return (
     <Modal show={showModal} setShowModal={setShowModal} >
