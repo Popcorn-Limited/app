@@ -214,7 +214,7 @@ export default function VePOP() {
               Voting power used: <span className="text-[#05BE64]">
                 {
                   veBal && veBal.value
-                    ? (votes.reduce((a, b) => a + b, 0) / 100).toFixed(2)
+                    ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
                     : "0"
                 }%
               </span>

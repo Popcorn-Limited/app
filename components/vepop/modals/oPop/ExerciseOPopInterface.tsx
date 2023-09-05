@@ -8,7 +8,7 @@ import useApproveBalance from "hooks/useApproveBalance";
 import toast from "react-hot-toast";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { Address, useAccount, useBalance, useNetwork, useSwitchNetwork, useToken } from "wagmi";
-import { useExerciseOPop } from "lib/OPop/useExerciseOPop";
+import { exerciseOPop } from "lib/OPop/useExerciseOPop";
 import InputTokenWithError from "components/InputTokenWithError";
 import { constants, utils } from "ethers";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -45,7 +45,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
   const { data: oPop } = useToken({ chainId: 5, address: OPOP as Address });
   const { data: pop } = useToken({ chainId: 5, address: POP as Address });
-  const { data: weth } = useToken({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
+  const { data: weth } = useToken({ chainId: 5, address: "0xba383A6649a8C849fc9274181D7B077D2b84FA95" as Address }); // temp - WETH
 
 
   const handleMaxWeth = () => {
@@ -118,7 +118,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           captionText={"Amount WETH"}
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
-          chainId={10}
+          chainId={5}
           value={maxPaymentAmount}
           onChange={handleEthInput}
           defaultValue={maxPaymentAmount}
