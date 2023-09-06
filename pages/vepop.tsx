@@ -31,6 +31,8 @@ const {
   VotingEscrow: VOTING_ESCROW,
   GaugeController: GAUGE_CONTROLLER,
   oPOP: OPOP,
+  POP: POP,
+  WETH: WETH,
   BalancerOracle: OPOP_ORACLE,
   Minter: OPOP_MINTER
 } = getVeAddresses();
@@ -137,8 +139,9 @@ export default function VePOP() {
             </p>
             <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
               Mint the token needed for testing on Goerli here: <br />
-              <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
-              <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
+              <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank">POP </a> <br />
+              <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank">WETH</a> <br />
+              <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank">BalancerPool</a>
             </div>
           </div>
         </section>
