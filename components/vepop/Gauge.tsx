@@ -36,8 +36,6 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
     }
   }
 
-  console.log("PING", token);
-
   return (
     <Accordion
       header={

@@ -80,7 +80,6 @@ export function useIncreaseLockAmount(address: `0x${string}`, amount: number | s
     chainId: Number(5),
   });
 
-
   const result = useContractWrite({
     ...config,
     onSuccess: () => {

@@ -1,16 +1,10 @@
-import Modal from "components/Modal/Modal";
 import { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
-import MainActionButton from "components/MainActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
-import useWaitForTx from "lib/utils/hooks/useWaitForTx";
-import { useCreateLock } from "lib/Gauges/utils";
-import useApproveBalance from "hooks/useApproveBalance";
-import toast from "react-hot-toast";
+import { ethers } from "ethers";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { Address, useAccount, useBalance, useNetwork, useSwitchNetwork, useToken } from "wagmi";
-import { useExerciseOPop } from "lib/OPop/useExerciseOPop";
+import { exerciseOPop } from "lib/OPop/useExerciseOPop";
 import InputTokenWithError from "components/InputTokenWithError";
-import { constants } from "ethers";
+import { constants, utils } from "ethers";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import InputNumber from "components/InputNumber";
 import TokenIcon from "components/TokenIcon";
@@ -20,7 +14,7 @@ import { usePrice } from "lib/Price";
 import { formatAndRoundBigNumber, safeRound } from "lib/utils";
 import { validateInput } from "components/AssetInputWithAction/internals/input";
 import { getVeAddresses } from "lib/utils/addresses";
-import { convertEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
+import { useEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
 
 const {
   POP: POP,
@@ -45,7 +39,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
   const { data: oPop } = useToken({ chainId: 5, address: OPOP as Address });
   const { data: pop } = useToken({ chainId: 5, address: POP as Address });
-  const { data: weth } = useToken({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
+  const { data: weth } = useToken({ chainId: 5, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
 
 
   const handleMaxWeth = () => {
@@ -86,20 +80,10 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
     setAmount(getOPopAmount(amount));
   };
 
-  console.log("PING0", oPopPrice.value);
-
-  const ethValue = Number(oPopPrice?.value);
-  console.log("DING", ethValue);
-
-  convertEthToUsd(ethValue / 18).then(usdValue => {
-    console.log(`The USD value of ${ethValue} ETH is: $${usdValue.toFixed(2)}`);
-  }).catch(console.error);
-
-
   return (
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oPOP</h2>
-      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(oPopPrice?.value, 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
+      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oPopPrice?.value), 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oPOP"}
@@ -128,7 +112,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           captionText={"Amount WETH"}
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
-          chainId={10}
+          chainId={5}
           value={maxPaymentAmount}
           onChange={handleEthInput}
           defaultValue={maxPaymentAmount}

@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 
 async function getEthToUsdPrice(): Promise<number> {
     try {
@@ -10,7 +11,28 @@ async function getEthToUsdPrice(): Promise<number> {
     }
 }
 
-export async function convertEthToUsd(ethAmount: number): Promise<number> {
+async function convertEthToUsd(ethAmount: BigNumber): Promise<BigNumber> {
     const ethToUsdPrice = await getEthToUsdPrice();
-    return ethAmount * ethToUsdPrice;
+    const ethAmountFloat = parseFloat(utils.formatEther(ethAmount));
+    const usdValue = ethAmountFloat * ethToUsdPrice;
+    return utils.parseUnits(usdValue.toString(), 'ether');
+}
+
+export function useEthToUsd(ethAmount: BigNumber) {
+    const [usdValue, setUsdValue] = useState<BigNumber | null>(null);
+
+    useEffect(() => {
+        async function fetchUsdValue() {
+            try {
+                const value = await convertEthToUsd(ethAmount);
+                setUsdValue(value);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        fetchUsdValue();
+    }, [ethAmount]);
+
+    return usdValue;
 }

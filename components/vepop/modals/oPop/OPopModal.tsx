@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 import MainActionButton from "components/MainActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { useExerciseOPop } from "lib/OPop/useExerciseOPop";
+import { useExerciseOPop, exerciseOPop } from "lib/OPop/useExerciseOPop";
 import ExerciseOPopInterface from "./ExerciseOPopInterface";
 import OptionInfo from "./OptionInfo";
 import { getVeAddresses } from "lib/utils/addresses";
+import { useAllowance } from "lib/Erc20/hooks";
+import { approveBalance } from "hooks/useApproveBalance";
+import { Address } from "wagmi";
+import { utils } from "ethers";
 
-const { BalancerOracle: OPOP_ORACLE } = getVeAddresses();
+const { BalancerOracle: OPOP_ORACLE, WETH: WETH, oPOP: OPOP } = getVeAddresses();
 
 export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.Element {
   const { chain } = useNetwork();
@@ -21,7 +25,10 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
   const [amount, setAmount] = useState<number>(0);
   const [maxPaymentAmount, setMaxPaymentAmount] = useState<number>(0);
 
-  const { write: exercise } = useExerciseOPop(OPOP_ORACLE, account, amount, maxPaymentAmount);
+  // const { write: exercise } = useExerciseOPop(OPOP, account, amount, maxPaymentAmount);
+
+  const { data: allowance } = useAllowance({ chainId: 5, address: WETH, account: OPOP as Address });
+  const needAllowance = amount > Number(allowance?.value || 0);
 
   useEffect(() => {
     if (!showModal) setStep(0)
@@ -35,10 +42,11 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
 
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
-    exercise();
+    if (needAllowance) await approveBalance(WETH, OPOP);
+    // console.log("exercisePOP data", amount, maxPaymentAmount)
+    exerciseOPop(OPOP, account, amount, utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber());
     setShowModal(false);
   }
-
 
   return (
     <Modal show={showModal} setShowModal={setShowModal} >

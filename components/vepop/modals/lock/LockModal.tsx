@@ -9,7 +9,7 @@ import TertiaryActionButton from "components/TertiaryActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useCreateLock } from "lib/Gauges/utils";
-import useApproveBalance from "hooks/useApproveBalance";
+import { useApproveBalance } from "hooks/useApproveBalance";
 import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
