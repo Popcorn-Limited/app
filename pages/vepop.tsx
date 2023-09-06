@@ -1,9 +1,9 @@
-import { BigNumber, Contract, constants } from "ethers";
-import useApproveBalance from "hooks/useApproveBalance";
+import { BigNumber, Contract, Wallet, constants } from "ethers";
+import { useApproveBalance } from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { getVotePeriodEndTime } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
-import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
+import { formatAndRoundBigNumber, formatNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -24,6 +24,7 @@ import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
+import { WalletIcon } from "@heroicons/react/24/outline";
 
 const {
   BalancerPool: POP_LP,
@@ -185,8 +186,11 @@ export default function VePOP() {
             <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
               <p className="">My oPOP</p>
               <div>
-                <p className="font-bold text-end">{(Number(oPopBal?.value) / 1e18).toFixed(2)}</p>
-                <p className="">($ {(Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)})</p>
+                <p className="font-bold text-end flex items-center justify-end">
+                  {(Number(oPopBal?.value) / 1e18).toFixed(2)}
+                  <WalletIcon className="ml-2 w-5 h-5" />
+                </p>
+                <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
               </div>
             </div>
             <div className="mt-5 flex flex-row items-center justify-between space-x-8">
