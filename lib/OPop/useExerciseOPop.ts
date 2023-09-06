@@ -1,8 +1,8 @@
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { showErrorToast, showSuccessToast } from "lib/Toasts";
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
-export async function exerciseOPop(address: `0x${string}`, account: `0x${string}`, amount: number | string, maxPaymentAmount: number | string) {
+export async function exerciseOPop(address: `0x${string}`, account: `0x${string}`, amount: BigNumber | string, maxPaymentAmount: BigNumber | string) {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();

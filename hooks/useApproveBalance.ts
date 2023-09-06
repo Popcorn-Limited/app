@@ -2,6 +2,7 @@ import type { ContractWriteArgs } from "lib/types";
 import { ChainId } from "lib/utils";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { ethers, constants } from 'ethers';
+import { showSuccessToast, showLoadingToast, showErrorToast } from "lib/Toasts";
 
 export const useApproveBalance = (
   assetAddress: string,
@@ -32,12 +33,16 @@ export async function approveBalance(assetAddress, spender, amount = '1157920892
     const contract = new ethers.Contract(assetAddress, approveAbi, signer);
 
     const tx = await contract.approve(spender, amount);
+    showLoadingToast('Approval pending!');
+
     await tx.wait();
+    showSuccessToast('Approval successful!');
 
     return tx;
 
   } catch (error) {
     console.error(error);
+    showErrorToast();
     throw error;
   }
 }

@@ -113,7 +113,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
           chainId={5}
-          value={maxPaymentAmount}
+          value={maxPaymentAmount * 1e3} // temp Goerli value
           onChange={handleEthInput}
           defaultValue={maxPaymentAmount}
           selectedToken={
