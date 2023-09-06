@@ -9,7 +9,7 @@ import TertiaryActionButton from "components/TertiaryActionButton";
 import SecondaryActionButton from "components/SecondaryActionButton";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useCreateLock } from "lib/Gauges/utils";
-import { useApproveBalance } from "hooks/useApproveBalance";
+import { useApproveBalance, approveBalance } from "hooks/useApproveBalance";
 import toast from "react-hot-toast";
 import { useAllowance } from "lib/Erc20/hooks";
 import { Address, useNetwork, useSwitchNetwork } from "wagmi";
@@ -67,7 +67,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
 
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
-    if (showApproveButton) return approve();
+    if (showApproveButton) await approveBalance(POP_LP, VOTING_ESCROW);
     // When approved continue to deposit
     createLock();
     setShowModal(false);

@@ -1,9 +1,9 @@
-import { BigNumber, Contract, constants } from "ethers";
-import useApproveBalance from "hooks/useApproveBalance";
+import { BigNumber, Contract, Wallet, constants } from "ethers";
+import { useApproveBalance } from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { getVotePeriodEndTime } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
-import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
+import { formatAndRoundBigNumber, formatNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -24,12 +24,15 @@ import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
+import { WalletIcon } from "@heroicons/react/24/outline";
 
 const {
   BalancerPool: POP_LP,
   VotingEscrow: VOTING_ESCROW,
   GaugeController: GAUGE_CONTROLLER,
   oPOP: OPOP,
+  POP: POP,
+  WETH: WETH,
   BalancerOracle: OPOP_ORACLE,
   Minter: OPOP_MINTER
 } = getVeAddresses();
@@ -136,8 +139,9 @@ export default function VePOP() {
             </p>
             <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
               Mint the token needed for testing on Goerli here: <br />
-              <a href="https://goerli.etherscan.io/address/0xf46292650335BB8Fa56FAb05CcE227E50011Fb35#writeContract" className="text-blue-500">POP</a> <br />
-              <a href="https://goerli.etherscan.io/address/0xba383A6649a8C849fc9274181D7B077D2b84FA95#writeContract" className="text-blue-500">WETH</a>
+              <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank">POP </a> <br />
+              <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank">WETH</a> <br />
+              <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank">BalancerPool</a>
             </div>
           </div>
         </section>
@@ -185,8 +189,11 @@ export default function VePOP() {
             <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
               <p className="">My oPOP</p>
               <div>
-                <p className="font-bold text-end">{(Number(oPopBal?.value) / 1e18).toFixed(2)}</p>
-                <p className="">($ {(Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)})</p>
+                <p className="font-bold text-end flex items-center justify-end">
+                  {(Number(oPopBal?.value) / 1e18).toFixed(2)}
+                  <WalletIcon className="ml-2 w-5 h-5" />
+                </p>
+                <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
               </div>
             </div>
             <div className="mt-5 flex flex-row items-center justify-between space-x-8">
