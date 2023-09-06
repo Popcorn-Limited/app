@@ -101,6 +101,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             } as any
           }
           errorMessage={""}
+          inputMoreThanBalance={Number(oPopBal) < amount}
           tokenList={[]}
 
         />
