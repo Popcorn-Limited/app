@@ -1,7 +1,7 @@
 import { toast } from 'react-hot-toast';
 import { loadingStyle, successStyle, errorStyle } from 'styles/toastStyles';
 
-export function showLoadingToast(message: string = 'Transaction loading!') {
+export function showLoadingToast(message: string = 'Transaction pending!') {
     toast.loading(message, loadingStyle);
 }
 
@@ -10,7 +10,7 @@ export function showSuccessToast(message: string = 'Transaction successful!') {
     toast.success(message, successStyle);
 }
 
-export function showErrorToast(error: any) {
+export function showErrorToast(error: any = 'An error occurred while interacting with the contract.') {
     const errorMessage = extractRevertReason(error);
     toast.dismiss();
     toast.error(errorMessage, errorStyle);
@@ -25,6 +25,6 @@ function extractRevertReason(error: any): string {
         return error.data.message;
     }
 
-    return 'An error occurred while interacting with the contract.';
+    return error;
 }
 

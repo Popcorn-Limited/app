@@ -43,8 +43,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
-    // console.log("exercisePOP data", amount, maxPaymentAmount)
-    exerciseOPop(OPOP, account, amount, utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber());
+    await exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber() * 1e5); // Temp values to work on Goerli
     setShowModal(false);
   }
 
@@ -56,8 +55,13 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
 
         <div className="space-y-4">
           {step === 0 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {step === 1 && <MainActionButton label={"Exercise oPOP"} handleClick={handleExerciseOPop} />}
-          {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
+          {
+            step === 1 && (
+              needAllowance
+                ? <SecondaryActionButton label={"Approve wETH"} handleClick={handleExerciseOPop} />
+                : <MainActionButton label={"Exercise oPOP"} handleClick={handleExerciseOPop} />
+            )
+          }          {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>
       </>
     </Modal >
