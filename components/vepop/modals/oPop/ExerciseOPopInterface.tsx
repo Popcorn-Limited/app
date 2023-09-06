@@ -52,7 +52,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const handleMaxOPop = () => {
     const maxOPop = safeRound(oPopBal?.value || constants.Zero, 18);
 
-    setMaxPaymentAmount(getPaymentAmount(maxOPop));
+    setMaxPaymentAmount(getPaymentAmount(maxOPop) * 10000);
     setAmount(maxOPop)
   };
 
@@ -113,7 +113,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
           chainId={5}
-          value={maxPaymentAmount}
+          value={maxPaymentAmount * 1e4} // Temp value for Goerli
           onChange={handleEthInput}
           defaultValue={maxPaymentAmount}
           selectedToken={
