@@ -139,9 +139,9 @@ export default function VePOP() {
             </p>
             <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
               Mint the token needed for testing on Goerli here: <br />
-              <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank">POP </a> <br />
-              <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank">WETH</a> <br />
-              <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank">BalancerPool</a>
+              <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">POP </a> <br />
+              <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">WETH</a> <br />
+              <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
             </div>
           </div>
         </section>
