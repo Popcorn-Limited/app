@@ -41,7 +41,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
-    await exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber() * 1e4); // Temp values for Goerli
+    await exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), (utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber() * 1e4).toString()); // Temp values for Goerli
     setShowModal(false);
   }
 
