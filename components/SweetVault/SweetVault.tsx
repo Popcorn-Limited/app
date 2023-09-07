@@ -55,10 +55,9 @@ function SweetVault({
   const gauge = gaugeAddress ? baseToken[2] : undefined;
 
   const [apy, setApy] = useState(undefined);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (asset && !apy) {
+    if (asset?.address && !apy) {
       resolveAdapterApy({ chainId, address: asset?.address?.toLowerCase(), resolver: vaultMetadata?.metadata?.resolver }).then(res => setApy(res))
     }
   }, [asset, apy])
@@ -86,7 +85,7 @@ function SweetVault({
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
               {formatAndRoundNumber(asset?.balance, asset?.decimals)}
             </Title>
-            <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
           </p>
         </div>
 
@@ -99,7 +98,7 @@ function SweetVault({
                 formatAndRoundNumber(vault.balance, vault.decimals)
               ) : "-"}
             </Title>
-            <span className="text-secondaryLight text-base inline">{asset?.symbol.slice(0, 12)}</span>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
           </div>
         </div>
 

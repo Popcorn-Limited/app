@@ -16,7 +16,7 @@ export default function TokenIcon({
   imageSize,
   chainId,
 }: TokenIconProps): JSX.Element {
-  const metadata = useContractMetadata({ address: token.address, chainId });
+  const metadata = useContractMetadata({ address: token?.address, chainId });
 
 
   icon = token?.icon || icon

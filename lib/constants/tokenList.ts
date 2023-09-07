@@ -283,5 +283,27 @@ export const tokenList = [
     "symbol": "b-ohm-dai-lp",
     "decimals": 18,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/OHM.png"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b",
+      "1337": "0xFCc5c47bE19d06BF83eB04298b026F81069ff65b"
+    },
+    "name": "yCRV",
+    "symbol": "yCRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/yearncrvnew_32.png"
+  },
+  {
+    "chains": [1,1337],
+    "address": {
+      "1": "0x27B5739e22ad9033bcBf192059122d163b60349D",
+      "1337": "0x27B5739e22ad9033bcBf192059122d163b60349D"
+    },
+    "name": "Staked yCRV",
+    "symbol": "st-yCRV",
+    "decimals": 18,
+    "logoURI": "https://etherscan.io/token/images/styearncrv_32.png"
   }
 ] as const

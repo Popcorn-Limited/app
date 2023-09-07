@@ -46,8 +46,8 @@ export async function getCTokenAddress({ chainId, address }: { chainId: number, 
     })
   }) as string[]).map(item => item ? item.toLowerCase() : item)
 
-  return underlying.includes(address.toLowerCase())
-    ? cTokens[underlying.indexOf(address.toLowerCase())]
+  return underlying.includes(address?.toLowerCase())
+    ? cTokens[underlying.indexOf(address?.toLowerCase())]
     : constants.AddressZero
 }
 
