@@ -45,7 +45,7 @@ export default function SelectToken({
           }}
         >
           <div className="md:mr-2 relative">
-            <TokenIcon token={selectedToken?.address} imageSize="w-5 h-5" chainId={chainId} />
+            <TokenIcon token={selectedToken?.address} icon={selectedToken?.icon} imageSize="w-5 h-5" chainId={chainId} />
           </div>
           <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
             {selectedToken?.symbol}
