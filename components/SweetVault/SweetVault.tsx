@@ -18,6 +18,7 @@ import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 import { useBaseVaultInputToken } from "lib/Vault/hooks/utils";
 import { AssetWithName } from "./AssetWithName";
 import VaultInputs from "./VaultInputs";
+import { resolveAdapterApy } from "lib/utils/resolvers/adapterApy/adapterApy";
 
 const HUNDRED = constants.Zero.add(100);
 
@@ -53,6 +54,12 @@ function SweetVault({
   const vault = baseToken[1];
   const gauge = gaugeAddress ? baseToken[2] : undefined;
 
+  const [apy, setApy] = useState(0);
+
+  useEffect(() => {
+    resolveAdapterApy({ chainId, address: asset?.address?.toLowerCase(), resolver: vaultMetadata?.metadata?.resolver }).then(res => setApy(res))
+  }, [])
+
   // Is loading / error
   if (!vaultMetadata || baseToken.length === 0) return <></>
   // Vault is not in search term
@@ -68,7 +75,6 @@ function SweetVault({
 
         <div className="flex items-center justify-between select-none w-full md:w-1/3">
           <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
-          <p>{vaultMetadata?.metadata?.protocol?.name}</p>
         </div>
 
         <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
@@ -97,52 +103,7 @@ function SweetVault({
         <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
           <p className="font-normal text-primaryLight">vAPY</p>
           <Title as="td" level={2} fontWeight="font-normal">
-            <Apy
-              address={vaultAddress}
-              chainId={chainId}
-              resolver={VAULT_APY_RESOLVER[vaultMetadata?.metadata?.protocol?.name]}
-              render={(apy) => {
-                return (
-                  <Apy
-                    address={vaultMetadata.staking}
-                    resolver={"multiRewardStaking"}
-                    render={(stakingApy) => (Number(apy?.data?.value) > 0 || Number(stakingApy?.data?.value) > 0) ? (
-                      <section className="flex items-center gap-1 text-primary">
-                        {formatAndRoundBigNumber(
-                          HUNDRED.mul((apy?.data?.value || constants.Zero).add(stakingApy?.data?.value || constants.Zero) || constants.Zero),
-                          18,
-                        )} %
-                        <InfoIconWithTooltip
-                          title="APR Breakdown"
-                          content={
-                            <ul className="text-sm">
-                              <li>
-                                Staking APY:{" "}
-                                {formatAndRoundBigNumber(
-                                  HUNDRED.mul(stakingApy?.data?.value || constants.Zero),
-                                  18,
-                                )}
-                                %
-                              </li>
-                              <li>
-                                Vault APY:{" "}
-                                {formatAndRoundBigNumber(
-                                  HUNDRED.mul(apy?.data?.value || constants.Zero),
-                                  18,
-                                )}
-                                %
-                              </li>
-                            </ul>
-                          }
-                        />
-                      </section>
-                    ) : <p className="flex items-center gap-1 text-primary">New ✨</p>
-                    }
-                    chainId={chainId}
-                  />
-                );
-              }}
-            />
+            {formatNumber(apy)}%
           </Title>
         </div>
 
