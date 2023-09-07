@@ -12,7 +12,6 @@ import { Address, useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 const { VaultRouter: VAULT_ROUTER } = { VaultRouter: constants.AddressZero as Address }
 
 async function handleAllowance(token: any, connector: any, spender: string, inputAmount: number): Promise<boolean> {
-  console.log({ token, connector, spender, inputAmount })
   const tokenContract = new Contract(
     token?.address,
     [
@@ -24,7 +23,7 @@ async function handleAllowance(token: any, connector: any, spender: string, inpu
   );
   const account = await connector.getAccount()
   const allowance = await tokenContract.allowance(account, spender)
-  console.log({ allowance: Number(allowance) })
+  
   if (Number(allowance) === 0 || Number(allowance) < inputAmount) {
     showLoadingToast("Approving assets for deposit...")
     const signer = await connector.getSigner()

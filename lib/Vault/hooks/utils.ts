@@ -5,7 +5,7 @@ import { useTotalAssets } from "./useTotalAssets";
 import { useAllowance, useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
 import { useEffect, useState } from "react";
 import { constants } from "ethers";
-import { ChainId } from "lib/utils";
+import { ChainId, RPC_URLS } from "lib/utils";
 
 export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account }:
   { vaultAddress: string, gaugeAddress?: string, chainId: ChainId, account?: string }) {
@@ -30,6 +30,17 @@ export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, ac
   const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
 
   const [baseToken, setBaseToken] = useState<any[]>([]);
+
+  const options = {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      id: chainId,
+      jsonrpc: '2.0',
+      method: 'alchemy_getTokenMetadata',
+      params: [asset.address]
+    })
+  };
 
   useEffect(() => {
     if (vault?.address && asset?.address && price?.value && pps > 0) {
