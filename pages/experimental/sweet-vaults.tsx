@@ -74,7 +74,7 @@ const PopSweetVaults: NextPage = () => {
       </section>
 
       <SweetVaults
-        vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
+        vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address)).slice(0, 1)}
         selectNetwork={selectNetwork}
         tags={[]}
       />

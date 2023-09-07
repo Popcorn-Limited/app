@@ -1,81 +1,142 @@
 import useVaultToken from "hooks/useVaultToken";
 import { usePrice } from "lib/Price";
-import { Address, useToken } from "wagmi";
-import { useTotalAssets } from "./useTotalAssets";
-import { useAllowance, useBalanceOf, useTotalSupply } from "lib/Erc20/hooks";
+import { Address, useContractReads, useToken } from "wagmi";
 import { useEffect, useState } from "react";
-import { constants } from "ethers";
-import { ChainId, RPC_URLS } from "lib/utils";
+import { ChainId } from "lib/utils";
+import useAdapterToken from "hooks/useAdapter";
+import { tokenList } from "lib/constants/tokenList";
+
+const EMPTY_TOKEN = {
+  1: "https://etherscan.io/images/main/empty-token.png",
+  1337: "https://etherscan.io/images/main/empty-token.png",
+  5: "https://etherscan.io/images/main/empty-token.png",
+  137: "https://polygonscan.com/images/main/empty-token.png",
+  10: "/images/icons/empty-op.svg",
+  42161: "https://arbiscan.io/images/main/empty-token.png",
+  56: "/images/icons/empty-bnb.svg",
+  250: "https://ftmscan.com/images/main/empty-token.png"
+}
+
+function getProtocolIcon(asset: any, adapter: any, chainId: ChainId): string | undefined {
+  // CURVE
+  if (name.includes("Curve")) {
+    // TODO fill this with curve lp icon
+    return undefined;
+  }
+  // VELODROME 
+  else if (name.includes("StableV1 AMM")) {
+    // TODO fill this with velodrome lp icon
+    return undefined;
+  }
+  return undefined;
+}
+
+function getIconFromTokenList(address: string, chainId: ChainId) {
+  const token = tokenList.find(token => token.address[chainId].toLowerCase() === address.toLowerCase());
+  return token ? token.logoURI : undefined;
+}
+
+function getAssetIcon(asset, adapter, chainId) {
+  // TODO wait for zerion api key and fetch the token result first (should be unlocked on the 30.08.23)
+  // 1. fetch token result from zerion and return the icon if not undefined
+  // 2. if undefined test for protocols
+  // 3. if undefined test for tokenlist?
+  // 4. if undefined return empty network token
+  let icon = getIconFromTokenList(asset.address, chainId);
+  if (!icon) return getProtocolIcon(asset, adapter, chainId)
+  return EMPTY_TOKEN[chainId]
+}
+
+function useGetTotalAssetsAndSupply({ vaultAddress, chainId }) {
+  const contract = {
+    address: vaultAddress,
+    abi: vaultABI,
+    chainId
+  }
+  return useContractReads({
+    contracts: [
+      {
+        ...contract,
+        functionName: 'totalAssets',
+      },
+      {
+        ...contract,
+        functionName: 'totalSupply',
+      },
+    ],
+    enabled: !!vaultAddress && !!chainId,
+  })
+}
+
+function useGetBaseTokenBalances({ vaultAddress, gaugeAddress, assetAddress, chainId, account }) {
+  const baseContract = {
+    abi: vaultABI,
+    chainId,
+    functionName: 'balanceOf',
+    args: [account]
+  }
+  const contracts = [{ ...baseContract, address: assetAddress }, { ...baseContract, address: vaultAddress }]
+  if (gaugeAddress) contracts.push({ ...baseContract, address: gaugeAddress })
+
+  return useContractReads({
+    contracts,
+    enabled: !!vaultAddress && !!assetAddress && !!chainId && !!account,
+  })
+}
 
 export function useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account }:
-  { vaultAddress: string, gaugeAddress?: string, chainId: ChainId, account?: string }) {
-  const { data: vault } = useToken({ address: vaultAddress as Address, chainId })
-  const { data: gauge } = useToken({ address: gaugeAddress as Address, chainId })
-  const { data: asset } = useVaultToken(vaultAddress, chainId);
+  { vaultAddress: Address, gaugeAddress?: Address, chainId: ChainId, account?: Address }) {
+  const { data: vault } = useToken({ address: vaultAddress, chainId })
+  const { data: gauge } = useToken({ address: gaugeAddress, chainId })
+  const { data: asset } = useVaultToken({ vaultAddress, chainId });
+  const { data: adapter } = useAdapterToken({ vaultAddress, chainId });
 
-  const { data: price } = usePrice({ address: asset?.address as Address, chainId });
-  const { data: totalAssets } = useTotalAssets({ address: vaultAddress as Address, chainId });
-  const { data: totalSupply } = useTotalSupply({ address: vaultAddress as Address, chainId });
-  const [pps, setPps] = useState<number>(1);
+  const { data: price } = usePrice({ address: asset?.address, chainId });
 
-  useEffect(() => {
-    if (totalAssets && totalSupply && price
-      && Number(totalAssets?.value) > 0 && Number(totalSupply?.value) > 0 && pps === 0) {
-      setPps((Number(totalAssets?.value) / Number(totalSupply?.value)) * (Number(price?.value) / (10 ** asset?.decimals)));
-    }
-  }, [totalAssets, totalSupply, price])
+  const { data: totalAssetsAndSupply } = useGetTotalAssetsAndSupply({ vaultAddress, chainId })
+  const { data: balances } = useGetBaseTokenBalances({ vaultAddress, gaugeAddress, assetAddress: asset?.address, chainId, account })
 
-  const { data: assetBalance } = useBalanceOf({ address: asset?.address as Address, chainId, account });
-  const { data: vaultBalance } = useBalanceOf({ address: vaultAddress as Address, chainId, account });
-  const { data: stakedBalance } = useBalanceOf({ address: gaugeAddress as Address, chainId, account });
+  const assetPrice = Number(price?.value) / (10 ** asset?.decimals) || 1
+  const vaultPrice = (Number(totalAssetsAndSupply?.[0]) || 1) / (Number(totalAssetsAndSupply?.[1]) || 1) * assetPrice
+  const vaultSupply = (Number(totalAssetsAndSupply?.[1]) || 1) / (10 ** asset?.decimals) || 0
 
-  const [baseToken, setBaseToken] = useState<any[]>([]);
-
-  const options = {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({
-      id: chainId,
-      jsonrpc: '2.0',
-      method: 'alchemy_getTokenMetadata',
-      params: [asset.address]
-    })
-  };
-
-  useEffect(() => {
-    if (vault?.address && asset?.address && price?.value && pps > 0) {
-      const _baseToken = [
-        {
-          ...asset,
-          balance: Number(assetBalance?.value) || 0,
-          price: Number(price?.value) / (10 ** asset?.decimals) || 1,
-          chainId: chainId,
-          icon: "/images/tokens/eth.png",
-          target: { type: "Vault", address: vaultAddress }
-        }, // asset
-        {
-          ...vault,
-          balance: Number(vaultBalance?.value) || 0,
-          price: pps,
-          chainId: chainId,
-          icon: undefined,
-          isVault: true,
-          target: { type: "Gauge", address: gaugeAddress }
-        }, // vault
-      ]
-      if (gaugeAddress) _baseToken.push({
-        ...gauge,
-        decimals: vault?.decimals,
-        balance: Number(stakedBalance?.value) || 0,
-        price: pps,
-        chainId: chainId,
-        icon: undefined,
-        target: { type: "VaultRouter", address: gaugeAddress },
-      }) // staked vault
-
-      setBaseToken(_baseToken);
-    }
-  }, [vault, asset, price, pps])
+  const baseToken: any[] = [
+    {
+      ...asset,
+      balance: account ? Number(balances?.[0]) : 0,
+      price: assetPrice,
+      chainId: chainId,
+      icon: getAssetIcon(asset, adapter),
+      target: { type: "Vault", address: vaultAddress }
+    }, // asset
+    {
+      ...vault,
+      balance: account ? Number(balances?.[1]) : 0,
+      price: vaultPrice,
+      chainId: chainId,
+      icon: undefined,
+      isVault: true,
+      target: { type: "Gauge", address: gaugeAddress },
+      supply: vaultSupply,
+    }, // vault
+  ]
+  if (gaugeAddress) baseToken.push({
+    ...gauge,
+    decimals: vault?.decimals,
+    balance: account ? Number(balances?.[2]) : 0,
+    price: vaultPrice,
+    chainId: chainId,
+    icon: undefined,
+    target: { type: "VaultRouter", address: gaugeAddress },
+    supply: vaultSupply,
+  }) // staked vault
 
   return baseToken;
 }
+
+
+const vaultABI = [
+  { "inputs": [], "name": "totalAssets", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "totalSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "balanceOf", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+] as const 

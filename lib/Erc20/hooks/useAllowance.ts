@@ -6,8 +6,7 @@ import { BigNumberWithFormatted, Pop } from "../../types";
 export const useAllowance: Pop.Hook<BigNumberWithFormatted> = ({ address: target, account: spender, chainId }) => {
   const { address: account } = useAccount();
 
-  return useConsistentRepolling(
-    useContractRead({
+  return useContractRead({
       address: target,
       chainId: Number(chainId),
       abi: ["function allowance(address owner, address spender) view returns (uint256)"],
@@ -21,6 +20,5 @@ export const useAllowance: Pop.Hook<BigNumberWithFormatted> = ({ address: target
           formatted: formatAndRoundBigNumber(data as BigNumber, 18),
         };
       },
-    }),
-  ) as Pop.HookResult<BigNumberWithFormatted>;
+    }) as Pop.HookResult<BigNumberWithFormatted>;
 };

@@ -358,9 +358,9 @@ function useGetIpfsMetadata(address: string, adapter, token, cid?: string): Ipfs
 }
 
 
-export default function useVaultMetadata(vaultAddress, chainId): VaultMetadata {
-  const { data: token } = useVaultToken(vaultAddress, chainId);
-  const { data: adapter = undefined } = useAdapterToken(vaultAddress, chainId);
+export default function useVaultMetadata({ vaultAddress, chainId }: { vaultAddress: string, chainId: number }): VaultMetadata {
+  const { data: token } = useVaultToken({ vaultAddress, chainId });
+  const { data: adapter = undefined } = useAdapterToken({ vaultAddress, chainId });
 
   const registry = useVaultRegistry(chainId);
   const { data } = useContractRead({

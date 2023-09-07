@@ -4,8 +4,7 @@ import { formatAndRoundBigNumber, useConsistentRepolling } from "lib/utils";
 import { BigNumberWithFormatted, Pop } from "../../types";
 
 export const useTotalSupply: Pop.Hook<BigNumberWithFormatted> = ({ chainId, address }) => {
-  return useConsistentRepolling(
-    useContractRead({
+  return useContractRead({
       address,
       chainId: Number(chainId),
       abi: ["function totalSupply() external view returns (uint256)"],
@@ -18,6 +17,5 @@ export const useTotalSupply: Pop.Hook<BigNumberWithFormatted> = ({ chainId, addr
           formatted: formatAndRoundBigNumber(data as BigNumber, 18),
         };
       },
-    }),
-  ) as Pop.HookResult<BigNumberWithFormatted>;
+    }) as Pop.HookResult<BigNumberWithFormatted>;
 };

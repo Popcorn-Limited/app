@@ -48,17 +48,20 @@ function SweetVault({
   deployer?: string
 }) {
   const { address: account } = useAccount();
-  const baseToken = useBaseVaultInputToken({ vaultAddress, gaugeAddress, chainId, account });
-  const vaultMetadata = useVaultMetadata(vaultAddress, chainId);
+  const baseToken = useBaseVaultInputToken({ vaultAddress: vaultAddress as Address, gaugeAddress: gaugeAddress as Address, chainId, account });
+  const vaultMetadata = useVaultMetadata({ vaultAddress, chainId });
   const asset = baseToken[0];
   const vault = baseToken[1];
   const gauge = gaugeAddress ? baseToken[2] : undefined;
 
-  const [apy, setApy] = useState(0);
+  const [apy, setApy] = useState(undefined);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    resolveAdapterApy({ chainId, address: asset?.address?.toLowerCase(), resolver: vaultMetadata?.metadata?.resolver }).then(res => setApy(res))
-  }, [])
+    if (asset && !apy) {
+      resolveAdapterApy({ chainId, address: asset?.address?.toLowerCase(), resolver: vaultMetadata?.metadata?.resolver }).then(res => setApy(res))
+    }
+  }, [asset, apy])
 
   // Is loading / error
   if (!vaultMetadata || baseToken.length === 0) return <></>
@@ -102,18 +105,15 @@ function SweetVault({
 
         <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
           <p className="font-normal text-primaryLight">vAPY</p>
-          <Title as="td" level={2} fontWeight="font-normal">
-            {formatNumber(apy)}%
+          <Title as="span" level={2} fontWeight="font-normal">
+            {apy ? `${formatNumber(apy)} %` : "New"}
           </Title>
         </div>
 
         <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
           <p className="leading-6 text-primaryLight">TVL</p>
-          <Title as="td" level={2} fontWeight="font-normal" className="text-primary">
-            $ {formatNumber((gaugeAddress ?
-              gauge.balance / (10 ** vault.decimals) :
-              vault.balance / (10 ** vault.decimals))
-              * vault.price)}
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            $ {formatNumber(vault?.supply * vault?.price)}
           </Title>
         </div>
 

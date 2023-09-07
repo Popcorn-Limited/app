@@ -6,6 +6,7 @@ const useAdapterAddress = (address: string, chainId?: any) => {
     address,
     functionName: "adapter",
     chainId,
+    scopeKey: `getAdapter-${address}-${chainId}`
   }) as ReturnType<typeof useContractRead> & { data: string };
 };
 
