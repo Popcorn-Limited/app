@@ -197,7 +197,7 @@ export default function VePOP() {
               </div>
             </div>
             <div className="mt-5 flex flex-row items-center justify-between space-x-8">
-              <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} />
+              <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
               <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
             </div>
           </div>

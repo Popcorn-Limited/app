@@ -90,7 +90,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <div className="flex w-1/4 justify-between">
               <div className="w-1/2">
                 <p className="text-primary text-xl">
-                  {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
+                  {(Number(currentGaugeWeight?.value) / 1e16).toFixed() || 0} %
                 </p>
               </div>
               <div className="w-1/2 mt-2">
@@ -114,18 +114,10 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
           </div>
 
           <div className="flex flex-row items-center justify-between w-full">
-            <div className="w-1/4">
-              <p className="text-primaryLight font-normal text-md">
-                Value
-                <span className={`ml-2 ${isUpwardArrow ? 'text-green-500' : 'text-red-500'}`}>
-                  {isUpwardArrow ? '↑' : '↓'}
-                </span>
-              </p>            </div>
             <div className="w-1/4"></div>
             <div className="w-1/4"></div>
-            <div className="w-1/4">
-              <p className="text-primaryLight font-normal text-md">Value</p>
-            </div>
+            <div className="w-1/4"></div>
+            <div className="w-1/4"></div>
           </div>
 
         </ div>

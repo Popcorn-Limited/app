@@ -18,7 +18,6 @@ function InputTokenWithError({
   captionText,
   getTokenUrl,
   allowInput,
-  inputMoreThanBalance,
   ...props
 }: {
   errorMessage?: string;
@@ -31,7 +30,6 @@ function InputTokenWithError({
   captionText?: string;
   getTokenUrl?: string;
   allowInput?: boolean;
-  inputMoreThanBalance?: boolean;
 } & HTMLProps<HTMLInputElement>) {
 
   return (
@@ -39,7 +37,6 @@ function InputTokenWithError({
       {captionText && (
         <p className="text-primary flex justify-between">
           {captionText}
-          {inputMoreThanBalance ? <span className="text-red-500 ml-2">Input More than Balance</span> : <span></span>}
         </p>
       )}
       <div className="mt-1 relative flex items-center w-full">

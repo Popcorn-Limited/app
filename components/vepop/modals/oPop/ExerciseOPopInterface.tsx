@@ -94,7 +94,6 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           chainId={5}
           value={amount}
           onChange={handleOPopInput}
-          defaultValue={amount}
           allowInput={true}
           selectedToken={
             {
@@ -103,8 +102,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
               balance: oPopBal?.value || constants.Zero,
             } as any
           }
-          errorMessage={""}
-          inputMoreThanBalance={parseFloat(utils.formatEther(oPopBal.value)) < amount}
+          errorMessage={amount > (Number(oPopBal?.value) / 1e18) ? "Insufficient Balance" : ""}
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
@@ -118,17 +116,17 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           chainId={5}
           value={maxPaymentAmount * 1e3} // temp Goerli value
           onChange={handleEthInput}
-          defaultValue={maxPaymentAmount}
           allowInput={true}
           selectedToken={
             {
               ...weth,
+              decimals: 18,
               icon: "https://etherscan.io/token/images/weth_28.png",
-              balance: ethBal?.value || constants.Zero,
+              balance: wethBal?.value || constants.Zero,
             } as any
           }
-          inputMoreThanBalance={parseFloat(utils.formatEther(wethBal.value)) < maxPaymentAmount}
           tokenList={[]}
+          errorMessage={(maxPaymentAmount * 1e3) > (Number(wethBal?.value) / 1e18) ? "Insufficient Balance" : ""}
         />
       </div>
 
