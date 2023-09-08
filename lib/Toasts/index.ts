@@ -12,8 +12,9 @@ export function showSuccessToast(message: string = 'Transaction successful!') {
 
 export function showErrorToast(error: any = 'An error occurred while interacting with the contract.') {
     const errorMessage = extractRevertReason(error);
+    const modifiedError = errorMessage.replace(/.{16}/g, "$&\u200B");
     toast.dismiss();
-    toast.error(errorMessage, errorStyle);
+    toast.error(modifiedError, errorStyle);
 }
 
 function extractRevertReason(error: any): string {

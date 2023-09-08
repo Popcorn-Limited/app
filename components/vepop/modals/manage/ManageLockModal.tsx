@@ -35,7 +35,7 @@ export enum ManagementOption {
 export default function ManageLockModal({ show }: { show: [boolean, Function] }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
-  const { address: account } = useAccount()
+  const { address: account } = useAccount();
 
   const [showModal, setShowModal] = show;
   const [step, setStep] = useState(0);
@@ -46,6 +46,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
 
   const [amount, setAmount] = useState<number>(0);
   const [days, setDays] = useState(7);
+  const isIncreaseLockValid = ((parseInt(lockedBal?.end.toHexString() || '0', 16) - Math.floor(Date.now() / 1000)) / (604800)) < 207
 
   const { waitForTx } = useWaitForTx();
   const { write: increaseLockAmount } = useIncreaseLockAmount(VOTING_ESCROW, amount);
@@ -116,7 +117,12 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
             {step === 1 &&
               <>
                 <IncreaseTimeInterface daysState={[days, setDays]} lockedBal={lockedBal} />
-                <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />
+                {
+                  isIncreaseLockValid
+                    ? <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />
+                    : <SecondaryActionButton label="Already Max Locked" handleClick={() => showErrorToast("You've already locked your stake for the maximum time allowed")}
+                    />
+                }
               </>
             }
             {step === 2 &&

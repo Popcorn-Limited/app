@@ -37,9 +37,9 @@ function InputTokenWithError({
   return (
     <>
       {captionText && (
-        <p className="text-primary">
+        <p className="text-primary flex justify-between">
           {captionText}
-          {inputMoreThanBalance && <span className="text-red-500 ml-2">Input More than Balance</span>}
+          {inputMoreThanBalance ? <span className="text-red-500 ml-2">Input More than Balance</span> : <span></span>}
         </p>
       )}
       <div className="mt-1 relative flex items-center w-full">

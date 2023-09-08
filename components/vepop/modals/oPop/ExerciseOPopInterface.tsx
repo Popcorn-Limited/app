@@ -20,6 +20,7 @@ const {
   POP: POP,
   oPOP: OPOP,
   BalancerOracle: OPOP_ORACLE,
+  WETH: WETH
 } = getVeAddresses();
 
 export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }:
@@ -36,6 +37,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
 
   const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
   const { data: ethBal } = useBalance({ chainId: 5, address: account })
+  const { data: wethBal } = useBalanceOf({ chainId: 5, address: WETH, account })
 
   const { data: oPop } = useToken({ chainId: 5, address: OPOP as Address });
   const { data: pop } = useToken({ chainId: 5, address: POP as Address });
@@ -93,6 +95,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           value={amount}
           onChange={handleOPopInput}
           defaultValue={amount}
+          allowInput={true}
           selectedToken={
             {
               ...oPop,
@@ -101,9 +104,8 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             } as any
           }
           errorMessage={""}
-          inputMoreThanBalance={Number(oPopBal) < amount}
+          inputMoreThanBalance={parseFloat(utils.formatEther(oPopBal.value)) < amount}
           tokenList={[]}
-
         />
         <div className="flex justify-center -mt-2 mb-4">
           <PlusIcon className="w-8 h-8 text-primaryLight" />
@@ -117,6 +119,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           value={maxPaymentAmount * 1e3} // temp Goerli value
           onChange={handleEthInput}
           defaultValue={maxPaymentAmount}
+          allowInput={true}
           selectedToken={
             {
               ...weth,
@@ -124,8 +127,8 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
               balance: ethBal?.value || constants.Zero,
             } as any
           }
+          inputMoreThanBalance={parseFloat(utils.formatEther(wethBal.value)) < maxPaymentAmount}
           tokenList={[]}
-
         />
       </div>
 
