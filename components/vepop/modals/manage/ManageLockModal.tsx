@@ -68,8 +68,6 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     },
   });
 
-  console.log("PING", (parseInt(lockedBal?.end.toHexString() || '0', 16) - Math.floor(Date.now() / 1000)) / (604800))
-
   const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
