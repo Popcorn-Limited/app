@@ -10,6 +10,7 @@ import { BigNumberWithFormatted } from "lib/types";
 import Slider from "rc-slider";
 import { useState } from "react";
 import { getVeAddresses } from "lib/utils/addresses";
+import Title from "components/content/Title";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
@@ -22,9 +23,6 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
   const { data: upcomingGaugeWeight } = useUpcomingGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
 
   const [amount, setAmount] = useState(0);
-
-  const [isUpwardArrow, setIsUpwardArrow] = useState(true);
-
 
   function onChange(value) {
     const currentVoteForThisGauge = votes[index];
@@ -39,8 +37,9 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
   return (
     <Accordion
       header={
-        <div className="w-full">
-          <div className="flex items-center justify-between w-full mb-4">
+        <div className="w-full flex flex-row flex-wrap items-center justify-between">
+
+          <div className="flex items-center justify-between select-none w-full md:w-1/3">
             <AssetWithName
               token={token}
               vault={vaultMetadata}
@@ -48,69 +47,50 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             />
           </div>
 
-
-          <div className="flex flex-row items-center justify-between w-full">
-            <div className="w-1/4">
-              <p className="text-primaryLight font-normal">Total Votes</p>
-            </div>
-            <div className="w-1/4">
-              <p className="text-primaryLight font-normal">Total Bribes</p>
-            </div>
-            <div className="w-1/4">
-              <p className="text-primaryLight font-normal">Bribes/vePOP</p>
-            </div>
-            <div className="flex w-1/4 justify-between">
-              <div className="w-1/2">
-                <p className="text-primaryLight font-normal">My Votes</p>
-              </div>
-              <div className="w-1/2">
-                <p className="text-primaryLight font-normal">My Vote %</p>
-              </div>
-            </div>
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="text-primaryLight font-normal">Current Weight</p>
+            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
+              </Title>
+            </p>
           </div>
 
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="text-primaryLight font-normal">Upcoming Weight</p>
+            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed() || 0} %
+              </Title>
+            </p>
+          </div>
 
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+            <p className="text-primaryLight font-normal">My Votes</p>
+            <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+              <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                {votes[index] / 100 || 0} %
+              </Title>
+            </p>
+          </div>
 
-          <div className="flex flex-row items-center justify-between w-full">
-            <div className="w-1/4">
-              <p className="text-primary text-xl text-start">
-                0
-              </p>
-            </div>
-            <div className="w-1/4">
-              <p className="text-primary text-xl text-start">
-                {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
-              </p>
-            </div>
-            <div className="w-1/4">
-              <p className="text-primary text-xl">
-                {(amount / 100).toFixed(2)}%
-              </p>
-            </div>
-            <div className="flex w-1/4 justify-between">
-              <div className="w-1/2">
-                <p className="text-primary text-xl">
-                  {(Number(currentGaugeWeight?.value) / 1e16).toFixed() || 0} %
-                </p>
-              </div>
-              <div className="w-1/2 mt-2">
-                <Slider
-                  railStyle={{ backgroundColor: '#645F4C', height: 4 }}
-                  trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
-                  handleStyle={{
-                    height: 22,
-                    width: 22,
-                    marginLeft: 0,
-                    marginTop: -9,
-                    borderColor: '#645F4C',
-                    backgroundColor: '#fff',
-                  }}
-                  value={amount}
-                  onChange={(val) => onChange(val)}
-                  max={10000}
-                />
-              </div>
-            </div>
+          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0 h-14">
+            <p className="text-primaryLight font-normal mb-2">Vote</p>
+            <Slider
+              railStyle={{ backgroundColor: '#645F4C', height: 4 }}
+              trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
+              handleStyle={{
+                height: 22,
+                width: 22,
+                marginLeft: 0,
+                marginTop: -9,
+                borderColor: '#645F4C',
+                backgroundColor: '#fff',
+              }}
+              value={amount}
+              onChange={(val) => onChange(val)}
+              max={10000}
+            />
           </div>
 
           <div className="flex flex-row items-center justify-between w-full">
