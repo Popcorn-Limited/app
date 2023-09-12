@@ -11,6 +11,7 @@ const PROTOCOL_ICONS = {
   "Idle": "idle",
   "Aura": "aura",
   "Balancer": "balancer",
+  "Aave": "aave"
 }
 
 export function AssetWithName({ token, vault, chainId }: { token: any; vault: VaultMetadata, chainId: ChainId }) {
