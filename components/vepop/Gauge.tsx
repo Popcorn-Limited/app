@@ -11,16 +11,20 @@ import Slider from "rc-slider";
 import { useState } from "react";
 import { getVeAddresses } from "lib/utils/addresses";
 import Title from "components/content/Title";
+import { Contract } from "ethers";
+import { RPC_PROVIDERS } from "lib/utils";
+import { useAccount } from "wagmi";
+import useGaugeWeights from "lib/Gauges/useGaugeWeights";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
+  const { address: account } = useAccount()
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
   const vaultMetadata = useVaultMetadata(gauge.vault, gauge.chainId);
 
-  const { data: currentGaugeWeight } = useCurrentGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
-  const { data: upcomingGaugeWeight } = useUpcomingGaugeWeight({ address: GAUGE_CONTROLLER, account: gauge.address, chainId: gauge.chainId })
+  const { data: weights } = useGaugeWeights({ address: gauge.address, account: account, chainId: gauge.chainId })
 
   const [amount, setAmount] = useState(0);
 
@@ -39,7 +43,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
       header={
         <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
-          <div className="flex items-center justify-between select-none w-full md:w-1/3">
+          <div className="flex items-center justify-between select-none w-full md:w-3/12">
             <AssetWithName
               token={token}
               vault={vaultMetadata}
@@ -51,7 +55,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <p className="text-primaryLight font-normal">Current Weight</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(currentGaugeWeight?.value) / 1e16).toFixed(2) || 0} %
+                {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
               </Title>
             </p>
           </div>
@@ -60,7 +64,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <p className="text-primaryLight font-normal">Upcoming Weight</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(upcomingGaugeWeight?.value) / 1e16).toFixed() || 0} %
+                {(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %
               </Title>
             </p>
           </div>
@@ -69,28 +73,37 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <p className="text-primaryLight font-normal">My Votes</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {votes[index] / 100 || 0} %
+                {(Number(weights?.[2]) / 1e10).toFixed(2) || 0} %
               </Title>
             </p>
           </div>
 
-          <div className="w-1/2 md:w-2/12 mt-6 md:mt-0 h-14">
+          <div className="w-1/2 md:w-3/12 mt-6 md:mt-0 h-14">
             <p className="text-primaryLight font-normal mb-2">Vote</p>
-            <Slider
-              railStyle={{ backgroundColor: '#645F4C', height: 4 }}
-              trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
-              handleStyle={{
-                height: 22,
-                width: 22,
-                marginLeft: 0,
-                marginTop: -9,
-                borderColor: '#645F4C',
-                backgroundColor: '#fff',
-              }}
-              value={amount}
-              onChange={(val) => onChange(val)}
-              max={10000}
-            />
+            <div className="flex flex-row items-center justify-between">
+              <div className="w-3/12">
+                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+                  {votes[index] / 100 || 0} %
+                </Title>
+              </div>
+              <div className="w-9/12">
+                <Slider
+                  railStyle={{ backgroundColor: '#645F4C', height: 4 }}
+                  trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
+                  handleStyle={{
+                    height: 22,
+                    width: 22,
+                    marginLeft: 0,
+                    marginTop: -9,
+                    borderColor: '#645F4C',
+                    backgroundColor: '#fff',
+                  }}
+                  value={amount}
+                  onChange={(val) => onChange(val)}
+                  max={10000}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-row items-center justify-between w-full">

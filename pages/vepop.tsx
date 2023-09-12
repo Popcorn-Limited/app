@@ -216,7 +216,7 @@ export default function VePOP() {
         </section>
 
         <div className="hidden md:block absolute left-0 bottom-10 w-full ">
-          <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
+          {account && <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
             <p className="mt-1">
               Voting power used: <span className="text-[#05BE64]">
                 {
@@ -234,7 +234,7 @@ export default function VePOP() {
             >
               Submit Votes
             </button>
-          </div>
+          </div>}
         </div>
 
       </div>
