@@ -427,7 +427,7 @@ export default function useVaultMetadata({ vaultAddress, chainId }: { vaultAddre
     }],
   });
   let ipfsMetadata = useGetIpfsMetadata(vaultAddress, adapter, token, data?.metadataCID);
-
+  console.log({ ipfsMetadata })
   return { ...data, metadata: ipfsMetadata } as VaultMetadata;
 }
 
