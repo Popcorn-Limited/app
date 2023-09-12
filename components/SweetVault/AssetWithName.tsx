@@ -4,14 +4,18 @@ import { VaultMetadata } from "lib/Vault/hooks";
 import { ChainId } from "lib/utils";
 
 const PROTOCOL_ICONS = {
-  "Beefy": "beefy",
-  "Yearn": "yearn-finance",
-  "Origin": "origin-defi",
-  "Flux": "flux-finance",
-  "Idle": "idle",
+  "Aave": "aave",
   "Aura": "aura",
   "Balancer": "balancer",
-  "Aave": "aave"
+  "Beefy": "beefy",
+  "Compound":"compound",
+  "Convex":"convex",
+  "Curve":"curve",
+  "Flux": "flux-finance",
+  "Idle": "idle",
+  "Origin": "origin-defi",
+  "Stargate":"stargate",
+  "Yearn": "yearn-finance",
 }
 
 export function AssetWithName({ token, vault, chainId }: { token: any; vault: VaultMetadata, chainId: ChainId }) {
