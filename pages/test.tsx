@@ -26,7 +26,9 @@ async function getGaugeData(_gauge) {
   const tokenless_production = await gaugeContract.tokenless_production();
   const working_supply = await gaugeContract.working_supply();
 
-  return [is_killed, inflation_rate.div(1e18), relative_weight.div(1e18), tokenless_production, working_supply.div(1e18)];
+  console.log(inflation_rate)
+
+  return [is_killed, inflation_rate.div(constants.WeiPerEther), relative_weight.div(constants.WeiPerEther), tokenless_production, working_supply.div(constants.WeiPerEther)];
 }
 
 async function getGaugeControllerData(_gauge) {
@@ -55,7 +57,7 @@ async function calculateAPR(vaultAddress, gaugeAddress) {
     /// @dev the price of oPOP is determined by applying the discount factor to the POP price.
     /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
     /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oPopPriceUSD = popPriceUSD.mul(0.5);
+    const oPopPriceUSD = popPriceUSD.div(2);
 
     if (gauge_exists == true && is_killed == false) {
       const relative_inflation = inflation_rate.mul(relative_weight);
@@ -81,7 +83,7 @@ async function calculateAPR(vaultAddress, gaugeAddress) {
 
 export default function Test() {
 
-
+  calculateAPR("0xf936E7b590851332caf95F6f7f401dE72E89311B", "0x6c70f4328b7a77A644657138438fbD1240A59a30")
   return <>
 
   </>
