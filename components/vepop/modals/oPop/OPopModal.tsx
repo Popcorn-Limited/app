@@ -10,7 +10,7 @@ import { getVeAddresses } from "lib/utils/addresses";
 import { useAllowance } from "lib/Erc20/hooks";
 import { approveBalance } from "hooks/useApproveBalance";
 import { Address } from "wagmi";
-import { utils } from "ethers";
+import { utils, BigNumber } from "ethers";
 
 const { BalancerOracle: OPOP_ORACLE, WETH: WETH, oPOP: OPOP } = getVeAddresses();
 
@@ -43,7 +43,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if (chain.id !== Number(5)) switchNetwork?.(Number(5));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
-    exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), (utils.parseEther(maxPaymentAmount.toFixed(18)).toNumber() * 1e4).toString()); // Temp values for Goerli
+    exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), utils.parseEther(maxPaymentAmount.toFixed(18)).mul(BigNumber.from("10000")).toString());
     setShowModal(false);
   }
 
