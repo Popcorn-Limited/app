@@ -1,19 +1,18 @@
 import { ethers, BigNumber } from 'ethers';
 import { useContractReads } from 'wagmi';
-import { getVeAddresses } from 'lib/utils/addresses';
 import { Pop } from 'lib/types';
 
 const DAYS = 24 * 60 * 60;
 
-export default async function useLastUserVotes({ addresses, chainId, account }: { addresses: string[], chainId: number, account: string }): { data: boolean, status: string } {
+export async function getLastUserVotes({ addresses, chainId, account }: { addresses: string[], chainId: number, account: string }): Promise<{ data: boolean, status: string }> {
     const { data, status } = useContractReads({
-        contracts: Array(addresses).fill(undefined).map((contract) => {
+        contracts: addresses.map((address) => {
             return {
                 address,
                 abi: abiController,
-                functionName: "last_user_votes",
+                functionName: "last_user_vote",
                 chainId: chainId,
-                args: [account, contract]
+                args: [account, address]
             }
         }),
     }) as Pop.HookResult<BigNumber[]>

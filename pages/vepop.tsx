@@ -25,7 +25,7 @@ import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
-import { useLastUserVotes } from "hooks/useLastUserVotes";
+import { getLastUserVotes } from "hooks/useLastUserVotes";
 
 const {
   BalancerPool: POP_LP,
@@ -53,7 +53,6 @@ export default function VePOP() {
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
-  const { data: alreadyVoted } = useLastUserVotes({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
   const [totalVotes, setTotalVotes] = useState(0);
@@ -79,6 +78,7 @@ export default function VePOP() {
   const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
 
   console.log("PING", gauges);
+  console.log("PING0", getLastUserVotes({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account }))
 
   function handleVotes(val: number, index: number) {
     setVotes((prevVotes) => {
