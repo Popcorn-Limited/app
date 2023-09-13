@@ -227,7 +227,6 @@ export default function VePOP() {
               </span>
             </p>
 
-
             <button
               className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
               onClick={sendVotesTx}

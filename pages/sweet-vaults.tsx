@@ -30,12 +30,12 @@ const PopSweetVaults: NextPage = () => {
   const { data: gauges = [] } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
 
   const allVaults = [
-    ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
-    ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
-    ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
-    ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
-    ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
-    ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } }),
+    // ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
+    // ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
+    // ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
+    // ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } }),
+    // ...arbVaults.map(vault => { return { address: vault, chainId: ChainId.Arbitrum } }),
+    // ...bscVaults.map(vault => { return { address: vault, chainId: ChainId.BNB } }),
     ...gauges.map(gauge => { return { address: gauge.vault, chainId: ChainId.Goerli, gauge: gauge.address } })
   ]
 
