@@ -1,14 +1,15 @@
-import { ethers, BigNumber } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useContractReads } from 'wagmi';
 import { Pop } from 'lib/types';
 
 const DAYS = 24 * 60 * 60;
 
-export async function getLastUserVotes({ addresses, chainId, account }: { addresses: string[], chainId: number, account: string }): Promise<{ data: boolean, status: string }> {
+export function useLastUserVotes({ addresses, chainId, account }: { addresses: string[], chainId: number, account: string }): { data: boolean, status: string } {
+    console.log("DING");
     const { data, status } = useContractReads({
         contracts: addresses.map((address) => {
             return {
-                address,
+                address: address,
                 abi: abiController,
                 functionName: "last_user_vote",
                 chainId: chainId,
@@ -17,9 +18,7 @@ export async function getLastUserVotes({ addresses, chainId, account }: { addres
         }),
     }) as Pop.HookResult<BigNumber[]>
 
-    const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_ALCHEMY_API_KEY);
-    const currentBlock = await provider.getBlock('latest');
-    const limitTimestamp = currentBlock.timestamp - (DAYS * 10);
+    const limitTimestamp = Math.floor(Date.now() / 1000) - (DAYS * 10);
 
     const alreadyVoted = data.some(voteTimestamp =>
         voteTimestamp.gt(BigNumber.from(limitTimestamp))
