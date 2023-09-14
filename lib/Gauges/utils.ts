@@ -41,6 +41,11 @@ export function getVotePeriodEndTime(): number {
   return epochEndTime;
 }
 
+export function thisPeriodTimestamp(): number {
+  const week = 604800 * 1000;
+  return (Math.floor(Date.now() / week) * week) / 1000;
+};
+
 export function useCreateLock(address: `0x${string}`, amount: number | string, days: number) {
   const [unlockTime, setUnlockTime] = useState<number>(0);
 

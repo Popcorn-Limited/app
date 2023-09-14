@@ -8,11 +8,11 @@ export function Accordion({ children, header, initiallyOpen = false, containerCl
     setIsOpen(!isOpen);
   };
 
-  return (
+  return (<>
     <div>
       {/* Desktop */}
       <div
-        className={`group px-8 pt-6 pb-5 pl-11 bg-[#FAF9F4] rounded-3xl border border-[#F0EEE0] [&_summary::-webkit-details-marker]:hidden ${containerClassName} hidden md:block`}
+        className={`group px-8 pt-6 pb-5 bg-[#FAF9F4] rounded-3xl border border-[#F0EEE0] [&_summary::-webkit-details-marker]:hidden ${containerClassName} hidden md:block`}
       >
         <div className="flex flex-row items-center justify-between">
           {header}
@@ -31,6 +31,7 @@ export function Accordion({ children, header, initiallyOpen = false, containerCl
         {isOpen && children}
       </div>
     </div >
+  </>
   );
 }
 
