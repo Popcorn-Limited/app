@@ -180,7 +180,7 @@ export const PortfolioPage: NextPage = () => {
         selectedSections={selectedSections}
         networth={networth}
         balance={totalBalance.sweetVaults}
-        title="Sweet Vaults"
+        title="Smart Vaults"
       >
         {allVaults
           .sort((a, b) => sortEntries(a, b, balances.sweetVaults, SortingType.BalDesc))

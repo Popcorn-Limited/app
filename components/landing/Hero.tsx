@@ -4,7 +4,7 @@ import useNetworth from "hooks/useNetworth";
 import Link from "next/link";
 import StatusWithLabel from "components/StatusWithLabel";
 import { useEffect, useState } from "react";
-import SecondaryActionButton from "components/SecondaryActionButton";
+import TertiaryActionButton from "components/TertiaryActionButton";
 
 const formatter: Intl.NumberFormat = Intl.NumberFormat("en", {
   //@ts-ignore
@@ -32,7 +32,7 @@ export default function Hero(): JSX.Element {
         <div className="flex flex-row items-center mb-2 smmd:mb-4">
           <p className="uppercase text-primary text-sm">My Portfolio</p>
           <div className="ml-5">
-            <SecondaryActionButton label="" />
+            <TertiaryActionButton label="" />
           </div>
         </div>
         <div className="flex flex-col smmd:flex-row smmd:items-center justify-between">

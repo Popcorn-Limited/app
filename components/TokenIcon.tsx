@@ -24,6 +24,10 @@ export default function TokenIcon({
     return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
   }
 
+  if (icon) {
+    return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+  }
+
   if (metadata?.data?.icons?.length > 1) {
     return (
       <div className="flex flex-row flex-shrink-0 flex-grow-0">

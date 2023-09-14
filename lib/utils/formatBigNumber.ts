@@ -1,5 +1,5 @@
 import { BigNumber, constants, utils } from "ethers";
-import { parseUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 
 const MILLION = 1e6;
 const THOUSAND = 1e3;
@@ -59,4 +59,9 @@ export function numberToBigNumber(value: number | string, decimals: number): Big
     return BigNumber.from(parseUnits(value, decimals));
   }
   return constants.Zero;
+}
+
+export function safeRound(bn: BigNumber, decimals = 18): number {
+  const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
+  return Number(formatUnits(bn.div(roundingValue).mul(roundingValue), decimals))
 }

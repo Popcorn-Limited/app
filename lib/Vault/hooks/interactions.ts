@@ -8,7 +8,6 @@ const vaultRouterAbi = ["function depositAndStake(address vault, address gauge, 
 
 export async function vaultDeposit(address: `0x${string}`, amount: number | string, connector: any) {
   showLoadingToast("Depositing into the vault...")
-  console.log({ address, amount, connector })
 
   const signer = await connector.getSigner()
 

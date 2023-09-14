@@ -1,18 +1,32 @@
 import type { NextPage } from "next";
-import SweetVaults, { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaults";
 import useNetworkFilter from "hooks/useNetworkFilter";
 import { useAllVaults } from "hooks/vaults";
-import { ChainId } from "lib/utils";
+import { ChainId, SUPPORTED_NETWORKS } from "lib/utils";
 import { HIDDEN_VAULTS } from "pages/sweet-vaults";
 import AllSweetVaultsTVL from "lib/Vault/AllSweetVaultsTVL";
 import AllSweetVaultDeposits from "lib/Vault/AllSweetVautDeposits";
 import { useAccount } from "wagmi";
 import NoSSR from "react-no-ssr";
+import NetworkFilter from "components/NetworkFilter";
+import { getVeAddresses } from "lib/utils/addresses";
+import { useState } from "react";
+import SweetVault from "components/SweetVault";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import Title from "components/content/Title";
 
+const {
+  GaugeController: GAUGE_CONTROLLER,
+  POP: POP,
+  WETH: WETH
+} = getVeAddresses();
 
 const PopSweetVaults: NextPage = () => {
   const { address: account } = useAccount();
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS);
+
+  const [searchString, handleSearch] = useState("");
+  const [selectedTags, setSelectedTags] = useState([])
+
 
   const { data: ethVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined);
   const { data: polyVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Polygon) ? ChainId.Polygon : undefined);
@@ -32,52 +46,99 @@ const PopSweetVaults: NextPage = () => {
 
   return (
     <NoSSR>
-      <section className="md:py-10 md:border-b border-[#EFECDD] md:flex md:flex-row items-center justify-between">
-
-        <div className="bg-[#FA5A6E] rounded-lg h-64 w-full p-6 mb-10 flex md:hidden justify-end items-end ">
-          <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
-            <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#961423" />
-          </svg>
-        </div>
-
-        <div className="">
-          <h1 className="text-5xl md:text-6xl font-normal m-0 leading-[38px] md:leading-11 mb-4 md:mb-8">
-            Experimental Sweet Vaults
+      <section className="lg:py-10 px-8 lg:border-b border-[#F0EEE0] w-full flex flex-row flex-wrap items-center justify-between">
+        <div className="md:w-2/3 mt-10">
+          <h1 className="text-5xl lg:text-6xl font-normal m-0 leading-[44px] lg:leading-12">
+            Smart Vaults
           </h1>
-          <p className="text-base text-primaryDark">
-            Vaults created by Popcorn and the community
+          <p className="text-base text-primaryDark mt-4">
+            Add liquidity into vaults for dive most competitive returns across DeFi.
           </p>
 
           <div className="flex flex-row items-center mt-8">
-            <div className="w-1/2">
+            <div className="w-1/4 mr-6">
               <p className="leading-6 text-base text-primaryDark">TVL</p>
               <div className="text-3xl font-bold whitespace-nowrap">
                 <AllSweetVaultsTVL />
               </div>
             </div>
 
-            <div className="w-1/2">
+            <div className="w-1/4 ml-6">
               <p className="leading-6 text-base text-primaryDark">Deposits</p>
               <div className="text-3xl font-bold whitespace-nowrap">
                 <AllSweetVaultDeposits account={account} />
               </div>
             </div>
           </div>
-
         </div>
 
-        <div className="bg-[#FA5A6E] rounded-lg h-64 w-112 p-6 hidden md:flex justify-end items-end ">
-          <svg xmlns="http://www.w3.org/2000/svg" width="132" height="132" viewBox="0 0 132 132" fill="none">
-            <path d="M99 0C80.7757 0 66 14.7758 66 33C66 14.7758 51.2243 0 33 0C14.7758 0 0 14.7758 0 33V66C0 102.451 29.5487 132 66 132C47.7758 132 33 117.224 33 99H49.5C40.3865 99 33 91.6135 33 82.5C33 73.3865 40.3865 66 49.5 66C58.6135 66 66 73.3865 66 82.5C66 73.3865 73.3865 66 82.5 66C91.6135 66 99 73.3865 99 82.5C99 91.6135 91.6135 99 82.5 99H99C99 117.224 84.2243 132 66 132C102.451 132 132 102.451 132 66V33C132 14.7758 117.224 0 99 0ZM66 82.5C66 91.6135 58.6135 99 49.5 99H82.5C73.3865 99 66 91.6135 66 82.5Z" fill="#961423" />
-          </svg>
+        <div className="w-full md:w-1/3">
+
+          <div className="bg-customLightYellow text-black rounded-md p-4 mb-8">
+            Mint the token needed for testing on Goerli here: <br />
+            <a href={`https://goerli.ediverscan.io/address/${POP}#writeCondivact`} className="text-blue-500" target="_blank" rel="noreferrer">POP</a> <br />
+            <a href={`https://goerli.ediverscan.io/address/${WETH}#writeCondivact`} className="text-blue-500" target="_blank" rel="noreferrer">WETH</a> <br />
+            <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
+          </div>
+
+          <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS} selectNetwork={selectNetwork} />
         </div>
       </section>
 
-      <SweetVaults
-        vaults={allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
-        selectNetwork={selectNetwork}
-        tags={[]}
-      />
+      <section>
+        <div className="w-full flex flex-row items-center px-8 pt-12 pb-4">
+          <div className="w-4/12 -ml-8 xl:pr-16 mr-8">
+            <div className="flex px-5 py-1 items-center rounded-lg border border-customLightGray">
+              <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
+              <input
+                className="w-10/12 focus:outline-none border-0 text-gray-500 leading-none mt-1"
+                type="text"
+                placeholder="Search..."
+                onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+                defaultValue={searchString}
+              />
+            </div>
+          </div>
+          <div className="w-2/12 text-start">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              Your Wallet
+            </Title>
+          </div>
+          <div className="w-2/12 text-start">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              Your Deposit
+            </Title>
+          </div>
+          <div className="w-2/12 text-start">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              TVL
+            </Title>
+          </div>
+          <div className="w-2/12 text-start">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              vAPR
+            </Title>
+          </div>
+          <div className={`hidden sm:block ml-10 h-5 w-5 flex-shrink-0`}></div>
+        </div>
+      </section>
+
+      <div className="space-y-4">
+        {allVaults.filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+          return (
+            <SweetVault
+              key={`sv-${vault.address}-${vault.chainId}`}
+              chainId={vault.chainId}
+              vaultAddress={vault.address}
+              searchString={searchString}
+              selectedTags={[]}
+              gaugeAddress={undefined}
+            />
+          )
+        })}
+      </div>
+
+
     </NoSSR>
   )
 };

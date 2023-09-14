@@ -1,4 +1,4 @@
-import { SearchIcon } from "@heroicons/react/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ChainId } from "lib/utils/connectors";
 import TokenIcon from "components/TokenIcon";
 import { FC, useState } from "react";
@@ -31,7 +31,7 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
     <>
       <div className="relative mb-4">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <SearchIcon className="h-6 w-6 md:h-8 md:w-8 text-gray-400" aria-hidden="true" />
+          <MagnifyingGlassIcon className="h-6 w-6 md:h-8 md:w-8 text-gray-400" aria-hidden="true" />
         </div>
         <input
           type="text"
@@ -44,7 +44,7 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
         />
       </div>
       {options
-        .filter((option) => quickOptionsTokens.find((token) => token == option.address))
+        .filter((option) => quickOptionsTokens.find((token) => token === option.address))
         .map((quickOption) => (
           <div className="inline-flex mr-2 my-3" key={quickOption?.symbol}>
             <button
@@ -71,11 +71,10 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
               }}
             >
               <span
-                className={`flex items-center py-3 px-3 ${
-                  selectedToken.address === option.address
+                className={`flex items-center py-3 px-3 ${selectedToken.address === option.address
                     ? "text-black font-semibold"
                     : "text-primary font-normal  cursor-pointer"
-                }`}
+                  }`}
               >
                 <span className="w-5 h-5 inline-flex mr-3 flex-shrink-0 cursor-pointer">
                   <img src={option.icon} alt={option.symbol} className="h-full w-full object-contain" />

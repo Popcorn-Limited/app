@@ -2,7 +2,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import MainActionButton from "components/MainActionButton";
-import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 
 export interface MultiChoiceActionModalProps {
@@ -126,7 +126,7 @@ export const MultiChoiceActionModal: React.FC<MultiChoiceActionModalProps> = ({
                         )}
                         {onSecondOption && (
                           <div className="mt-6">
-                            <TertiaryActionButton label={onSecondOption.label} handleClick={secondOption} />
+                            <SecondaryActionButton label={onSecondOption.label} handleClick={secondOption} />
                           </div>
                         )}
                         {onDismiss?.label && (
@@ -135,7 +135,7 @@ export const MultiChoiceActionModal: React.FC<MultiChoiceActionModalProps> = ({
                             <div className="flex justify-center vertical-align h-6 my-3 md:my-7">
                               <img src="/images/butter/primary-btn-divider.svg" />
                             </div>
-                            <TertiaryActionButton label={onDismiss.label} handleClick={dismiss} />
+                            <SecondaryActionButton label={onDismiss.label} handleClick={dismiss} />
                           </div>
                         )}
                         {onDontShowAgain && (

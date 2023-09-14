@@ -36,7 +36,12 @@ export const errorStyle: ToastOptions = {
         padding: '16px',
         color: '#D43D44',
         fontSize: '18px',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#FFFFFF',
+        whiteSpace: 'normal',
+        overflowX: 'visible',
+        maxWidth: '70%',
+        wordWrap: 'break-word',
+        overflowWrap: 'break-word',
     },
     iconTheme: {
         primary: '#D43D44',

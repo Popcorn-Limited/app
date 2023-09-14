@@ -1,38 +1,29 @@
-import RightArrowIcon from "components/SVGIcons/RightArrowIcon";
-import React, { useState } from "react";
-
-interface ButtonProps {
+interface SecondaryActionButtonProps {
   label: string;
-  handleClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  handleClick?: any;
   disabled?: boolean;
+  className?: string;
   hidden?: boolean;
 }
-const SecondaryActionButton: React.FC<ButtonProps> = ({ label, handleClick, hidden, disabled = false }) => {
-  const [arrowColor, setArrowColor] = useState("645F4B");
-  const [arrowClass, setArrowClass] = useState("transform translate-x-0");
 
-  const animateArrow = () => {
-    setArrowColor("000000");
-    setArrowClass("transform -translate-x-1/2");
-    setTimeout(() => {
-      setArrowColor("645F4B");
-      setArrowClass("transform translate-x-0");
-    }, 500);
-  };
+const SecondaryActionButton: React.FC<SecondaryActionButtonProps> = ({
+  label,
+  handleClick,
+  disabled = false,
+  className,
+  hidden = false,
+}) => {
   return (
     <button
-      className={`${
+      type="button"
+      className={`${className} px-8 py-3 font-medium text-base transition-all ease-in-out duration-500 w-full flex flex-row items-center justify-center bg-white border border-primary text-primary rounded-4xl hover:bg-primary hover:text-white disabled:bg-white disabled:border-secondaryLight disabled:text-secondaryLight disabled:hover:border-secondaryLight disabled:hover:text-secondaryLight disabled:hover:bg-white ${
         hidden ? "hidden" : ""
-      } w-full flex justify-between items-center text-primary hover:text-black transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
-      onMouseEnter={animateArrow}
+      }`}
       onClick={handleClick}
+      disabled={disabled}
     >
-      <span>{label}</span>
-      <div className={`'absolute right-0 transition-all ease-in-out duration-500 ${arrowClass}`}>
-        <RightArrowIcon color={arrowColor} />
-      </div>
+      {label}
     </button>
   );
 };
-
 export default SecondaryActionButton;
