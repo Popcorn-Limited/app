@@ -16,7 +16,7 @@ export function Accordion({ children, header, initiallyOpen = false, containerCl
       >
         <div className="flex flex-row items-center justify-between">
           {header}
-          <ChevronDownIcon className={`hidden sm:block text-secondaryLight ml-10 h-5 w-5 flex-shrink-0 transition duration-300 ${isOpen ? 'rotate-180 transform' : ''}`}
+          <ChevronDownIcon className={`hidden sm:block text-secondaryLight ml-10 h-5 w-5 cursor-pointer flex-shrink-0 transition duration-300 ${isOpen ? 'rotate-180 transform' : ''}`}
             onClick={handleToggle} />
         </div>
         {isOpen && children}

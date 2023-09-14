@@ -64,20 +64,22 @@ function SweetVault({
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (<Accordion
     header={
-      <div className="w-full flex flex-row items-center">
+      <div className="w-full flex flex-wrap md:items-center cursor-pointer md:cursor-default">
 
-        <div className="w-4/12">
+        <div className="md:w-4/12 mb-8 md:mb-0">
           <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
         </div>
 
-        <div className="w-2/12">
+        <div className="w-1/2 md:w-2/12 mb-4 md:mb-0">
+          <p className="md:hidden leading-6 text-primaryLight">Wallet</p>
           <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
             {formatAndRoundNumber(asset?.balance, asset?.decimals)}
           </Title>
           <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
         </div>
 
-        <div className="w-2/12">
+        <div className="w-1/2 md:w-2/12 mb-4 md:mb-0">
+          <p className="md:hidden leading-6 text-primaryLight">Deposited</p>
           <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
             {account ? (gaugeAddress ?
               formatAndRoundNumber(gauge.balance, vault.decimals) :
@@ -87,13 +89,15 @@ function SweetVault({
           <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
         </div>
 
-        <div className="w-2/12">
+        <div className="w-1/2 md:w-2/12">
+          <p className="md:hidden leading-6 text-primaryLight">TVL</p>
           <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
             $ {formatNumber(vault?.supply * vault?.price)}
           </Title>
         </div>
 
-        <div className="w-2/12 flex flex-col">
+        <div className="w-1/2 md:w-2/12 flex flex-col">
+          <p className="md:hidden leading-6 text-primaryLight">vAPR</p>
           <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
             {apy ? `${formatNumber(apy)} %` : "New"}
           </Title>
