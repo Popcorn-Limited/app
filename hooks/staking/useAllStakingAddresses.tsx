@@ -23,11 +23,11 @@ export default function useAllStakingAddresses(): StakingAddressWithMetadata[] {
 
   //Optimism
   const [optimismPopStaking] = useNamedAccounts("10", ["popStaking"]);
-
+  
   return [
-    { chainId: ChainId.Ethereum, stakingType: StakingType.PopLocker, address: ethereumPopStaking?.address },
-    { chainId: ChainId.Polygon, stakingType: StakingType.PopLocker, address: polygonPopStaking?.address },
-    { chainId: ChainId.Optimism, stakingType: StakingType.PopLocker, address: optimismPopStaking?.address },
+    { chainId: ChainId.Ethereum, stakingType: StakingType.PopLocker, address: "0xeEE1d31297B042820349B03027aB3b13a9406184" },
+    { chainId: ChainId.Polygon, stakingType: StakingType.PopLocker, address: "0xe8af04AD759Ad790Aa5592f587D3cFB3ecC6A9dA" },
+    { chainId: ChainId.Optimism, stakingType: StakingType.PopLocker, address: "0x3Fcc4eA703054453D8697b58C5CB2585F8883C05" },
     ...(ethereumStakingAddresses?.length ? ethereumStakingAddresses : []).map(
       (staking) => ({ chainId: ChainId.Ethereum, stakingType: StakingType.StakingPool, address: staking?.address } || {}),
     ),

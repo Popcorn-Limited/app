@@ -1,90 +1,46 @@
-import { BigNumber, Contract, constants, ethers } from "ethers"
-import { parseUnits } from "ethers/lib/utils.js"
-import useOPopDiscount from "lib/OPop/useOPopDiscount"
-import useOPopPrice from "lib/OPop/useOPopPrice"
-import { RPC_PROVIDERS } from "lib/utils"
-import { getVeAddresses } from "lib/utils/addresses"
-import GaugeControllerAbi from "lib/utils/constants/abi/GaugeController"
-import LiquidityGaugeAbi from "lib/utils/constants/abi/LiquidityGauge"
-import { useState } from "react"
+import { useContractReads } from "wagmi"
+import NoSSR from "react-no-ssr"
+import axios from "axios";
+import Cors from 'cors'
 
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses()
+function Fetcher() {
 
-const thisPeriodTimestamp = () => {
-  const week = 604800 * 1000;
-  return (Math.floor(Date.now() / week) * week) / 1000;
-};
 
-const provider = RPC_PROVIDERS[5];
-
-async function getGaugeData(_gauge) {
-  const gaugeContract = new Contract(_gauge, LiquidityGaugeAbi, provider);
-
-  const is_killed = await gaugeContract.is_killed();
-  const inflation_rate = await gaugeContract.inflation_rate();
-  const relative_weight = await gaugeContract.getCappedRelativeWeight(thisPeriodTimestamp());
-  const tokenless_production = await gaugeContract.tokenless_production();
-  const working_supply = await gaugeContract.working_supply();
-
-  console.log(inflation_rate)
-
-  return [is_killed, inflation_rate.div(constants.WeiPerEther), relative_weight.div(constants.WeiPerEther), tokenless_production, working_supply.div(constants.WeiPerEther)];
+  return <></>
 }
 
-async function getGaugeControllerData(_gauge) {
-  const gaugeControllerContract = new Contract(GAUGE_CONTROLLER, GaugeControllerAbi, provider);
+import { NextApiRequest, NextApiResponse } from "next";
 
-  const gauge_exists = await gaugeControllerContract.gauge_exists(_gauge);
-
-  return [gauge_exists];
-}
-
-async function calculateAPR(vaultAddress, gaugeAddress) {
-  /// fetch the price of token0, token1 and LIT in USD
-  const popPriceUSD = parseUnits("1") // TODO fetch pop price
-
-  /// calculate the price of the vaultToken in USD
-  const vaultTokenPriceUSD = parseUnits("1") // TODO calculate PPS * price
-
-  /// calculate the lowerAPR and upperAPR
-  let lowerAPR = constants.Zero;
-  let upperAPR = constants.Zero;
-
-  if (gaugeAddress) {
-    const [is_killed, inflation_rate, relative_weight, tokenless_production, working_supply] = await getGaugeData(gaugeAddress);
-    const [gauge_exists] = await getGaugeControllerData(gaugeAddress);
-
-    /// @dev the price of oPOP is determined by applying the discount factor to the POP price.
-    /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
-    /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oPopPriceUSD = popPriceUSD.div(2);
-
-    if (gauge_exists == true && is_killed == false) {
-      const relative_inflation = inflation_rate.mul(relative_weight);
-      if (relative_inflation.gt(0)) {
-        const annualRewardUSD = relative_inflation.mul(86400).mul(365).mul(oPopPriceUSD);
-        const effectiveSupply = working_supply.gt(0) ? working_supply : parseUnits("1");
-        const workingSupplyUSD = effectiveSupply.mul(vaultTokenPriceUSD);
-
-        lowerAPR = annualRewardUSD.mul(tokenless_production).div(100).div(workingSupplyUSD).mul(100);
-        upperAPR = annualRewardUSD.div(workingSupplyUSD).mul(100);
-      }
-    }
-  } else {
-    console.log('~~~~~ No Gauge Found ~~~~~');
-    return;
-  }
-
-  console.log(`lowerAPR: ${Number(lowerAPR).toFixed(2)}%`);
-  console.log(`upperAPR: ${Number(upperAPR).toFixed(2)}%`);
-
-  return [lowerAPR, upperAPR];
-}
 
 export default function Test() {
+  const { data, isError, isLoading } = useContractReads({
+    contracts: [
+      {
+        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
+        abi: vaultABI,
+        functionName: 'totalAssets',
+        chainId: 1
+      },
+      {
+        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
+        abi: vaultABI,
+        functionName: 'totalSupply',
+        chainId: 1
+      },
+    ],
+  })
 
-  calculateAPR("0xf936E7b590851332caf95F6f7f401dE72E89311B", "0x6c70f4328b7a77A644657138438fbD1240A59a30")
-  return <>
-
-  </>
+  return (
+    <NoSSR>
+      <div>
+        <h1>Test</h1>
+        <Fetcher />
+      </div>
+    </NoSSR>
+  )
 }
+
+const vaultABI = [
+  { "inputs": [], "name": "totalAssets", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "totalSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+] as const 

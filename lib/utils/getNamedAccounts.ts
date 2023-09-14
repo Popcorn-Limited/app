@@ -1,4 +1,5 @@
 import deployments from "lib/deployments/deployments.json";
+import { supportedChainIds } from "./connectors";
 
 export type Deployments = typeof deployments;
 
@@ -24,7 +25,7 @@ export const getNamedAccounts = <Chain extends DeploymentChainIds>(
   chainId: Chain,
   contractAddresses?: Array<DeploymentContractsKeys<Chain>> | undefined[],
 ): GetNamedAccountsResponse => {
-  if (Number(chainId) === 0) {
+  if (!supportedChainIds.includes(chainId as any)) {
     return Object.keys(deployments).map((chainId) =>
       Object.keys(deployments[chainId].contracts).flat().map((contract) => map(chainId, contract)),
     ).flat();

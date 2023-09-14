@@ -7,15 +7,15 @@ const vaultRouterAbi = ["function depositAndStake(address vault, address gauge, 
 
 
 export async function vaultDeposit(address: `0x${string}`, amount: number | string, connector: any) {
-  showLoadingToast("Vault Deposit Loading...")
+  showLoadingToast("Depositing into the vault...")
 
   const signer = await connector.getSigner()
 
-  const router = new Contract(address, vaultAbi, signer)
+  const vault = new Contract(address, vaultAbi, signer)
   try {
-    const tx = await router.deposit(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
+    const tx = await vault.deposit(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
     await tx.wait(1)
-    showSuccessToast("Vault Deposit Success!")
+    showSuccessToast("Deposited into the vault!")
   } catch (error) {
     showErrorToast(error)
   }
@@ -23,23 +23,23 @@ export async function vaultDeposit(address: `0x${string}`, amount: number | stri
 
 
 export async function vaultRedeem(address: `0x${string}`, amount: number | string, connector: any) {
-  showLoadingToast("Vault Redeem Loading...")
+  showLoadingToast("Withdrawing from the vault...")
   const signer = await connector.getSigner()
 
-  const router = new Contract(address, vaultAbi, signer)
+  const vault = new Contract(address, vaultAbi, signer)
   try {
 
-    const tx = await router.redeem(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
+    const tx = await vault.redeem(Number(amount).toLocaleString("fullwide", { useGrouping: false }))
     await tx.wait(1)
-    showSuccessToast("Vault Redeem Success!")
+    showSuccessToast("Withdrawn from the vault!")
   } catch (error) {
     showErrorToast(error)
   }
 }
 
 export async function vaultDepositAndStake(address: `0x${string}`, vault: string, gauge: string, amount: number | string, connector: any) {
-  showLoadingToast("Vault Deposit Loading...")
-  
+  showLoadingToast("Depositing into the vault...")
+
   const account = await connector.getAccount()
   const signer = await connector.getSigner()
 
@@ -47,14 +47,14 @@ export async function vaultDepositAndStake(address: `0x${string}`, vault: string
   try {
     const tx = await router.depositAndStake(vault, gauge, Number(amount).toLocaleString("fullwide", { useGrouping: false }), account)
     await tx.wait(1)
-    showSuccessToast("Vault Deposit Success!")
+    showSuccessToast("Deposited into the vault!")
   } catch (error) {
     showErrorToast(error)
   }
 }
 
 export async function vaultUnstakeAndWithdraw(address: `0x${string}`, vault: string, gauge: string, amount: number | string, connector: any) {
-  showLoadingToast("Vault Redeem Loading...")
+  showLoadingToast("Withdrawing from the vault...")
 
   const account = await connector.getAccount()
   const signer = await connector.getSigner()
@@ -63,7 +63,7 @@ export async function vaultUnstakeAndWithdraw(address: `0x${string}`, vault: str
   try {
     const tx = await router.unstakeAndWithdraw(vault, gauge, Number(amount).toLocaleString("fullwide", { useGrouping: false }), account)
     await tx.wait(1)
-    showSuccessToast("Vault Redeem Success!")
+    showSuccessToast("Withdrawn from the vault!")
   } catch (error) {
     showErrorToast(error)
   }

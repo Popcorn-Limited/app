@@ -17,8 +17,10 @@ module.exports = {
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     IPFS_URL: process.env.IPFS_URL,
+    DUNE_API_KEY: process.env.DUNE_API_KEY,
     NEXT_PUBLIC_ENABLE_TESTNETS: process.env.ENABLE_TESTNETS,
-    NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
+    NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+    NEXT_PUBLIC_ZERION_KEY: process.env.ZERION_KEY,
   },
   images: {
     domains: ["rawcdn.githack.com"],
@@ -53,6 +55,13 @@ module.exports = {
       {
         source: "/polygon",
         destination: `/`,
+        permanent: true,
+      },
+      {
+        source:
+          "/api.zerion.io/v1/fungibles/0x1e19cf2d73a72ef1332c882f20534b6519be0276",
+        destination:
+          "https://api.zerion.io/v1/fungibles/0x1e19cf2d73a72ef1332c882f20534b6519be0276/?currency=usd",
         permanent: true,
       },
     ];

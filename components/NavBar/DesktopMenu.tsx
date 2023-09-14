@@ -115,13 +115,13 @@ export default function DesktopMenu(): JSX.Element {
               leaveTo="-translate-x-full"
             >
               <div className="h-full w-full flex flex-col justify-between pt-12 px-8 shadow-xl bg-warmGray overflow-y-scroll">
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col w-full space-y-4">
                   <div className="mb-18">
                     <Link href={`/`} passHref>
                       <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10" />
                     </Link>
                   </div>
-                  <div className={`mb-4`}>
+                  <div className={``}>
                     <NavbarLink label="My Portfolio" url="/portfolio" isActive={router.pathname === "/portfolio"} onClick={() => toggleMenu(false)} />
                   </div>
                   <li className="relative flex flex-container flex-row z-10 mb-4">
@@ -174,6 +174,9 @@ export default function DesktopMenu(): JSX.Element {
                   </div>
                   <div className="">
                     <NavbarLink label="Rewards" url={`/rewards`} isActive={router?.pathname.includes("/rewards")} onClick={() => toggleMenu(false)} />
+                  </div>
+                  <div className="">
+                    <NavbarLink label="Stats" url={`/stats`} isActive={router?.pathname.includes("/stats")} onClick={() => toggleMenu(false)} />
                   </div>
                 </div>
                 <div>

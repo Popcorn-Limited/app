@@ -17,7 +17,7 @@ function Title({
 }>) {
   const Wrapper = ComponentWraper as any;
   const headingCx = level === 1 ? "text-3xl md:text-4xl" : " text-xl";
-  return <Wrapper className={`${headingCx} ${fontWeight} ${className}`}>{children}</Wrapper>;
+  return <span className={`${headingCx} ${fontWeight} ${className}`}>{children}</span>;
 }
 
 export default Title;

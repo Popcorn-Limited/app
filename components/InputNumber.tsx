@@ -4,7 +4,6 @@ function InputNumber(props: HTMLProps<HTMLInputElement>) {
   return (
     <input
       {...props}
-      defaultValue={props.value}
       className="block w-full p-0 border-0 text-primaryDark text-lg bg-inherit"
       inputMode="decimal"
       autoComplete="off"

@@ -27,7 +27,6 @@ export const useTvl: Pop.Hook<BigNumberWithFormatted> = ({ chainId, address, res
     resolver: _priceResolver,
     enabled: _enabled,
   });
-
   const { data: primaryBalance, status: primaryBalanceStatus } = useTotalSupply({
     address,
     chainId,

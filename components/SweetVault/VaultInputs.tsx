@@ -2,14 +2,14 @@ import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "components/InputTokenWithError";
 import MainActionButton from "components/MainActionButton";
 import TabSelector from "components/TabSelector";
-import { Contract } from "ethers";
+import { Contract, constants } from "ethers";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "lib/Toasts";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "lib/Vault/hooks/interactions";
 import { RPC_PROVIDERS } from "lib/utils";
-import { getVeAddresses } from "lib/utils/addresses";
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { Address, useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
-const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
+const { VaultRouter: VAULT_ROUTER } = { VaultRouter: constants.AddressZero as Address }
 
 async function handleAllowance(token: any, connector: any, spender: string, inputAmount: number): Promise<boolean> {
   const tokenContract = new Contract(
@@ -23,12 +23,18 @@ async function handleAllowance(token: any, connector: any, spender: string, inpu
   );
   const account = await connector.getAccount()
   const allowance = await tokenContract.allowance(account, spender)
-
+  
   if (Number(allowance) === 0 || Number(allowance) < inputAmount) {
+    showLoadingToast("Approving assets for deposit...")
     const signer = await connector.getSigner()
 
-    const tx = await tokenContract.connect(signer).approve(spender, "115792089237316195423570985008687907853269984665640")
-    await tx.wait(1)
+    try {
+      const tx = await tokenContract.connect(signer).approve(spender, "115792089237316195423570985008687907853269984665640")
+      await tx.wait(1)
+      showSuccessToast("Approved assets for deposit!")
+    } catch (error) {
+      showErrorToast(error)
+    }
   }
   return true
 }
