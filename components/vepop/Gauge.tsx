@@ -18,7 +18,7 @@ import useGaugeWeights from "lib/Gauges/useGaugeWeights";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
-export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted }): JSX.Element {
+export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted, canVote: boolean }): JSX.Element {
   const { address: account } = useAccount()
   const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
   const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
@@ -82,24 +82,24 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal }: { gau
             <p className="text-primaryLight font-normal mb-2">Vote</p>
             <div className="flex flex-row items-center justify-between">
               <div className="w-3/12">
-                <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                  {(votes[index] / 100).toFixed() || 0} %
+                <Title level={2} fontWeight="font-normal" as="span" className={`mr-1 ${canVote ? "text-primary" : "text-secondaryLight"}`}>
+                  {/votes[index] / 100).toFixed() || 0} %
                 </Title>
               </div>
               <div className="w-9/12">
                 <Slider
-                  railStyle={{ backgroundColor: '#645F4C', height: 4 }}
-                  trackStyle={{ backgroundColor: '#645F4C', height: 4 }}
+                  railStyle={{ backgroundColor: canVote ? '#645F4C' : "#AFAFAF", height: 4 }}
+                  trackStyle={{ backgroundColor: canVote ? '#645F4C' : "#AFAFAF", height: 4 }}
                   handleStyle={{
                     height: 22,
                     width: 22,
                     marginLeft: 0,
                     marginTop: -9,
-                    borderColor: '#645F4C',
+                    borderColor: canVote ? '#645F4C' : "#AFAFAF",
                     backgroundColor: '#fff',
                   }}
                   value={amount}
-                  onChange={(val) => onChange(val)}
+                  onChange={canVote ? (val) => onChange(val) : () => { }}
                   max={10000}
                 />
               </div>

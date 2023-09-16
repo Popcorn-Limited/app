@@ -25,6 +25,7 @@ import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
+import { useHasAlreadyVoted } from "lib/Gauges/useHasAlreadyVoted";
 
 const {
   BalancerPool: POP_LP,
@@ -55,6 +56,8 @@ export default function VePOP() {
 
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
   const [totalVotes, setTotalVotes] = useState(0);
+  const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
+  const canVote = account && Number(veBal?.value) > 0 && !hasAlreadyVoted
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
@@ -122,121 +125,124 @@ export default function VePOP() {
 
     }
   }
-
   return (
     <NoSSR>
-      <LockModal show={[showLockModal, setShowLockModal]} />
-      <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
-      <OPopModal show={[showOPopModal, setShowOPopModal]} />
-      <div>
-        <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
-          <div className="lg:w-[1050px]">
-            <h1 className="banner-text">
-              Lock <span className="banner-highlight-text">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
-            </h1>
-            <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
-              Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
-            </p>
-            <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
-              Mint the token needed for testing on Goerli here: <br />
-              <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">POP </a> <br />
-              <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">WETH</a> <br />
-              <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-10 lg:flex lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
-          <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
-            <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
-            <span className="flex flex-row items-center justify-between mt-6">
-              <p className="">My POP LP</p>
-              <p className="font-bold">{popLpBal?.formatted}</p>
-            </span>
-            <span className="flex flex-row items-center justify-between">
-              <p className="">My Locked POP LP</p>
-              <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}</p>
-            </span>
-            <span className="flex flex-row items-center justify-between">
-              <p className="">Locked Until</p>
-              <p className="font-bold">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
-            </span>
-            <span className="flex flex-row items-center justify-between">
-              <p className="">My vePOP</p>
-              <p className="font-bold">{veBal?.formatted}</p>
-            </span>
-            <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
-              <p className="">Voting period ends</p>
-              <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
-            </span>
-            <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-              <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
-              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
-            </div>
-          </div>
-
-          <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
-            <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
-            <span className="flex flex-row items-center justify-between mt-6">
-              <p className="">APR</p>
-              <p className="font-bold">? %</p>
-            </span>
-            <span className="flex flex-row items-center justify-between">
-              <p className="">Claimable oPOP</p>
-              <p className="font-bold">{(Number(gaugeRewards?.total) / 1e18).toFixed(2)}</p>
-            </span>
-            <div className="h-8"></div>
-            <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
-              <p className="">My oPOP</p>
-              <div>
-                <p className="font-bold text-end flex items-center justify-end">
-                  {(Number(oPopBal?.value) / 1e18).toFixed(2)}
-                  <WalletIcon className="ml-2 w-5 h-5" />
+      {(!votes || votes.length === 0) ? <></>
+        : <>
+          <LockModal show={[showLockModal, setShowLockModal]} />
+          <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
+          <OPopModal show={[showOPopModal, setShowOPopModal]} />
+          <div>
+            <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
+              <div className="lg:w-[1050px]">
+                <h1 className="banner-text">
+                  Lock <span className="banner-highlight-text">20WETH-80POP</span> for vePOP, Rewards, and Voting Power
+                </h1>
+                <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
+                  Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
                 </p>
-                <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
+                <div className="bg-customLightYellow text-black rounded-md w-1/2 p-4">
+                  Mint the token needed for testing on Goerli here: <br />
+                  <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">POP </a> <br />
+                  <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">WETH</a> <br />
+                  <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
+                </div>
               </div>
+            </section>
+
+            <section className="py-10 lg:flex lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
+              <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+                <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
+                <span className="flex flex-row items-center justify-between mt-6">
+                  <p className="">My POP LP</p>
+                  <p className="font-bold">{popLpBal?.formatted}</p>
+                </span>
+                <span className="flex flex-row items-center justify-between">
+                  <p className="">My Locked POP LP</p>
+                  <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}</p>
+                </span>
+                <span className="flex flex-row items-center justify-between">
+                  <p className="">Locked Until</p>
+                  <p className="font-bold">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
+                </span>
+                <span className="flex flex-row items-center justify-between">
+                  <p className="">My vePOP</p>
+                  <p className="font-bold">{veBal?.formatted}</p>
+                </span>
+                <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
+                  <p className="">Voting period ends</p>
+                  <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
+                </span>
+                <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
+                  <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
+                  <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+                <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
+                <span className="flex flex-row items-center justify-between mt-6">
+                  <p className="">APR</p>
+                  <p className="font-bold">? %</p>
+                </span>
+                <span className="flex flex-row items-center justify-between">
+                  <p className="">Claimable oPOP</p>
+                  <p className="font-bold">{(Number(gaugeRewards?.total) / 1e18).toFixed(2)}</p>
+                </span>
+                <div className="h-8"></div>
+                <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
+                  <p className="">My oPOP</p>
+                  <div>
+                    <p className="font-bold text-end flex items-center justify-end">
+                      {(Number(oPopBal?.value) / 1e18).toFixed(2)}
+                      <WalletIcon className="ml-2 w-5 h-5" />
+                    </p>
+                    <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-row items-center justify-between space-x-8">
+                  <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
+                  <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
+                </div>
+              </div>
+            </section>
+
+            <section className="hidden md:block space-y-4">
+              {gauges?.length > 0 ? gauges.map((gauge, index) =>
+                <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} canVote={canVote} />
+              )
+                : <p>Loading Gauges...</p>
+              }
+            </section>
+
+            <section className="md:hidden">
+              <p className="text-primary">Gauge Voting not available on mobile.</p>
+            </section>
+
+            <div className="hidden md:block absolute left-0 bottom-10 w-full ">
+              {canVote && <>
+                <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
+                  <p className="mt-1">
+                    Voting power used: <span className="text-[#05BE64]">
+                      {
+                        veBal && veBal.value
+                          ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
+                          : "0"
+                      }%
+                    </span>
+                  </p>
+                  <button
+                    className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
+                    onClick={sendVotesTx}
+                  >
+                    Submit Votes
+                  </button>
+                </div>
+              </>}
             </div>
-            <div className="mt-5 flex flex-row items-center justify-between space-x-8">
-              <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
-              <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
-            </div>
+
           </div>
-        </section>
-
-        <section className="hidden md:block space-y-4">
-          {gauges?.length > 0 ? gauges.map((gauge, index) =>
-            <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} />
-          )
-            : <p>Loading Gauges...</p>
-          }
-        </section>
-
-        <section className="md:hidden">
-          <p className="text-primary">Gauge Voting not available on mobile.</p>
-        </section>
-
-        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
-          {account && <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
-            <p className="mt-1">
-              Voting power used: <span className="text-[#05BE64]">
-                {
-                  veBal && veBal.value
-                    ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
-                    : "0"
-                }%
-              </span>
-            </p>
-
-            <button
-              className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
-              onClick={sendVotesTx}
-            >
-              Submit Votes
-            </button>
-          </div>}
-        </div>
-
-      </div>
+        </>}
     </NoSSR >
   )
 }
