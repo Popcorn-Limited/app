@@ -1,39 +1,46 @@
-import { Contract } from "ethers"
-import useOPopDiscount from "lib/OPop/useOPopDiscount"
-import useOPopPrice from "lib/OPop/useOPopPrice"
-import { RPC_PROVIDERS } from "lib/utils"
-import { useState } from "react"
-import { getSupportedTokens } from "wido"
-import NoSSR from "react-no-ssr";
-import axios from "axios"
+import { useContractReads } from "wagmi"
+import NoSSR from "react-no-ssr"
+import axios from "axios";
+import Cors from 'cors'
 
-function DynamicImage() {
-  const [image, setImage] = useState<string>("")
+function Fetcher() {
 
-  try {
-    fetch("https://etherscan.io/token/0xd0cd466b34a24fcb2f87676278af2005ca8a78c4")
-      .then(res => res.text())
-      .then(res => {
-        const i = res.indexOf("js-token-avatar rounded-circle")
-        const roughItem = res.slice(i - 100, i)
-        const j = roughItem.indexOf('src="')
-        const n = roughItem.indexOf('width="32"')
-        console.log(`https://etherscan.io/${roughItem.slice(j + 5, n - 2)}`)
-        setImage(`https://etherscan.io/${roughItem.slice(j + 5, n - 2)}`)
-      })
-  } catch (e) { console.log(e) }
-  console.log(image)
-  return <img src={image} className="w-8 h-8" />
+
+  return <></>
 }
+
+import { NextApiRequest, NextApiResponse } from "next";
+
 
 export default function Test() {
-  axios.get('https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', {
-    headers: {
-      'X-CMC_PRO_API_KEY': 'b54bcf4d-1bca-4e8e-9a24-22ff2c3d462c',
-    },
-  }).then(res => console.log(res))
+  const { data, isError, isLoading } = useContractReads({
+    contracts: [
+      {
+        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
+        abi: vaultABI,
+        functionName: 'totalAssets',
+        chainId: 1
+      },
+      {
+        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
+        abi: vaultABI,
+        functionName: 'totalSupply',
+        chainId: 1
+      },
+    ],
+  })
 
-  return <>
-
-  </>
+  return (
+    <NoSSR>
+      <div>
+        <h1>Test</h1>
+        <Fetcher />
+      </div>
+    </NoSSR>
+  )
 }
+
+const vaultABI = [
+  { "inputs": [], "name": "totalAssets", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "totalSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+] as const 

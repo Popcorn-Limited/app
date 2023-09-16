@@ -2,7 +2,7 @@ import { ChainId } from "lib/utils/connectors";
 import { useContractMetadata } from "lib/Contract";
 
 interface TokenIconProps {
-  token: string;
+  token: any;
   icon?: string;
   fullsize?: boolean;
   imageSize?: string;
@@ -10,13 +10,19 @@ interface TokenIconProps {
 }
 
 export default function TokenIcon({
-  token: address,
+  token,
   icon,
   fullsize = false,
   imageSize,
   chainId,
 }: TokenIconProps): JSX.Element {
-  const metadata = useContractMetadata({ address, chainId });
+  const metadata = useContractMetadata({ address: token?.address, chainId });
+
+
+  icon = token?.icon || icon
+  if (icon) {
+    return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />
+  }
 
   if (icon) {
     return <img src={icon} alt="token icon" className={imageSize ? imageSize : "w-6 md:w-10 h-6 md:h-10"} />

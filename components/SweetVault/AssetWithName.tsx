@@ -4,13 +4,18 @@ import { VaultMetadata } from "lib/Vault/hooks";
 import { ChainId } from "lib/utils";
 
 const PROTOCOL_ICONS = {
-  "Beefy": "beefy",
-  "Yearn": "yearn-finance",
-  "Origin": "origin-defi",
-  "Flux": "flux-finance",
-  "Idle": "idle",
+  "Aave": "aave",
   "Aura": "aura",
   "Balancer": "balancer",
+  "Beefy": "beefy",
+  "Compound":"compound",
+  "Convex":"convex",
+  "Curve":"curve",
+  "Flux": "flux-finance",
+  "Idle": "idle",
+  "Origin": "origin-defi",
+  "Stargate":"stargate",
+  "Yearn": "yearn-finance",
 }
 
 export function AssetWithName({ token, vault, chainId }: { token: any; vault: VaultMetadata, chainId: ChainId }) {
@@ -18,7 +23,7 @@ export function AssetWithName({ token, vault, chainId }: { token: any; vault: Va
   return <div className="flex items-center gap-4">
     <div className="relative">
       <NetworkSticker chainId={chainId} />
-      <TokenIcon token={token?.address} icon={token?.icon} chainId={chainId} imageSize="w-8 h-8" />
+      <TokenIcon token={token} icon={token?.icon} chainId={chainId} imageSize="w-8 h-8" />
     </div>
     <h2 className="text-gray-900 text-2xl font-bold mt-1">
       {vault?.metadata?.name || vault?.metadata?.token?.name || token?.name}

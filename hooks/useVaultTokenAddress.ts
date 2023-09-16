@@ -6,6 +6,7 @@ const useVaultTokenAddress = (address: string, chainId?: any) => {
     address,
     functionName: "asset",
     chainId,
+    scopeKey: `getAsset-${address}-${chainId}`
   }) as ReturnType<typeof useContractRead> & { data: string };
 };
 

@@ -40,22 +40,27 @@ const StakingTermsAndConditions = ({
             Accept reward terms and conditions:
           </p>
           <ol className="space-y-4">
-            {showLockTerms && (
-              <>
-                <li className={` leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
-                  Your staked tokens will be locked for a period of 12 weeks. You will be unable to access your tokens
-                  during this period.
-                </li>
-                <li className={` leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
-                  Your staked tokens must be re-staked or withdrawn after the 3-month lock time expires or they will be
-                  subjected to a penalty of 1% per epoch that they are not re-staked.
-                </li>
-              </>
-            )}
-            <li className={` leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
-              After rewards are earned and claimed, 10% is immediately transferred, and the rest of the earned amount is
-              unlocked linearly over the following 365 day period.
+            <li className={`leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
+              IMPORTANT UPDATE: As we prepare for the launch of POP 2.0, we will be reducing POP staking rewards to zero. Please do not stake or restake your POP until we announce our new staking contracts. For users who staked recently, rewards will be calculated and airdropped accordingly on September 30th.
             </li>
+            {/*<>
+              {showLockTerms && (
+                <>
+                  <li className={`leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
+                    Your staked tokens will be locked for a period of 12 weeks. You will be unable to access your tokens
+                    during this period.
+                  </li>
+                  <li className={` leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
+                    Your staked tokens must be re-staked or withdrawn after the 3-month lock time expires or they will be
+                    subjected to a penalty of 1% per epoch that they are not re-staked.
+                  </li>
+                </>
+              )}
+              <li className={` leading-6 ${isDisabled ? "text-customLightGray" : "text-primaryDark"}`}>
+                After rewards are earned and claimed, 10% is immediately transferred, and the rest of the earned amount is
+                unlocked linearly over the following 365 day period.
+              </li>
+              </>*/}
           </ol>
         </div>
       </div>

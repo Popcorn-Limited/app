@@ -100,9 +100,8 @@ export const MobileMenu: React.FC = () => {
             >
               <img src={logo} alt={""} className="w-3 h-3 object-contain" />
               <span
-                className={`${
-                  address ? "border-green-400 bg-green-400" : "bg-white border-gray-300"
-                } block h-2 w-2 rounded-full border`}
+                className={`${address ? "border-green-400 bg-green-400" : "bg-white border-gray-300"
+                  } block h-2 w-2 rounded-full border`}
               ></span>
             </div>
           </div>
@@ -113,21 +112,18 @@ export const MobileMenu: React.FC = () => {
             <div className="block w-10">
               <span
                 aria-hidden="true"
-                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2.5"
-                }`}
+                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "rotate-45 translate-y-1" : "-translate-y-2.5"
+                  }`}
               />
               <span
                 aria-hidden="true"
-                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "opacity-0" : "opacity-100"
-                }`}
+                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "opacity-0" : "opacity-100"
+                  }`}
               />
               <span
                 aria-hidden="true"
-                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${
-                  menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2.5"
-                }`}
+                className={`block h-1 w-10 bg-black transform transition duration-500 ease-in-out rounded-3xl ${menuVisible ? "-rotate-45 -translate-y-1" : "translate-y-2.5"
+                  }`}
               />
             </div>
           </button>
@@ -149,15 +145,13 @@ export const MobileMenu: React.FC = () => {
               >
                 <div className="w-screen">
                   <div className="h-full w-full flex flex-col justify-between pt-18 px-6 shadow-xl bg-white overflow-y-scroll">
-                    <div className="flex flex-col w-full">
-                      <div className="py-6">
-                        <NavbarLink
-                          label="Popcorn"
-                          url="/"
-                          isActive={router?.pathname === `/`}
-                          onClick={() => toggleMenu(false)}
-                        />
-                      </div>
+                    <div className="flex flex-col w-full space-y-6">
+                      <NavbarLink
+                        label="Popcorn"
+                        url="/"
+                        isActive={router?.pathname === `/`}
+                        onClick={() => toggleMenu(false)}
+                      />
                       <div className={`py-6`}>
                         <NavbarLink
                           label="Portfolio"
@@ -194,6 +188,12 @@ export const MobileMenu: React.FC = () => {
                           onClick={() => toggleMenu(false)}
                         />
                       </div>
+                      <NavbarLink
+                        label="Stats"
+                        url={`/stats`}
+                        isActive={router?.pathname.includes("/stats")}
+                        onClick={() => toggleMenu(false)}
+                      />
                     </div>
                     <div>
                       <div className="grid grid-cols-12 mt-12">

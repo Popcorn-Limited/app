@@ -55,7 +55,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <p className="text-primaryLight font-normal">Current Weight</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(weights?.[0]) / 1e16).toFixed(2) || 0} %
+                {(Number(weights?.[0]) / 1e16).toFixed() || 0} %
               </Title>
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <p className="text-primaryLight font-normal">Upcoming Weight</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(weights?.[1]) / 1e16).toFixed(2) || 0} %
+                {(Number(weights?.[1]) / 1e16).toFixed() || 0} %
               </Title>
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <p className="text-primaryLight font-normal">My Votes</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(weights?.[2]) / 1e10).toFixed(2) || 0} %
+                {(Number(weights?.[2]) / 1e10).toFixed() || 0} %
               </Title>
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <div className="flex flex-row items-center justify-between">
               <div className="w-3/12">
                 <Title level={2} fontWeight="font-normal" as="span" className={`mr-1 ${canVote ? "text-primary" : "text-secondaryLight"}`}>
-                  {votes[index] / 100 || 0} %
+                  {/votes[index] / 100).toFixed() || 0} %
                 </Title>
               </div>
               <div className="w-9/12">
