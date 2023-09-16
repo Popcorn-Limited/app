@@ -42,10 +42,6 @@ const ProtocolMetadata: { [key: string]: { name: string, description: string } }
     description: `Idle is a decentralized yield automation protocol that aims to step up DeFi by reimagining how risk and yield are managed. This vault is connected to **[Yield Tranches](https://docs.idle.finance/products/yield-tranches) (YTs)**: an innovative DeFi primitive that segments yields and risks to appeal to a diverse range of users, offering two risk-return profiles, Senior and Junior. **Senior YTs withhold part of their yield in exchange for funds coverage**, given by the Junior class’ liquidity. This way, **Senior holders benefit from built-in protection on deposits**. That yield is routed to the Junior side in exchange for first-loss liquidity to cover Senior funds.
     ---
     All Idle strategies feature **automatically compounded interest** and **no lock-up periods**.`
-  },
-  popcorn:{
-    name: "Popcorn",
-    description: "Popcorn is a decentralized protocol that allows users to earn yield on their Assets."
   }
 }
 

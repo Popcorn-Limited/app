@@ -1,4 +1,4 @@
-import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export const ConnectWallet = ({ hidden }: { hidden?: boolean }) => {
@@ -14,10 +14,10 @@ export const ConnectWallet = ({ hidden }: { hidden?: boolean }) => {
       <p className="text-gray-900 text-3xl leading-8 hidden md:block">Connect your wallet</p>
       <div className="border md:border-0 md:border-t border-customLightGray rounded-lg md:rounded-none px-6 md:px-0  py-6 md:py-2 md:mt-4">
         <div className="hidden md:block">
-          <TertiaryActionButton label="Connect" />
+          <SecondaryActionButton label="Connect" />
         </div>
         <div className="md:hidden">
-          <TertiaryActionButton label="Connect Wallet" />
+          <SecondaryActionButton label="Connect Wallet" />
         </div>
       </div>
     </div>

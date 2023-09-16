@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/outline";
 import { ChainId } from "lib/utils/connectors";
 import PopUpModal from "components/Modal/PopUpModal";
 import SingleActionModal from "components/Modal/SingleActionModal";
@@ -37,7 +37,7 @@ export default function SelectToken({
 
   return (
     <>
-      <div className="relative w-52 justify-end">
+      <div className="relative w-auto justify-end">
         <span
           className={`flex flex-row items-center justify-end ${allowSelection ? "cursor-pointer group" : ""}`}
           onClick={() => {

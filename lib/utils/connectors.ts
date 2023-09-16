@@ -79,6 +79,7 @@ export const networkMap = {
   [ChainId.Mumbai]: "polygon_mumbai",
   [ChainId.Polygon]: "Polygon",
   [ChainId.Hardhat]: "Hardhat",
+  [ChainId.Localhost]: "Localhost",
   [ChainId.RemoteFork]: "RemoteFork",
   [ChainId.Optimism]: "Optimism",
   [ChainId.BNB]: "Bsc",
@@ -93,6 +94,7 @@ export const networkLogos = {
   [ChainId.Polygon]: "/images/icons/polygon.svg",
   [ChainId.Arbitrum]: "/images/icons/arbitrum.svg",
   [ChainId.Localhost]: "/images/icons/testNetLogo.png",
+  [ChainId.Hardhat]: "/images/icons/testNetLogo.png",
   [ChainId.RemoteFork]: "/images/icons/testNetLogo.png",
   [ChainId.Optimism]: "/images/icons/optimism-op-logo.svg",
   [ChainId.Fantom]: "/images/icons/fantom.png",
@@ -107,6 +109,7 @@ export const RPC_URLS = {
   [ChainId.BNB]: `https://bsc-dataseed1.binance.org`,
   [ChainId.Fantom]: `https://rpc.fantom.network`,
   [ChainId.Localhost]: `http://localhost:8545`,
+  [ChainId.Hardhat]: `http://localhost:8545`,
   [ChainId.RemoteFork]: `http://localhost:8545`,
 };
 export const RPC_PROVIDERS = {
@@ -117,19 +120,8 @@ export const RPC_PROVIDERS = {
   [ChainId.Mumbai]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Mumbai], ChainId.Mumbai),
   [ChainId.BNB]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.BNB], ChainId.BNB),
   [ChainId.Localhost]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Localhost], ChainId.Localhost),
+  [ChainId.Hardhat]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Hardhat], ChainId.Hardhat),
   [ChainId.RemoteFork]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.RemoteFork], ChainId.RemoteFork),
   [ChainId.Optimism]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Optimism], ChainId.Optimism),
   [ChainId.Fantom]: new ethers.providers.JsonRpcProvider(RPC_URLS[ChainId.Fantom], ChainId.Fantom),
 };
-
-
-export const SUPPORTED_NETWORKS = [
-  ChainId.ALL,
-  ChainId.Ethereum,
-  ChainId.Polygon,
-  ChainId.Optimism,
-  ChainId.Arbitrum,
-  // ChainId.BNB,
-  // ChainId.Fantom,
-  ChainId.Goerli
-]

@@ -1,19 +1,36 @@
-import { useEffect, useState } from "react";
-import { Address, useAccount } from "wagmi";
+import { Fragment, useEffect, useState } from "react";
+import { Address, useAccount, useNetwork, useSwitchNetwork, useToken } from "wagmi";
+import { Contract, constants } from "ethers";
 
-import { ChainId } from "lib/utils";
+import { BalanceOf } from "lib/Erc20";
+import useVaultToken from "hooks/useVaultToken";
+
+import { ChainId, formatAndRoundBigNumber } from "lib/utils";
 import Title from "components/content/Title";
+import { Apy } from "lib/Staking";
 import MarkdownRenderer from "./MarkdownRenderer";
 import Accordion from "../Accordion";
 import TokenIcon from "components/TokenIcon";
 import { formatAndRoundNumber, formatNumber } from "lib/utils/formatBigNumber";
 import useVaultMetadata, { VaultTag } from "lib/Vault/hooks/useVaultMetadata";
 
+import { InfoIconWithTooltip } from "components/InfoIconWithTooltip";
 import { useBaseVaultInputToken } from "lib/Vault/hooks/utils";
 import { AssetWithName } from "./AssetWithName";
 import VaultInputs from "./VaultInputs";
 import { resolveAdapterApy } from "lib/utils/resolvers/adapterApy/adapterApy";
-import calculateAPR from "lib/Gauges/calculateGaugeAPR";
+
+const HUNDRED = constants.Zero.add(100);
+
+const VAULT_APY_RESOLVER = {
+  "Beefy": "beefy",
+  "Yearn": "yearnAsset",
+  "Origin": "ousd",
+  "Flux": "llama",
+  "Idle": "idle",
+  "Aura": "aura",
+  "Balancer": "balancer",
+}
 
 function SweetVault({
   vaultAddress,
@@ -45,14 +62,6 @@ function SweetVault({
     }
   }, [asset, apy])
 
-  const [gaugeApr, setGaugeApr] = useState([]);
-
-  useEffect(() => {
-    if (vault?.price && gaugeApr.length === 0) {
-      calculateAPR(vault?.price, gaugeAddress).then(res => setGaugeApr(res))
-    }
-  }, [vault, gaugeApr])
-
   // Is loading / error
   if (!vaultMetadata || baseToken.length === 0) return <></>
   // Vault is not in search term
@@ -64,44 +73,47 @@ function SweetVault({
   if (selectedTags.length > 0 && !vaultMetadata?.metadata?.tags?.some((tag) => selectedTags.includes(VaultTag[tag]))) return <></>
   return (<Accordion
     header={
-      <div className="w-full flex flex-wrap md:items-center cursor-pointer md:cursor-default">
+      <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
-        <div className="md:w-4/12 mb-8 md:mb-0">
+        <div className="flex items-center justify-between select-none w-full md:w-1/3">
           <AssetWithName token={asset} vault={vaultMetadata} chainId={chainId} />
         </div>
 
-        <div className="w-1/2 md:w-2/12 mb-4 md:mb-0">
-          <p className="md:hidden leading-6 text-primaryLight">Wallet</p>
-          <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-            {formatAndRoundNumber(asset?.balance, asset?.decimals)}
-          </Title>
-          <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="text-primaryLight font-normal">Your Wallet</p>
+          <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {formatAndRoundNumber(asset?.balance, asset?.decimals)}
+            </Title>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
+          </p>
         </div>
 
-        <div className="w-1/2 md:w-2/12 mb-4 md:mb-0">
-          <p className="md:hidden leading-6 text-primaryLight">Deposited</p>
-          <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-            {account ? (gaugeAddress ?
-              formatAndRoundNumber(gauge.balance, vault.decimals) :
-              formatAndRoundNumber(vault.balance, vault.decimals)
-            ) : "0"}
-          </Title>
-          <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="text-primaryLight font-normal">Your Deposit</p>
+          <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
+            <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+              {account ? (gaugeAddress ?
+                formatAndRoundNumber(gauge.balance, vault.decimals) :
+                formatAndRoundNumber(vault.balance, vault.decimals)
+              ) : "-"}
+            </Title>
+            <span className="text-secondaryLight text-base inline">{asset?.symbol?.slice(0, 12)}</span>
+          </div>
         </div>
 
-        <div className="w-1/2 md:w-2/12">
-          <p className="md:hidden leading-6 text-primaryLight">TVL</p>
-          <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-            $ {formatNumber(vault?.supply * vault?.price)}
-          </Title>
-        </div>
-
-        <div className="w-1/2 md:w-2/12 flex flex-col">
-          <p className="md:hidden leading-6 text-primaryLight">vAPR</p>
-          <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
+        <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
+          <p className="font-normal text-primaryLight">vAPY</p>
+          <Title as="span" level={2} fontWeight="font-normal">
             {apy ? `${formatNumber(apy)} %` : "New"}
           </Title>
-          {gaugeApr.length > 0 && <span className="text-secondaryLight text-base inline">{`+ (${formatNumber(gaugeApr[0])} % - ${formatNumber(gaugeApr[1])} %)`}</span>}
+        </div>
+
+        <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
+          <p className="leading-6 text-primaryLight">TVL</p>
+          <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
+            $ {formatNumber(vault?.supply * vault?.price)}
+          </Title>
         </div>
 
       </div>

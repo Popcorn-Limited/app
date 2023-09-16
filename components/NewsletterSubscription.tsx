@@ -1,4 +1,4 @@
-import SecondaryButton from "components/TertiaryActionButton";
+import SecondaryButton from "components/SecondaryActionButton";
 import useSubscribeToNewsletter from "hooks/useSubscribeToNewsletter";
 import React, { useState } from "react";
 

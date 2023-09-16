@@ -1,5 +1,6 @@
 import { useAllVaults } from "hooks/vaults"
-import { ChainId, SUPPORTED_NETWORKS } from "lib/utils"
+import { ChainId } from "lib/utils"
+import { SUPPORTED_NETWORKS } from "components/SweetVault/SweetVaults"
 
 export const useAllSweetVaults = () => {
   const { data: ethVaults = [] } = useAllVaults(

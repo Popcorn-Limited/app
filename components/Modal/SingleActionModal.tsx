@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import MainActionButton from "components/MainActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
+import TertiaryActionButton from "components/TertiaryActionButton";
 import Image from "next/image";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 
@@ -135,7 +135,7 @@ export const SingleActionModal: React.FC<SingleActionModalProps> = ({
                       )}
                       {onDismiss?.label && (
                         <>
-                          <SecondaryActionButton label={onDismiss.label} handleClick={dismiss} />
+                          <TertiaryActionButton label={onDismiss.label} handleClick={dismiss} />
                         </>
                       )}
                     </div>

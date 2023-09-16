@@ -8,7 +8,7 @@ import RedditIcon from "components/SVGIcons/RedditIcon";
 import TelegramIcon from "components/SVGIcons/TelegramIcon";
 import TwitterIcon from "components/SVGIcons/TwitterIcon";
 import YoutubeIcon from "components/SVGIcons/YoutubeIcon";
-import SecondaryActionButton from "components/SecondaryActionButton";
+import TertiaryActionButton from "components/TertiaryActionButton";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useMemo, useState } from "react";
@@ -152,48 +152,29 @@ export const MobileMenu: React.FC = () => {
                         isActive={router?.pathname === `/`}
                         onClick={() => toggleMenu(false)}
                       />
-                      <div className={`py-6`}>
-                        <NavbarLink
-                          label="Portfolio"
-                          url="/portfolio"
-                          isActive={router.pathname === "/portfolio"}
-                          onClick={() => toggleMenu(false)}
-                        />
-                      </div>
-                      <div className="py-6">
-                        {products.length < 2 ? (
-                          <NavbarLink
-                            label={products[0].title}
-                            isActive={false}
-                            url={products[0].url}
-                            onClick={() => closePopUp()}
-                          />
-                        ) : (
-                          <NavbarLink label="Products" isActive={false} onClick={() => toggleProductsMenu(true)} />
-                        )}
-                      </div>
-                      <div className="py-6">
-                        <NavbarLink
-                          label="VePOP"
-                          url={`/vepop`}
-                          isActive={router?.pathname.includes("/vepop")}
-                          onClick={() => toggleMenu(false)}
-                        />
-                      </div>
-                      <div className="py-6">
-                        <NavbarLink
-                          label="Rewards"
-                          url={`/rewards`}
-                          isActive={router?.pathname.includes("/rewards")}
-                          onClick={() => toggleMenu(false)}
-                        />
-                      </div>
                       <NavbarLink
-                        label="Stats"
-                        url={`/stats`}
-                        isActive={router?.pathname.includes("/stats")}
+                        label="Portfolio"
+                        url="/portfolio"
+                        isActive={router.pathname === "/portfolio"}
                         onClick={() => toggleMenu(false)}
                       />
+                      {products.length < 2 ? (
+                        <NavbarLink
+                          label={products[0].title}
+                          isActive={false}
+                          url={products[0].url}
+                          onClick={() => closePopUp()}
+                        />
+                      ) : (
+                        <NavbarLink label="Products" isActive={false} onClick={() => toggleProductsMenu(true)} />
+                      )}
+                      <NavbarLink
+                        label="Rewards"
+                        url={`/rewards`}
+                        isActive={router?.pathname.includes("/rewards")}
+                        onClick={() => toggleMenu(false)}
+                      />
+                      <NavbarLink label="Stats" url={`/stats`} isActive={router?.pathname.includes("/stats")} onClick={() => toggleMenu(false)} />
                     </div>
                     <div>
                       <div className="grid grid-cols-12 mt-12">
@@ -258,7 +239,7 @@ export const MobileMenu: React.FC = () => {
         <div>
           <p className="text-black mb-3">Connect to Wallet</p>
           <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={!!address} />
-          <SecondaryActionButton label="Disconnect" handleClick={disconnect} hidden={!address} />
+          <TertiaryActionButton label="Disconnect" handleClick={disconnect} hidden={!address} />
           <hr className="my-6" />
           <p className="text-black mb-3">Select Network</p>
           <div
