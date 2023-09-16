@@ -40,7 +40,7 @@ function Deposit({
         chainId={chainId}
         action={(balance) => {
           return {
-            label: "Deposit & Stake",
+            label: "Deposit",
             abi: ["function depositAndStake(address vault, uint256 assetAmount, address receiver) external", "function deposit(uint256 assetAmount) external"],
             functionName: usesStaking ? "depositAndStake" : "deposit",
             successMessage: "Deposit successful!",

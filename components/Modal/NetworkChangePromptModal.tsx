@@ -2,7 +2,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import MainActionButton from "components/MainActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
+import TertiaryActionButton from "components/TertiaryActionButton";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 
 export interface NetworkChangePromptModalProps {
@@ -130,12 +130,12 @@ export const NetworkChangePromptModal: React.FC<NetworkChangePromptModalProps> =
                       )}
                       {onChangeUrl && (
                         <div className="w-full">
-                          <SecondaryActionButton label={onChangeUrl.label} handleClick={changeUrl} />
+                          <TertiaryActionButton label={onChangeUrl.label} handleClick={changeUrl} />
                         </div>
                       )}
                       {onDisconnect && (
                         <div className="w-full mt-4">
-                          <SecondaryActionButton label={onDisconnect.label} handleClick={disconnect} />
+                          <TertiaryActionButton label={onDisconnect.label} handleClick={disconnect} />
                         </div>
                       )}
                     </div>

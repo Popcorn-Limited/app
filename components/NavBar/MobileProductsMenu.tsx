@@ -1,4 +1,4 @@
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import React from "react";
 import NavbarLink from "components/NavBar/NavbarLinks";

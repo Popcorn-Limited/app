@@ -40,10 +40,14 @@ const Footer = () => {
   return (
     <footer className="grid grid-cols-12 smmd:gap-14 pb-10 mt-20 font-landing px-6 md:px-8">
       <div className="col-span-12 lg:col-span-3 order-1 smmd:order-1">
+        <div className="bg-customYellow rounded-lg py-3 text-center font-medium text-black">
+          Subscribe to our newsletter
+        </div>
+        <NewsletterSubscription title="Sign up" buttonLabel="Submit" />
       </div>
       <div className="col-span-12 smmd:col-span-6 flex flex-col justify-between order-3 smmd:order-2 mt-12 smmd:mt-0">
         <p className=" text-primaryDark leading-6 order-2 smmd:order-1 mt-8 smmd:mt-0">
-          Popcorn is a DeFi yield-optimizing protocol with customizable asset strategies that instantly zap your crypto from any chain into the highest yield-generating products across DeFi in 1 click.
+          Popcorn is an audited, non-custodial DeFi wealth manager with yield-generating products that simultaneously fund nonprofits and social impact organizations.
         </p>
         <div className="flex justify-between smmd:justify-start smmd:gap-7 order-1 smmd:order-2">
           <a
@@ -53,15 +57,13 @@ const Footer = () => {
           >
             <TwitterIcon color={twitterColor} size={iconSize} />
           </a>
-          <a
-            href="https://discord.gg/vSccCMaVZn"
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* <a
+            href="https://discord.gg/w9zeRTSZsq"
             onMouseEnter={() => onHoverIcon(setDiscordColor)}
             onMouseLeave={() => onLeaveIcon(setDiscordColor)}
           >
             <DiscordIcon color={discordColor} size={iconSize} />
-          </a>
+          </a> */}
           <a
             href="https://t.me/popcorndaochat"
             onMouseEnter={() => onHoverIcon(setTelegramColor)}
@@ -101,35 +103,21 @@ const Footer = () => {
               Popcorn
             </Link>
             <Link
-              href="https://github.com/Popcorn-Limited/app/issues/docs.pop.network"
+              href="/docs/Popcorn_whitepaper_v1.pdf"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
-              Docs
+              Whitepaper
             </Link>
             <Link
-              href="https://docs.pop.network/security/audits"
+              href="https://popcorn-dao.gitbook.io/popcorndao-gitbook/about-popcorn/welcome-to-popcorn"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
-              Audits
+              Gitbook
             </Link>
             <Link
-              href="https://immunefi.com/bounty/popcorn/"
-              target="_blank"
-              className=" text-primary hover:text-black leading-6 mt-4"
-            >
-              Bug Bounty
-            </Link>
-            <Link
-              href="https://github.com/Popcorn-Limited"
-              target="_blank"
-              className=" text-primary hover:text-black leading-6 mt-4"
-            >
-              Github
-            </Link>
-            <Link
-              href="https://app.pop.network/disclaimer"
+              href="/disclaimer"
               target="_blank"
               className=" text-primary hover:text-black leading-6 mt-4"
             >
@@ -148,21 +136,6 @@ const Footer = () => {
               className=" text-primary hover:text-black leading-6 mt-4"
             >
               Immunefi
-            </Link>
-            <Link
-              href="app.vaultcraft.io"
-              passHref
-              target="_blank"
-              className=" text-primary hover:text-black leading-6 mt-4"
-            >
-              VaultCraft Interface
-            </Link>
-            <Link
-              href="https://docs.pop.network/products/vaultcraft/vaultcraft-sdk"
-              target="_blank"
-              className=" text-primary hover:text-black leading-6 mt-4"
-            >
-              VaultCraft SDK
             </Link>
           </div>
         </div>

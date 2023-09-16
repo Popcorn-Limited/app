@@ -169,9 +169,6 @@ export default function DesktopMenu(): JSX.Element {
                       </Menu.Button>
                     </Menu>
                   </li>
-                  <div className="mb-4">
-                    <NavbarLink label="VePOP" url={`/vepop`} isActive={router?.pathname.includes("/vepop")} onClick={() => toggleMenu(false)} />
-                  </div>
                   <div className="">
                     <NavbarLink label="Rewards" url={`/rewards`} isActive={router?.pathname.includes("/rewards")} onClick={() => toggleMenu(false)} />
                   </div>

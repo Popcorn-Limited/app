@@ -12,9 +12,13 @@ import { useContractMetadata } from "lib/Contract";
 import useMainAction from "./internals/useMainAction";
 import MainActionButton from "components/MainActionButton";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
-import { ChainId, safeRound, useConsistentRepolling } from "lib/utils";
+import { ChainId, useConsistentRepolling } from "lib/utils";
 import { useSpendableBalance } from "lib/POP";
 
+const safeRound = (bn: BigNumber, decimals = 18) => {
+  const roundingValue = parseUnits("1", decimals > 8 ? 8 : 2)
+  return Number(formatUnits(bn.div(roundingValue).mul(roundingValue), decimals))
+}
 
 function AssetInputWithAction({
   assetAddress,

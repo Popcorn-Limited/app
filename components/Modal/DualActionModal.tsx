@@ -1,5 +1,5 @@
 import MainActionButton from "components/MainActionButton";
-import TertiaryActionButton from "components/TertiaryActionButton";
+import SecondaryActionButton from "components/SecondaryActionButton";
 import React, { useEffect, useRef, useState } from "react";
 
 export interface DualActionModalProps {
@@ -70,7 +70,7 @@ export const DualActionModal: React.FC<DualActionModalProps> = ({ title, content
           <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
             {onConfirm && <MainActionButton label={onConfirm.label} handleClick={() => confirm()}></MainActionButton>}
             {onDismiss && (
-              <TertiaryActionButton label={onDismiss.label} handleClick={() => dismiss()}></TertiaryActionButton>
+              <SecondaryActionButton label={onDismiss.label} handleClick={() => dismiss()}></SecondaryActionButton>
             )}
           </div>
         </div>
