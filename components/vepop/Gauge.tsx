@@ -20,9 +20,9 @@ const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted, canVote: boolean }): JSX.Element {
   const { address: account } = useAccount()
-  const { data: token } = useVaultToken(gauge.vault, gauge.chainId);
-  const { data: adapter } = useAdapterToken(gauge.vault, gauge.chainId);
-  const vaultMetadata = useVaultMetadata(gauge.vault, gauge.chainId);
+  const { data: token } = useVaultToken({ vaultAddress: gauge.vault, chainId: gauge.chainId });
+  const { data: adapter } = useAdapterToken({ vaultAddress: gauge.vault, chainId: gauge.chainId });
+  const vaultMetadata = useVaultMetadata({ vaultAddress: gauge.vault, chainId: gauge.chainId });
 
   const { data: weights } = useGaugeWeights({ address: gauge.address, account: account, chainId: gauge.chainId })
 
