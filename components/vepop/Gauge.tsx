@@ -40,7 +40,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
 
   return (
     <Accordion
-      header={
+      header={<>
         <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
           <div className="flex items-center justify-between select-none w-full md:w-3/12">
@@ -83,7 +83,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <div className="flex flex-row items-center justify-between">
               <div className="w-3/12">
                 <Title level={2} fontWeight="font-normal" as="span" className={`mr-1 ${canVote ? "text-primary" : "text-secondaryLight"}`}>
-                  {/votes[index] / 100).toFixed() || 0} %
+                  {(votes[index] / 100).toFixed() || 0} %
                 </Title>
               </div>
               <div className="w-9/12">
@@ -114,7 +114,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
           </div>
 
         </ div>
-      }
+      </>}
     >
       {/* Accordion Content */}
       <div className="lg:flex lg:flex-row lg:space-x-8 space-y-4 lg:space-y-0 mt-8">
