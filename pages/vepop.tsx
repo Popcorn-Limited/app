@@ -54,14 +54,19 @@ export default function VePOP() {
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
-  const [votes, setVotes] = useState(gauges?.map(gauge => 0));
-  const [totalVotes, setTotalVotes] = useState(0);
+  const [votes, setVotes] = useState([]);
   const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
   const canVote = account && Number(veBal?.value) > 0 && !hasAlreadyVoted
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
   const [showOPopModal, setShowOPopModal] = useState(false);
+
+  useEffect(() => {
+    if (gauges?.length > 0, votes?.length === 0) {
+      setVotes(new Array(gauges.length).fill(0));
+    }
+  }, [gauges, votes])
 
   function votingPeriodEnd(): number[] {
     const periodEnd = getVotePeriodEndTime();
@@ -84,9 +89,8 @@ export default function VePOP() {
       const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
 
       if (updatedTotalVotes <= 10000) {
+        // TODO should we adjust the val to the max possible value if it exceeds 10000?
         updatedVotes[index] = val;
-        setTotalVotes(updatedTotalVotes);
-        return updatedVotes;
       }
 
       return prevVotes;
@@ -122,9 +126,9 @@ export default function VePOP() {
         .catch(error => {
           showErrorToast(error);
         });
-
     }
   }
+
   return (
     <NoSSR>
       {(!votes || votes.length === 0) ? <></>
@@ -155,11 +159,11 @@ export default function VePOP() {
                 <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
                 <span className="flex flex-row items-center justify-between mt-6">
                   <p className="">My POP LP</p>
-                  <p className="font-bold">{popLpBal?.formatted}</p>
+                  <p className="font-bold">{popLpBal?.formatted || "0"}</p>
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">My Locked POP LP</p>
-                  <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : ""}</p>
+                  <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : "0"}</p>
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">Locked Until</p>
@@ -167,7 +171,7 @@ export default function VePOP() {
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">My vePOP</p>
-                  <p className="font-bold">{veBal?.formatted}</p>
+                  <p className="font-bold">{veBal?.formatted || "0"}</p>
                 </span>
                 <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
                   <p className="">Voting period ends</p>
@@ -187,17 +191,21 @@ export default function VePOP() {
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">Claimable oPOP</p>
-                  <p className="font-bold">{(Number(gaugeRewards?.total) / 1e18).toFixed(2)}</p>
+                  <p className="font-bold">{gaugeRewards?.total ? (Number(gaugeRewards?.total) / 1e18).toFixed(2) : "0"}</p>
                 </span>
                 <div className="h-8"></div>
                 <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
                   <p className="">My oPOP</p>
                   <div>
                     <p className="font-bold text-end flex items-center justify-end">
-                      {(Number(oPopBal?.value) / 1e18).toFixed(2)}
+                      {oPopBal?.value ? (Number(oPopBal?.value) / 1e18).toFixed(2) : "0"}
                       <WalletIcon className="ml-2 w-5 h-5" />
                     </p>
-                    <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
+                    <p className="">
+                      ($ {oPopPrice?.value && oPopBal?.value ?
+                        formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)) :
+                        "0"})
+                    </p>
                   </div>
                 </div>
                 <div className="mt-5 flex flex-row items-center justify-between space-x-8">
