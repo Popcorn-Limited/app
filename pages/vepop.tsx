@@ -146,8 +146,8 @@ export default function VePOP() {
           </div>
         </section>
 
-        <section className="py-10 lg:flex lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
-          <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
+        <section className="py-10 lg:flex lg:flex-row lg:items-stretch lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
+          <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary flex flex-col">
             <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
             <span className="flex flex-row items-center justify-between mt-6">
               <p className="">My POP LP</p>
@@ -169,39 +169,51 @@ export default function VePOP() {
               <p className="">Voting period ends</p>
               <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
             </span>
-            <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
+            <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 flex-grow">
               <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
               <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
             </div>
           </div>
 
-          <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
-            <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
-            <span className="flex flex-row items-center justify-between mt-6">
+          <div className="lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-6 text-primary flex flex-col">
+            <h3 className="text-2xl pb-4 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
+            <span className="flex flex-row items-center justify-between mt-2">
               <p className="">APR</p>
               <p className="font-bold">? %</p>
             </span>
-            <span className="flex flex-row items-center justify-between">
+            <span className="flex flex-row items-center justify-between mt-4">
               <p className="">Claimable oPOP</p>
               <p className="font-bold">{(Number(gaugeRewards?.total) / 1e18).toFixed(2)}</p>
             </span>
-            <div className="h-8"></div>
-            <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
+            <div className="h-4"></div>
+            <div className="flex flex-row items-center justify-between mb-2">
               <p className="">My oPOP</p>
               <div>
                 <p className="font-bold text-end flex items-center justify-end">
                   {(Number(oPopBal?.value) / 1e18).toFixed(2)}
                   <WalletIcon className="ml-2 w-5 h-5" />
+                  ($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})
                 </p>
-                <p className="">($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})</p>
               </div>
             </div>
-            <div className="mt-5 flex flex-row items-center justify-between space-x-8">
+            <div className="flex flex-row items-center justify-between pt-2 border-t border-[#F0EEE0] flex-grow">
+              <p className="">My wETH</p>
+              <div>
+                <p className="font-bold text-end flex items-center justify-end">
+                  {10000}
+                  <WalletIcon className="ml-2 w-5 h-5" />
+                  ($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-row items-center justify-between space-x-8 pt-4 pb-2.5 border-t border-[#F0EEE0]">
               <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
               <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
+              <SecondaryActionButton label="Claim wETH" handleClick={() => claimWEth()} disabled={Number(gaugeRewards?.total) === 0} />
             </div>
           </div>
         </section>
+
 
         <section className="hidden md:block space-y-4">
           {gauges?.length > 0 ? gauges.map((gauge, index) =>
