@@ -26,6 +26,9 @@ import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
 import { useHasAlreadyVoted } from "lib/Gauges/useHasAlreadyVoted";
+import { useUserWethReward } from "lib/FeeDistributor/useUserWethRewards";
+import { useClaimTokens } from "lib/FeeDistributor/useClaimToken";
+import useClaimableTokens from "lib/FeeDistributor/useClaimableTokens";
 
 const {
   BalancerPool: POP_LP,
@@ -35,7 +38,8 @@ const {
   POP: POP,
   WETH: WETH,
   BalancerOracle: OPOP_ORACLE,
-  Minter: OPOP_MINTER
+  Minter: OPOP_MINTER,
+  FeeDistributor: FEE_DISTRIBUTOR
 } = getVeAddresses();
 
 function VePopContainer() {
@@ -51,6 +55,9 @@ function VePopContainer() {
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
+
+  const { data: claimableTokens } = useClaimableTokens({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", timestamp: 1694649600 })
+  const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", token: WETH, timestamp: 1694649600 })
 
   const [votes, setVotes] = useState([]);
   const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
@@ -80,6 +87,7 @@ function VePopContainer() {
   }
 
   const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
+  const { write: claimTokens = noOp } = useClaimTokens(FEE_DISTRIBUTOR, account, [WETH]);
 
   function handleVotes(val: number, index: number) {
     setVotes((prevVotes) => {
@@ -185,30 +193,39 @@ function VePopContainer() {
                 <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
                 <span className="flex flex-row items-center justify-between mt-6">
                   <p className="">APR</p>
-                  <p className="font-bold">? %</p>
+                  <p className="font-bold">{formatNumber(Number(userWethReward) / 1e18)} %</p>
                 </span>
                 <span className="flex flex-row items-center justify-between">
-                  <p className="">Claimable oPOP</p>
-                  <p className="font-bold">{gaugeRewards?.total ? (Number(gaugeRewards?.total) / 1e18).toFixed(2) : "0"}</p>
+                  <p className="">Claimable WETH</p>
+                  <p className="font-bold">{Number(claimableTokens) > 0 ? (Number(claimableTokens) / 1e18).toFixed(2) : "0"}</p>
                 </span>
-                <div className="h-8"></div>
-                <div className="flex flex-row items-center justify-between pt-6 border-t border-[#F0EEE0]">
-                  <p className="">My oPOP</p>
-                  <div>
-                    <p className="font-bold text-end flex items-center justify-end">
-                      {oPopBal?.value ? (Number(oPopBal?.value) / 1e18).toFixed(2) : "0"}
-                      <WalletIcon className="ml-2 w-5 h-5" />
-                    </p>
-                    <p className="">
-                      ($ {oPopPrice?.value && oPopBal?.value ?
-                        formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)) :
-                        "0"})
-                    </p>
-                  </div>
-                </div>
                 <div className="mt-5 flex flex-row items-center justify-between space-x-8">
-                  <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
-                  <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
+                  <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={Number(claimableTokens) === 0} />
+                </div>
+                <div className="h-8"></div>
+                <div className="pt-6 border-t border-[#F0EEE0]">
+                  <span className="flex flex-row items-center justify-between">
+                    <p className="">Claimable oPOP</p>
+                    <p className="font-bold">{gaugeRewards?.total ? (Number(gaugeRewards?.total) / 1e18).toFixed(2) : "0"}</p>
+                  </span>
+                  <span className="flex flex-row items-center justify-between">
+                    <p className="">My oPOP</p>
+                    <div>
+                      <p className="font-bold text-end flex items-center justify-end">
+                        {oPopBal?.value ? (Number(oPopBal?.value) / 1e18).toFixed(2) : "0"}
+                        <WalletIcon className="ml-2 w-5 h-5" />
+                      </p>
+                      <p className="">
+                        ($ {oPopPrice?.value && oPopBal?.value ?
+                          formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18)) :
+                          "0"})
+                      </p>
+                    </div>
+                  </span>
+                  <div className="mt-5 flex flex-row items-center justify-between space-x-8">
+                    <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
+                    <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
+                  </div>
                 </div>
               </div>
             </section>

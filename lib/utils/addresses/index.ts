@@ -25,7 +25,8 @@ const veAddresses = {
     Vault2WETHGauge: "0x73F846D3d5Ec3bDFF8893c123e9966BdBeA4c00B",
     Vault3USDCGauge: "0x50185e24e6Db0FB08A530752FE828A19776237c1",
     Vault4DAIGauge: "0x744DaBDc35A924705E49d3183A389040e9E0A84A",
-    VaultRouter: "0x1DB17afE14732A5267a0839D5f3dE0AF1426cb9E"
+    VaultRouter: "0x1DB17afE14732A5267a0839D5f3dE0AF1426cb9E",
+    FeeDistributor: "0x2661cdddb673DDcF2e0bc0dD7Fd432fCF1fe9e74"
 };
 
 export function getVeAddresses(): veAddresses {
