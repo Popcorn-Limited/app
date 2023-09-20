@@ -22,6 +22,8 @@ import useOPopDiscount from "lib/OPop/useOPopDiscount";
 import OPopModal from "components/vepop/modals/oPop/OPopModal";
 import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
+import { useClaimTokens } from "lib/FeeDistributor/useClaimTokens";
+import { useClaimableTokens } from "lib/FeeDistributor/useClaimableTokens";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
@@ -34,7 +36,8 @@ const {
   POP: POP,
   WETH: WETH,
   BalancerOracle: OPOP_ORACLE,
-  Minter: OPOP_MINTER
+  Minter: OPOP_MINTER,
+  FeeDistributor: FEE_DISTRIBUTOR
 } = getVeAddresses();
 
 export default function VePOP() {
@@ -52,6 +55,8 @@ export default function VePOP() {
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
+
+  const { data: userCanClaimExtraRewards } = useClaimableTokens({ address: FEE_DISTRIBUTOR, user: account, timestamp: 1694649600, chainId: 5 })
 
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
   const [totalVotes, setTotalVotes] = useState(0);
@@ -74,6 +79,7 @@ export default function VePOP() {
   }
 
   const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
+  const { write: claimTokens = noOp } = useClaimTokens(FEE_DISTRIBUTOR, account, [WETH]);
 
   function handleVotes(val: number, index: number) {
     setVotes((prevVotes) => {
@@ -171,7 +177,7 @@ export default function VePOP() {
             </span>
             <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 flex-grow">
               <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
-              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
+              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={userCanClaimExtraRewards} />
             </div>
           </div>
 
@@ -209,7 +215,7 @@ export default function VePOP() {
             <div className="mt-4 flex flex-row items-center justify-between space-x-8 pt-4 pb-2.5 border-t border-[#F0EEE0]">
               <MainActionButton label="Exercise oPOP" handleClick={() => setShowOPopModal(true)} disabled={Number(oPopBal?.value) === 0} />
               <SecondaryActionButton label="Claim oPOP" handleClick={() => claimOPop()} disabled={Number(gaugeRewards?.total) === 0} />
-              <SecondaryActionButton label="Claim wETH" handleClick={() => claimWEth()} disabled={Number(gaugeRewards?.total) === 0} />
+              <SecondaryActionButton label="Claim wETH" handleClick={() => claimTokens()} disabled={Number(gaugeRewards?.total) === 0} />
             </div>
           </div>
         </section>
