@@ -24,6 +24,7 @@ import useClaimableOPop from "lib/Gauges/useClaimableOPop";
 import { useClaimOPop } from "lib/OPop/useClaimOPop";
 import { useClaimTokens } from "lib/FeeDistributor/useClaimTokens";
 import { useClaimableTokens } from "lib/FeeDistributor/useClaimableTokens";
+import { useUserWethReward } from "lib/FeeDistributor/useUserWETHReward";
 import { showSuccessToast, showErrorToast } from "lib/Toasts";
 import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
@@ -56,7 +57,8 @@ export default function VePOP() {
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
-  const { data: userCanClaimExtraRewards } = useClaimableTokens({ address: FEE_DISTRIBUTOR, user: account, timestamp: 1694649600, chainId: 5 })
+  const { data: claimableTokens } = useClaimableTokens({ chainId: 5, address: FEE_DISTRIBUTOR, user: account, timestamp: 1694649600 })
+  const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: account, token: WETH, timestamp: 1694649600 })
 
   const [votes, setVotes] = useState(gauges?.map(gauge => 0));
   const [totalVotes, setTotalVotes] = useState(0);
@@ -177,7 +179,7 @@ export default function VePOP() {
             </span>
             <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6 flex-grow">
               <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
-              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={userCanClaimExtraRewards} />
+              <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(claimableTokens) > 0} />
             </div>
           </div>
 
@@ -203,10 +205,10 @@ export default function VePOP() {
               </div>
             </div>
             <div className="flex flex-row items-center justify-between pt-2 border-t border-[#F0EEE0] flex-grow">
-              <p className="">My wETH</p>
+              <p className="">Claimable wETH</p>
               <div>
                 <p className="font-bold text-end flex items-center justify-end">
-                  {10000}
+                  {formatNumber(Number(userWethReward) / 1e18)}
                   <WalletIcon className="ml-2 w-5 h-5" />
                   ($ {formatNumber((Number(oPopBal?.value) / 1e18) * (Number(oPopPrice?.value) / 1e18))})
                 </p>
