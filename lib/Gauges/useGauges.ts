@@ -9,6 +9,7 @@ export interface Gauge {
 }
 
 export default function useGauges({ address, chainId }: { address: string, chainId: number }): Pop.HookResult<Gauge[]> {
+  console.log({ address, chainId })
   const { data: n_gauges } = useContractRead({
     address,
     abi: abiController,
@@ -16,6 +17,7 @@ export default function useGauges({ address, chainId }: { address: string, chain
     chainId,
     args: []
   }) as { data: BigNumber, status: string }
+  console.log({ n_gauges })
 
   const { data: gauges } = useContractReads({
     contracts: Array(n_gauges?.toNumber()).fill(undefined).map((item, idx) => {
@@ -29,6 +31,7 @@ export default function useGauges({ address, chainId }: { address: string, chain
     }),
     enabled: !!n_gauges,
   }) as { data: string[], status: string }
+  console.log({ gauges })
 
   const { data: areGaugesKilled } = useContractReads({
     contracts: gauges?.map((gauge: any) => {
@@ -42,8 +45,11 @@ export default function useGauges({ address, chainId }: { address: string, chain
     }),
     enabled: !!gauges,
   }) as { data: boolean[], status: string }
+  console.log({ areGaugesKilled })
 
   const aliveGauges = areGaugesKilled ? gauges?.filter((gauge: any, idx: number) => !areGaugesKilled[idx]) : gauges
+  console.log({ aliveGauges })
+
   const { data, status } = useContractReads({
     contracts: aliveGauges?.map((gauge: any) => {
       return {
@@ -59,6 +65,7 @@ export default function useGauges({ address, chainId }: { address: string, chain
       return (data as string[]).map((token, i) => { return { address: aliveGauges[i], vault: token, chainId: chainId } })
     }
   }) as { data: Gauge[], status: string }
+  console.log({ data, status })
 
   return { data, status } as Pop.HookResult<Gauge[]>;
 }

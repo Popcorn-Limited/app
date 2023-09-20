@@ -64,7 +64,7 @@ export default function VePOP() {
 
   useEffect(() => {
     if (gauges?.length > 0, votes?.length === 0) {
-      setVotes(new Array(gauges.length).fill(0));
+      setVotes(new Array(gauges?.length).fill(0));
     }
   }, [gauges, votes])
 
