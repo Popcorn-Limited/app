@@ -2,7 +2,6 @@ import { BigNumber } from 'ethers';
 import { useContractRead } from 'wagmi';
 
 export function useUserWethReward({ chainId, address, user, token, timestamp }: { address: `0x${string}`, chainId: number, user: `0x${string}`, token: `0x${string}`, timestamp: number }): { data: BigNumber } {
-  console.log("user", user, timestamp);
   const { data: totalSupplyAtTimestamp } = useContractRead({
     address,
     abi: abiFeeDistributor,
@@ -26,10 +25,6 @@ export function useUserWethReward({ chainId, address, user, token, timestamp }: 
     chainId: chainId,
     args: [token, timestamp]
   }) as { data: BigNumber }
-
-  console.log("totalSupplyAtTimestamp", totalSupplyAtTimestamp)
-  console.log("userBalanceAtTimestamp", userBalanceAtTimestamp)
-  console.log("tokensDistributedInWeek", tokensDistributedInWeek)
 
   if (userBalanceAtTimestamp && tokensDistributedInWeek && totalSupplyAtTimestamp) {
     const userReward = userBalanceAtTimestamp.mul(tokensDistributedInWeek).div(totalSupplyAtTimestamp);
