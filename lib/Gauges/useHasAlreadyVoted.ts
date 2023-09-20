@@ -22,7 +22,6 @@ export function useHasAlreadyVoted({ addresses, chainId, account }: { addresses:
     }) as Pop.HookResult<BigNumber[]>
 
     const limitTimestamp = Math.floor(Date.now() / 1000) - (DAYS * 10);
-    console.log(data)
 
     const alreadyVoted = data?.some(voteTimestamp =>
         voteTimestamp?.gt(BigNumber.from(limitTimestamp))

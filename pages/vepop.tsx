@@ -38,9 +38,7 @@ const {
   Minter: OPOP_MINTER
 } = getVeAddresses();
 
-export default function VePOP() {
-  const { waitForTx } = useWaitForTx();
-
+function VePopContainer() {
   const { address: account } = useAccount()
   const { data: signer } = useSigner({ chainId: 5 })
 
@@ -130,7 +128,7 @@ export default function VePOP() {
   }
 
   return (
-    <NoSSR>
+    <>
       {(!votes || votes.length === 0) ? <></>
         : <>
           <LockModal show={[showLockModal, setShowLockModal]} />
@@ -251,8 +249,12 @@ export default function VePOP() {
 
           </div>
         </>}
-    </NoSSR >
+    </ >
   )
+}
+
+export default function VePOP() {
+  return <NoSSR><VePopContainer /></NoSSR>
 }
 
 function noOp() { }
