@@ -12,8 +12,7 @@ async function getLatestTimestamp(chainId: number) {
 }
 
 export function useUserWethReward({ chainId, address, user, token }: { address: `0x${string}`, chainId: number, user: `0x${string}`, token: `0x${string}` }): { data: BigNumber } {
-  console.log({ chainId, address, user, token, thisPeriod: thisPeriodTimestamp(), nextPeriod: getVotePeriodEndTime() })
-  const timestamp = BigNumber.from(String(thisPeriodTimestamp() - 604800));
+  const timestamp = BigNumber.from(String(thisPeriodTimestamp()));
 
   const { data: totalSupplyAtTimestamp } = useContractRead({
     address,
@@ -41,8 +40,6 @@ export function useUserWethReward({ chainId, address, user, token }: { address: 
     args: [token, timestamp],
     enabled: !!timestamp && !!user && !!token
   }) as { data: BigNumber }
-
-  console.log({ tokensDistributedInWeek: Number(tokensDistributedInWeek), totalSupplyAtTimestamp: Number(totalSupplyAtTimestamp) })
 
   if (Number(userBalanceAtTimestamp) && Number(tokensDistributedInWeek) > 0 && Number(totalSupplyAtTimestamp) > 0) {
     const userReward = userBalanceAtTimestamp.mul(tokensDistributedInWeek).div(totalSupplyAtTimestamp);
