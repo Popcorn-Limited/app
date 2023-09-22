@@ -1,4 +1,4 @@
-import { BigNumber, Contract, Wallet, constants } from "ethers";
+import { BigNumber, Contract, Wallet, constants, utils } from "ethers";
 import { useApproveBalance } from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { getVotePeriodEndTime } from "lib/Gauges/utils";
@@ -56,8 +56,10 @@ function VePopContainer() {
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
-  const { data: claimableTokens } = useClaimableTokens({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", timestamp: 1694649600 })
+  // const { data: claimableTokens } = useClaimableTokens({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", timestamp: 1694649600 })
   const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", token: WETH, timestamp: 1694649600 })
+
+  console.log("userWethReward", userWethReward);
 
   const [votes, setVotes] = useState([]);
   const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
@@ -193,14 +195,14 @@ function VePopContainer() {
                 <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
                 <span className="flex flex-row items-center justify-between mt-6">
                   <p className="">APR</p>
-                  <p className="font-bold">{formatNumber(Number(userWethReward) / 1e18)} %</p>
+                  <p className="font-bold">??? %</p>
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">Claimable WETH</p>
-                  <p className="font-bold">{Number(claimableTokens) > 0 ? (Number(claimableTokens) / 1e18).toFixed(2) : "0"}</p>
+                  <p className="font-bold">{parseFloat(utils.formatEther(userWethReward)).toFixed(3)} wETH</p>
                 </span>
                 <div className="mt-5 flex flex-row items-center justify-between space-x-8">
-                  <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={Number(claimableTokens) === 0} />
+                  <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={false} />
                 </div>
                 <div className="h-8"></div>
                 <div className="pt-6 border-t border-[#F0EEE0]">
