@@ -1,9 +1,9 @@
-import { BigNumber, Contract, Wallet, constants, utils } from "ethers";
+import { BigNumber, Contract, Wallet, constants, ethers, utils } from "ethers";
 import { useApproveBalance } from "hooks/useApproveBalance";
 import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
 import { getVotePeriodEndTime } from "lib/Gauges/utils";
 import { Pop } from "lib/types";
-import { formatAndRoundBigNumber, formatNumber, useConsistentRepolling } from "lib/utils";
+import { RPC_PROVIDERS, formatAndRoundBigNumber, formatNumber, useConsistentRepolling } from "lib/utils";
 import useWaitForTx from "lib/utils/hooks/useWaitForTx";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -28,7 +28,8 @@ import { WalletIcon } from "@heroicons/react/24/outline";
 import { useHasAlreadyVoted } from "lib/Gauges/useHasAlreadyVoted";
 import { useUserWethReward } from "lib/FeeDistributor/useUserWethRewards";
 import { useClaimTokens } from "lib/FeeDistributor/useClaimToken";
-import useClaimableTokens from "lib/FeeDistributor/useClaimableTokens";
+import useClaimableTokens from "lib/FeeDistributor/getVeApy";
+import getVeApy from "lib/FeeDistributor/getVeApy";
 
 const {
   BalancerPool: POP_LP,
@@ -56,10 +57,7 @@ function VePopContainer() {
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
   const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
 
-  // const { data: claimableTokens } = useClaimableTokens({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", timestamp: 1694649600 })
-  const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: "0x4204FDD868FFe0e62F57e6A626F8C9530F7d5AD1", token: WETH, timestamp: 1694649600 })
-
-  console.log("userWethReward", userWethReward);
+  const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: account, token: WETH })
 
   const [votes, setVotes] = useState([]);
   const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
@@ -68,6 +66,14 @@ function VePopContainer() {
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
   const [showOPopModal, setShowOPopModal] = useState(false);
+
+  const [apy, setApy] = useState(undefined);
+
+  useEffect(() => {
+    if (!apy) {
+      getVeApy({ chainId: 5, address: FEE_DISTRIBUTOR, token: WETH }).then(res => setApy(res))
+    }
+  }, [apy])
 
   useEffect(() => {
     if (gauges?.length > 0, votes?.length === 0) {
@@ -195,14 +201,14 @@ function VePopContainer() {
                 <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">Total vePOP Rewards</h3>
                 <span className="flex flex-row items-center justify-between mt-6">
                   <p className="">APR</p>
-                  <p className="font-bold">??? %</p>
+                  <p className="font-bold">{apy || "0"} %</p>
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">Claimable WETH</p>
                   <p className="font-bold">{parseFloat(utils.formatEther(userWethReward)).toFixed(3)} wETH</p>
                 </span>
                 <div className="mt-5 flex flex-row items-center justify-between space-x-8">
-                  <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={false} />
+                  <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={Number(userWethReward) === 0} />
                 </div>
                 <div className="h-8"></div>
                 <div className="pt-6 border-t border-[#F0EEE0]">

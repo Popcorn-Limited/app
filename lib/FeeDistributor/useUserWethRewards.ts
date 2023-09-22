@@ -1,13 +1,27 @@
 import { BigNumber } from 'ethers';
+import { time } from 'highcharts';
+import { getVotePeriodEndTime, thisPeriodTimestamp } from 'lib/Gauges/utils';
+import { RPC_PROVIDERS } from 'lib/utils';
+import { useEffect, useState } from 'react';
 import { useContractRead } from 'wagmi';
 
-export function useUserWethReward({ chainId, address, user, token, timestamp }: { address: `0x${string}`, chainId: number, user: `0x${string}`, token: `0x${string}`, timestamp: number }): { data: BigNumber } {
+async function getLatestTimestamp(chainId: number) {
+  const latestBlockNumber = await RPC_PROVIDERS[chainId].getBlockNumber()
+  const latestBlock = await RPC_PROVIDERS[chainId].getBlock(latestBlockNumber)
+  return latestBlock.timestamp
+}
+
+export function useUserWethReward({ chainId, address, user, token }: { address: `0x${string}`, chainId: number, user: `0x${string}`, token: `0x${string}` }): { data: BigNumber } {
+  console.log({ chainId, address, user, token, thisPeriod: thisPeriodTimestamp(), nextPeriod: getVotePeriodEndTime() })
+  const timestamp = BigNumber.from(String(thisPeriodTimestamp() - 604800));
+
   const { data: totalSupplyAtTimestamp } = useContractRead({
     address,
     abi: abiFeeDistributor,
     functionName: "getTotalSupplyAtTimestamp",
     chainId: chainId,
-    args: [timestamp]
+    args: [timestamp],
+    enabled: !!timestamp && !!user && !!token
   }) as { data: BigNumber }
 
   const { data: userBalanceAtTimestamp } = useContractRead({
@@ -15,7 +29,8 @@ export function useUserWethReward({ chainId, address, user, token, timestamp }: 
     abi: abiFeeDistributor,
     functionName: "getUserBalanceAtTimestamp",
     chainId: chainId,
-    args: [user, timestamp]
+    args: [user, timestamp],
+    enabled: !!timestamp && !!user && !!token
   }) as { data: BigNumber }
 
   const { data: tokensDistributedInWeek } = useContractRead({
@@ -23,10 +38,13 @@ export function useUserWethReward({ chainId, address, user, token, timestamp }: 
     abi: abiFeeDistributor,
     functionName: "getTokensDistributedInWeek",
     chainId: chainId,
-    args: [token, timestamp]
+    args: [token, timestamp],
+    enabled: !!timestamp && !!user && !!token
   }) as { data: BigNumber }
 
-  if (userBalanceAtTimestamp && tokensDistributedInWeek && totalSupplyAtTimestamp) {
+  console.log({ tokensDistributedInWeek: Number(tokensDistributedInWeek), totalSupplyAtTimestamp: Number(totalSupplyAtTimestamp) })
+
+  if (Number(userBalanceAtTimestamp) && Number(tokensDistributedInWeek) > 0 && Number(totalSupplyAtTimestamp) > 0) {
     const userReward = userBalanceAtTimestamp.mul(tokensDistributedInWeek).div(totalSupplyAtTimestamp);
     return { data: userReward };
   }
@@ -94,4 +112,4 @@ const abiFeeDistributor = [
       }
     ]
   },
-]
+] as const
