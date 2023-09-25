@@ -64,6 +64,8 @@ function SweetVault({
 
   // Is loading / error
   if (!vaultMetadata || baseToken.length === 0) return <></>
+  // Dont show if we filter by deployer
+  if (!!deployer && deployer.toLowerCase() !== vaultMetadata?.creator?.toLowerCase()) return <></>
   // Vault is not in search term
   if (searchString !== "" &&
     !vault?.name.toLowerCase().includes(searchString) &&
