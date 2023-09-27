@@ -22,6 +22,16 @@ import { formatNumber } from "lib/utils";
 
 function noOp() { }
 
+const stakingAddressToAsset = {
+  // mainnet
+  "0x27A9B8065Af3A678CD121A435BEA9253C53Ab428": { address: "0x109d2034e97eC88f50BEeBC778b5A5650F98c124", symbol: "BTR" },  // butter
+  "0x584732f867a4533BC349d438Fba4fc2aEE5f5f83": { address: "0x8b97ADE5843c9BE7a1e8c95F32EC192E31A46cf3", symbol: "3X" },  // 3x
+  "0xeB906A75838A8078B181815969b1DCBC20eaF7c0": { address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8", symbol: "XEN" }, // xen
+  "0x633b32573793A67cE41A7D0fFe66e78Cd3379C45": { address: "0xbba11b41407df8793a89b44ee4b50afad4508555", symbol: "POP-LP" }, // popUsdc Arrakis
+  // polygon
+  "0xd3836EF639A74EA7398d34c66aa171b1564BE4bc": { address: "0x6dE0500211bc3140409B345Fa1a5289cb77Af1e4", symbol: "POP-LP" } // popUsdc Arrakis
+}
+
 export default function Index(): JSX.Element {
   const chainId = useChainIdFromUrl();
   const router = useRouter();
@@ -32,13 +42,7 @@ export default function Index(): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
-  const { data: price } = usePrice({
-    address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
-    chainId: 1,
-    resolver: "llama"
-  })
-  const { data: tokenStaked } = useBalanceOf({ address: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8", chainId, account: stakingAddress })
-
+  const { data: tokenStaked } = useBalanceOf({ address: stakingAddressToAsset[stakingAddress]?.address, chainId, account: stakingAddress });
 
   function handleExit() {
     if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId))
@@ -84,18 +88,14 @@ export default function Index(): JSX.Element {
                   </div>
                   <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
                     <StatusWithLabel
-                      content={`$${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
-                      label="TVL"
+                      content={`${formatNumber(Number(tokenStaked?.value) / 1e18)} ${stakingAddressToAsset[stakingAddress]?.symbol}`}
+                      label="TOTAL STAKED"
                     />
                   </div>
                   <div className="block mt-6 laptop:mt-8 pr-8 laptop:pr-0 laptop:pl-6 laptop:border-l laptop:border-customLightGray">
                     <StatusWithLabel
-                      content={
-                        <span>
-                          <Staking.TokenEmission chainId={chainId} address={stakingAddress} /> POP / day
-                        </span>
-                      }
-                      label="EMISSION RATE"
+                      content={"Paused"}
+                      label="STATUS"
                     />
                   </div>
                 </div>

@@ -102,18 +102,14 @@ export default function Index(): JSX.Element {
             <div className="block mt-6 md:mt-8 pr-8 md:pr-6 md:pl-6 md:border-l md:border-customLightGray">
               {/* Somehow the Convex Staking Contract breaks on optimism. Therefore we simply check the balanceOf pop token in the staking contract */}
               <StatusWithLabel
-                content={`$${formatNumber((Number(price?.value) / 1e18) * (Number(tokenStaked?.value) / 1e18))}`}
-                label="TVL"
+                content={`${formatNumber(Number(tokenStaked?.value) / 1e18)} POP`}
+                label="TOTAL STAKED"
               />
             </div>
             <div className="block mt-6 laptop:mt-8 pr-8 laptop:pr-0 laptop:pl-6 laptop:border-l laptop:border-customLightGray">
               <StatusWithLabel
-                content={
-                  <span>
-                    <Staking.TokenEmission chainId={chainId} address={popStaking?.address} /> POP / day
-                  </span>
-                }
-                label="EMISSION RATE"
+                content={"Paused"}
+                label="STATUS"
               />
             </div>
           </div>
