@@ -1,46 +1,22 @@
-import { useContractReads } from "wagmi"
-import NoSSR from "react-no-ssr"
-import axios from "axios";
-import Cors from 'cors'
+import { getVaults } from "@/lib/vault/getVault"
+import getVaultAddresses from "@/lib/vault/getVaultAddresses"
+import { createPublicClient, http } from "viem"
+import { mainnet } from "wagmi"
 
-function Fetcher() {
-
-
-  return <></>
+async function getData() {
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http()
+  })
+  const vaults = await getVaultAddresses({ client })
+  getVaults({ vaults, client })
 }
-
-import { NextApiRequest, NextApiResponse } from "next";
-
 
 export default function Test() {
-  const { data, isError, isLoading } = useContractReads({
-    contracts: [
-      {
-        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
-        abi: vaultABI,
-        functionName: 'totalAssets',
-        chainId: 1
-      },
-      {
-        address: '0x5d344226578DC100b2001DA251A4b154df58194f',
-        abi: vaultABI,
-        functionName: 'totalSupply',
-        chainId: 1
-      },
-    ],
-  })
-
+  getData().then(res => console.log(res))
   return (
-    <NoSSR>
-      <div>
-        <h1>Test</h1>
-        <Fetcher />
-      </div>
-    </NoSSR>
+    <div>
+      <h1>Test</h1>
+    </div>
   )
 }
-
-const vaultABI = [
-  { "inputs": [], "name": "totalAssets", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
-  { "inputs": [], "name": "totalSupply", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
-] as const 

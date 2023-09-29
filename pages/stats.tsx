@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import Highcharts from "highcharts";
+// @ts-ignore
+import NoSSR from "react-no-ssr";
 import axios from "axios";
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
-import SelectField from "../components/SelectField";
-import { ChainId, RPC_URLS } from "lib/utils";
-import NoSSR from "react-no-ssr";
+import { useEffect, useRef, useState } from "react";
+import Highcharts from "highcharts";
+import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
+import SelectField from "@/components/input/SelectField";
 
 type DuneQueryResult<T> = {
     result: {

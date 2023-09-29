@@ -1,5 +1,5 @@
 import React from "react";
-import StatusWithLabel, { StatusWithLabelProps } from "components/StatusWithLabel";
+import StatusWithLabel, { StatusWithLabelProps } from "@/components/common/StatusWithLabel";
 import Link from "next/link";
 
 export interface ProductProps {

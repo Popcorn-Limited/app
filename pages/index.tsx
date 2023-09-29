@@ -1,8 +1,9 @@
-import Products from "components/landing/Products";
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import Hero from "components/landing/Hero";
+// @ts-ignore
 import NoSSR from "react-no-ssr";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import Hero from "@/components/landing/Hero";
+import Products from "@/components/landing/Products";
 
 const IndexPage = () => {
   const router = useRouter();
