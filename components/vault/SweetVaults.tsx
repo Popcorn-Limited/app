@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SweetVault from "./SweetVault";
-import { Vault } from "@/lib/vault/getVault";
 import { ChainId, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import NetworkFilter from "../network/NetworkFilter";
 import { Address } from "viem";
+import { VaultData } from "@/lib/types";
 
 export default function SweetVaults({
   vaults,
   selectNetwork,
   deployer,
 }: {
-  vaults: Vault[]
+  vaults: VaultData[]
   selectNetwork: (chainId: ChainId) => void,
   deployer?: Address
 }) {
