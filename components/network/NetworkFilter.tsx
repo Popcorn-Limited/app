@@ -3,6 +3,7 @@ import PseudoRadioButton from "@/components/button/PseudoRadioButton";
 import Image from "next/image";
 import { useState } from "react";
 import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
+import PopUpModal from "../modal/PopUpModal";
 
 interface NetworkFilterProps {
   supportedNetworks: ChainId[];
@@ -11,36 +12,12 @@ interface NetworkFilterProps {
 
 export default function NetworkFilter({ supportedNetworks, selectNetwork }: NetworkFilterProps): JSX.Element {
   const [openFilter, setOpenFilter] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<{ id: ChainId; value: JSX.Element }>({
-    id: ChainId.ALL,
-    value: (
-      <div className="flex space-x-4">
-        <Image src={networkLogos[ChainId.ALL]} alt={ChainId[ChainId.ALL]} height="24" width="24" />
-        <p className="text-secondaryDark">{networkMap[ChainId.ALL]}</p>
-      </div>
-    ),
-  });
-  const switchFilter = (value: { id: any; value: any }) => {
-    selectNetwork(value.id);
-    setCategoryFilter(value);
-  };
   const [activeNetwork, setActiveNetwork] = useState(ChainId.ALL);
 
   const setActiveAndSelectedNetwork = (chainId: ChainId) => {
     setActiveNetwork(chainId);
     selectNetwork(chainId);
   };
-  const networkCategories = supportedNetworks.map((network) => {
-    return {
-      id: network,
-      value: (
-        <div className="flex space-x-4">
-          <Image src={networkLogos[network]} alt={ChainId[network]} height="24" width="24" />
-          <p className="text-secondaryDark">{networkMap[network]}</p>
-        </div>
-      ),
-    };
-  });
   return (
     <>
       <div className="hidden md:flex flex-row items-center space-x-2">
@@ -70,21 +47,48 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
           }}
           className="w-full py-3 px-5 flex flex-row items-center justify-between mt-1 space-x-1 rounded-4xl border border-gray-300 bg-white"
         >
-          <div className="flex items-center">{categoryFilter.value}</div>
+          <div className="flex items-center">
+            <Image src={networkLogos[activeNetwork]} alt={"activeNetwork"} height="24" width="24" />
+            <p className="ml-4 mt-1">{activeNetwork === ChainId.ALL ? "All Networks" : ChainId[activeNetwork]}</p>
+          </div>
           <ChevronDownIcon className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
       <div className="no-select-dot absolute left-0">
-        {/* TODO - add mobile menu */}
-        {/* <MobilePopupSelect
-          categories={networkCategories}
-          visible={openFilter}
-          onClose={setOpenFilter}
-          selectedItem={categoryFilter}
-          switchFilter={switchFilter}
-          title="Network filters"
-        /> */}
-      </div>
+        <PopUpModal visible={openFilter} onClosePopUpModal={() => setOpenFilter(false)}>
+          <>
+            <p className="text-black mb-3 text-center">Select a Network</p>
+            <div className="space-y-2">
+              <PseudoRadioButton
+                key={"all"}
+                label={
+                  <div className="flex flex-row items-center w-full ml-4">
+                    <Image src={networkLogos[ChainId.ALL]} alt={"All"} height="24" width="24" />
+                    <p className="ml-4 mb-0.5">All Networks</p>
+                  </div>
+                }
+                handleClick={() => { setActiveAndSelectedNetwork(ChainId.ALL); setOpenFilter(false) }}
+                isActive={activeNetwork == ChainId.ALL}
+                extraClasses="h-12 w-full border border-customLightGray rounded-3xl text-primary flex justify-center items-center bg-white"
+              />
+              {supportedNetworks.map((network) => (
+                <PseudoRadioButton
+                  key={network}
+                  label={
+                    <div className="flex flex-row items-center w-full ml-4">
+                      <Image src={networkLogos[network]} alt={ChainId[network]} height="24" width="24" />
+                      <p className="ml-4 mb-0.5">{ChainId[network]}</p>
+                    </div>
+                  }
+                  handleClick={() => { setActiveAndSelectedNetwork(network); setOpenFilter(false) }}
+                  isActive={activeNetwork == network}
+                  extraClasses="h-12 w-full border border-customLightGray rounded-3xl text-primary flex justify-center items-center bg-white"
+                />
+              ))}
+            </div>
+          </>
+        </PopUpModal>
+      </div >
     </>
   );
 }

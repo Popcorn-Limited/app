@@ -7,6 +7,9 @@ import { useAccount, useDisconnect, useNetwork } from "wagmi";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
 import { ChainId, networkLogos, networkMap } from "@/lib/utils/connectors";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
+import PopUpModal from "../modal/PopUpModal";
+import MainActionButton from "../button/MainActionButton";
+import TertiaryActionButton from "../button/TertiaryActionButton";
 
 const networkData = [
   {
@@ -173,12 +176,11 @@ export default function MobileMenu(): JSX.Element {
           </div>
         </Dialog>
       </Transition.Root>
-      {/* TODO -- replace this with our new way to create modals (look into vepop page) */}
-      {/* <PopUpModal visible={showPopUp} onClosePopUpModal={closePopUp}>
+      <PopUpModal visible={showPopUp} onClosePopUpModal={closePopUp}>
         <div>
           <p className="text-black mb-3">Connect to Wallet</p>
           <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={!!address} />
-          <TertiaryActionButton label="Disconnect" handleClick={disconnect} hidden={!address} />
+          <TertiaryActionButton label="Disconnect" handleClick={() => disconnect()} hidden={!address} />
           <hr className="my-6" />
           <p className="text-black mb-3">Select Network</p>
           <div
@@ -189,7 +191,7 @@ export default function MobileMenu(): JSX.Element {
             <p className="leading-none mt-0.5">{chainName}</p>
           </div>
         </div>
-      </PopUpModal> */}
+      </PopUpModal>
     </>
   );
 };

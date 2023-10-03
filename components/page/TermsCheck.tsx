@@ -44,21 +44,27 @@ export default function TermsCheck(): JSX.Element {
     if (!account && isDisconnected && !show) setShow(false);
   }, [account])
 
-  {/* TODO - style this */}
-  return <Modal visibility={[show, setShow]}>
-    <div>
-      <h2>Terms & Conditions</h2>
-      <p>To continue please sign terms and conditions.</p>
-      <MainActionButton
-        label="Sign Message"
-        handleClick={() => {
-          signTermsAndConditions({
-            account: account as Address,
-            walletClient: walletClient as WalletClient,
-            setShow
-          })
-        }}
-      />
-    </div>
-  </Modal>
+  return (
+    <Modal visibility={[show, setShow]}>
+      <div className="text-start space-y-8">
+        <img src="/images/icons/pendulum.svg" alt="pendulum" className="w-20 h-20 mb-4" />
+        <h2 className="text-4xl leading-tight">Terms & <br /> Conditions</h2>
+        <p className="text-base text-primaryDark">
+          Please read the disclaimer carefully before accessing, interacting with, or using the pop.network, consisting of the pop.network smart contract technology stack and the user interface for the Popcorn DeFi application, as well as any other application developed in the future (together the “Popcorn Software”). By signing this message, you confirm that you have carefully read this disclaimer.
+          <br />
+          <a className="text-blue-800 cursor-pointer">https://app.pop.network/disclaimer</a>
+        </p>
+        <MainActionButton
+          label="Sign Message"
+          handleClick={() => {
+            signTermsAndConditions({
+              account: account as Address,
+              walletClient: walletClient as WalletClient,
+              setShow
+            })
+          }}
+        />
+      </div>
+    </Modal>
+  )
 }
