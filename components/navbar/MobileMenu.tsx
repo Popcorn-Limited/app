@@ -70,16 +70,16 @@ export default function MobileMenu(): JSX.Element {
 
   return (
     <>
-      <div className="flex flex-row justify-between items-center px-6 py-6 font-khTeka">
+      <div className={`flex flex-row justify-between items-center py-6 font-khTeka ${router.pathname === "/" ? "bg-[#FAF9F4]" : ""}`}>
         <div>
           <Link href={`/`} passHref>
-            <img src="/images/icons/popLogo.svg" alt="Logo" className="w1010 h-10" />
+            <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10" />
           </Link>
         </div>
         <div className="flex items-center gap-4">
           <div className={`relative w-full ${!menuVisible ? "" : "hidden"}`}>
             <div
-              className={`w-full px-4 py-3 flex flex-row items-center justify-center border border-light bg-white rounded-3xl cursor-pointer relative gap-2`}
+              className={`w-full px-4 py-3 flex flex-row items-center justify-center border border-light rounded-3xl cursor-pointer relative gap-2 ${router.pathname === "/" ? "bg-[#FAF9F4]" : ""}`}
               onClick={() => setShowPopUp(true)}
             >
               <img src={logo} alt={""} className="w-3 h-3 object-contain" />

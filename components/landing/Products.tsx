@@ -10,8 +10,10 @@ import PopIcon from "@/components/svg/popcorn/PopIcon";
 export default function Products(): JSX.Element {
   const vaultTvl = usetVaultTvl();
   return (
-    <section className="pt-4 pb-24 mx-8">
-      <div className="flex flex-row justify-between">
+    <>
+      {/* @dev Product.tsx has `md:mx-2` so with `md:mx-6` that adds up to consistent mx-8*/}
+      <section className="pt-4 pb-12 mx-8 md:mx-6">
+        <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between">
           <Product
             title={
               <>
@@ -73,16 +75,8 @@ export default function Products(): JSX.Element {
             stats={[]}
             route="https://archive.pop.network"
           />
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   );
 };
-
-function Rotable({ label, badge }: { label: string; badge: string }): JSX.Element {
-  return (
-    <li className="flex items-start -space-y-8 space-x-1 text-black/20">
-      <sup className="text-xs h-0">{badge}</sup>
-      <p className="text-4xl xl:text-7xl whitespace-nowrap">{label}</p>
-    </li>
-  );
-}
