@@ -11,6 +11,10 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     url: "/stats"
   },
   {
+    label: "VaultCraft",
+    url: "https://vaultcraft.io/",
+  },
+  {
     label: "Archive",
     url: "https://archive.pop.network/",
   }
