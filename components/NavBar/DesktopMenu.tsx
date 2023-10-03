@@ -175,6 +175,9 @@ export default function DesktopMenu(): JSX.Element {
                   <div className="">
                     <NavbarLink label="Stats" url={`/stats`} isActive={router?.pathname.includes("/stats")} onClick={() => toggleMenu(false)} />
                   </div>
+                  <div className="">
+                    <NavbarLink label="Return to live app" url={`https://app.pop.network/`} isActive={false} onClick={() => toggleMenu(false)} />
+                  </div>
                 </div>
                 <div>
                   <p className="text-primary">

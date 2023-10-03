@@ -175,6 +175,12 @@ export const MobileMenu: React.FC = () => {
                         onClick={() => toggleMenu(false)}
                       />
                       <NavbarLink label="Stats" url={`/stats`} isActive={router?.pathname.includes("/stats")} onClick={() => toggleMenu(false)} />
+                      <NavbarLink
+                        label="Return to live app"
+                        url={`https://app.pop.network/`}
+                        isActive={false}
+                        onClick={() => toggleMenu(false)}
+                      />
                     </div>
                     <div>
                       <div className="grid grid-cols-12 mt-12">
