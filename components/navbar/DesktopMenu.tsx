@@ -8,8 +8,10 @@ import { networkLogos } from "@/lib/utils/connectors";
 import MainActionButton from "@/components/button/MainActionButton";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
 import NavbarLinks from "@/components/navbar/NavbarLinks";
+import { useRouter } from "next/router";
 
 export default function DesktopMenu(): JSX.Element {
+  const { pathname } = useRouter();
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
   const { address } = useAccount();
@@ -21,7 +23,7 @@ export default function DesktopMenu(): JSX.Element {
 
   return (
     <>
-      <div className="flex flex-row items-center justify-between w-full py-8 px-8 z-30 ">
+      <div className="flex flex-row items-center justify-between w-full py-8 z-30">
         <div className="flex flex-row items-center">
           <div>
             <Link href={`/`} passHref>
@@ -45,7 +47,7 @@ export default function DesktopMenu(): JSX.Element {
             <MainActionButton label="Connect Wallet" handleClick={openConnectModal} hidden={address ? true : false} />
           )}
           <button
-            className={`text-gray-500 w-10 transform transition duration-500 relative focus:outline-none bg-white`}
+            className={`text-gray-500 w-10 transform transition duration-500 relative focus:outline-none ${pathname === "/" ? "bg-[#FAF9F4]" : ""}`}
             onClick={() => toggleMenu(!menuVisible)}
           >
             <span

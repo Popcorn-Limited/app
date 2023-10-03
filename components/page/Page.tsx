@@ -20,7 +20,6 @@ async function setUpYieldOptions() {
 
 export default function Page({ children }: { children: JSX.Element }): JSX.Element {
   const { pathname } = useRouter();
-  const compactRoutes = ["/"];
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
 
@@ -33,14 +32,12 @@ export default function Page({ children }: { children: JSX.Element }): JSX.Eleme
   return (
     <>
       <TermsCheck />
-      <div className="w-full md:w-10/12 laptop:w-11/12 2xl:w-8/12 mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
+      <div className="w-full  mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
         <NoSSR>
           <Navbar />
         </NoSSR>
         <Toaster position="top-right" />
-        <div
-          className={`${pathname === "/" ? "" : "pt-5 md:pt-10"} ${compactRoutes.includes(pathname) ? "" : "px-6 md:px-8 "}`}
-        >
+        <div className={pathname === "/" ? "" : "mx-8"}>
           {children}
         </div>
         <Footer />

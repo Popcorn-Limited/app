@@ -82,10 +82,10 @@ export const networkLogos: { [key: number]: string } = {
 };
 export const RPC_URLS: { [key: number]: string } = {
   [ChainId.Ethereum]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-  [ChainId.Goerli]: "https://goerli.blockpi.network/v1/rpc/public",
   [ChainId.Arbitrum]: `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
   [ChainId.Polygon]: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
   [ChainId.Optimism]: `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+  [ChainId.Goerli]: "https://goerli.blockpi.network/v1/rpc/public",
   [ChainId.BNB]: `https://bsc-dataseed1.binance.org`,
   [ChainId.Localhost]: `http://localhost:8545`,
   [ChainId.RemoteFork]: `http://localhost:8545`,

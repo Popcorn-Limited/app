@@ -30,8 +30,8 @@ export default function Hero(): JSX.Element {
 
 
   return (
-    <section className="pt-4 mb-10 pb-6 mx-6 sm:mx-8 border-b border-[#EBE7D4]">
-      <div className="flex flex-col smmd:flex-row smmd:items-center justify-between">
+    <section className="pt-4 mb-10 pb-6 border-b border-[#EBE7D4] bg-[#FAF9F4]">
+      <div className="flex flex-col smmd:flex-row smmd:items-center justify-between mx-8">
         <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
           <StatusWithLabel
             label={"Deposits"}

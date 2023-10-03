@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Address, PublicClient, mainnet } from "wagmi";
-import { ChainId, networkMap } from "@/lib/utils/connectors";
+import { ChainId, RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { VaultAbi } from "@/lib/constants";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses";
 import { Chain, createPublicClient, http } from "viem";
@@ -55,7 +55,7 @@ async function getVaultValues({ addresses, account, client }: { addresses: Addre
 export async function getVaultNetworthByChain({ account, chain }: { account: Address, chain: Chain }): Promise<number> {
   const client = createPublicClient({
     chain,
-    transport: http()
+    transport: http(RPC_URLS[chain.id])
   })
   const addresses = await getVaultAddresses({ client })
   const vaultValues = await getVaultValues({ addresses, account, client })

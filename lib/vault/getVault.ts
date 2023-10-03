@@ -5,7 +5,7 @@ import { VaultAbi } from "@/lib/constants/abi/Vault"
 import { resolvePrice } from "@/lib/resolver/price/price"
 import { Token, VaultData } from "@/lib/types"
 import { ADDRESS_ZERO, ERC20Abi, VaultRegistryByChain, VaultRegistyAbi } from "@/lib/constants"
-import { networkMap } from "@/lib/utils/connectors";
+import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses"
 import getAssetIcon from "@/lib/vault/getAssetIcon"
 import getVaultName from "@/lib/vault/getVaultName"
@@ -98,7 +98,7 @@ function prepareTokenContracts(address: Address, account: Address): ReadContract
 }
 
 export async function getVaultsByChain({ chain, account }: { chain: Chain, account?: Address }): Promise<VaultData[]> {
-  const client = createPublicClient({ chain, transport: http() })
+  const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
   const vaults = await getVaultAddresses({ client })
   return getVaults({ vaults, account, client })
 }

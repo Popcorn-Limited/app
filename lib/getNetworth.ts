@@ -1,7 +1,7 @@
 import { PublicClient, createPublicClient, http } from "viem";
 import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
-import { ChainId } from "@/lib/utils/connectors";
+import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
 import { ERC20Abi, PopByChain, PopStakingByChain } from "@/lib/constants";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses";
 import { resolvePrice } from "@/lib/resolver/price/price";
@@ -56,7 +56,7 @@ async function getBalancesByChain({ account, client, addresses }: { account: Add
 export async function getNetworthByChain({ account, chain }: { account: Address, chain: Chain }): Promise<Networth> {
   const client = createPublicClient({
     chain,
-    transport: http()
+    transport: http(RPC_URLS[chain.id])
   })
   // Get addresses
   const vaultAddresses = await getVaultAddresses({ client })

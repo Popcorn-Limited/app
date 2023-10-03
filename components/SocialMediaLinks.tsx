@@ -1,9 +1,9 @@
-import DiscordIcon from "@/components/svg/DiscordIcon";
-import MediumIcon from "@/components/svg/MediumIcon";
-import RedditIcon from "@/components/svg/RedditIcon";
-import TelegramIcon from "@/components/svg/TelegramIcon";
-import TwitterIcon from "@/components/svg/TwitterIcon";
-import YoutubeIcon from "@/components/svg/YoutubeIcon";
+import DiscordIcon from "@/components/svg/socialMedia/DiscordIcon";
+import MediumIcon from "@/components/svg/socialMedia/MediumIcon";
+import RedditIcon from "@/components/svg/socialMedia/RedditIcon";
+import TelegramIcon from "@/components/svg/socialMedia/TelegramIcon";
+import TwitterIcon from "@/components/svg/socialMedia/TwitterIcon";
+import YoutubeIcon from "@/components/svg/socialMedia/YoutubeIcon";
 
 export default function SocialMediaLinks() {
   return <>

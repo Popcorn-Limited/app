@@ -72,3 +72,9 @@ export type SimulationResponse = {
   success: boolean;
   error: string | null;
 }
+
+export interface IconProps {
+  color: string;
+  size: string;
+  className?: string;
+}
