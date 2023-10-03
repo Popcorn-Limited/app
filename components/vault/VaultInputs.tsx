@@ -1,7 +1,6 @@
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
-import { constants } from "ethers";
 import { useEffect, useState } from "react";
 import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
@@ -9,8 +8,9 @@ import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import { WalletClient } from "viem";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
+import { ADDRESS_ZERO } from "@/lib/constants";
 
-const { VaultRouter: VAULT_ROUTER } = { VaultRouter: constants.AddressZero as Address }
+const { VaultRouter: VAULT_ROUTER } = { VaultRouter: ADDRESS_ZERO as Address }
 
 interface VaultInputsProps {
   vault: Token;
