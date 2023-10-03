@@ -1,11 +1,13 @@
 // @ts-ignore
 import NoSSR from "react-no-ssr";
 import axios from "axios";
-import { BalancerSDK, Network } from '@balancer-labs/sdk';
+// import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { useEffect, useRef, useState } from "react";
 import Highcharts from "highcharts";
 import { ChainId, RPC_URLS } from "@/lib/utils/connectors";
 import SelectField from "@/components/input/SelectField";
+
+// TODO -- removed balancer since it was causing build issues with ethers. Need to readd it once the vcx pool is live
 
 type DuneQueryResult<T> = {
     result: {
@@ -48,7 +50,7 @@ const leaderboardOptions = [{
     label: 'Top Depositors'
 }]
 
-const balancerPoolId = '0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014'
+// const balancerPoolId = '0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014'
 
 const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -292,13 +294,13 @@ export default function Vaults() {
             }
         }
 
-        const balancer = new BalancerSDK({
-            network: Network.MAINNET,
-            rpcUrl: RPC_URLS[ChainId.Ethereum] as string,
-        })
+        // const balancer = new BalancerSDK({
+        //     network: Network.MAINNET,
+        //     rpcUrl: RPC_URLS[ChainId.Ethereum] as string,
+        // })
 
         const [
-            balancerPool,
+            // balancerPool,
             duneTokenResult,
             duneHoldersWithPop,
             duneHoldersWithPopMoreHundred,
@@ -310,7 +312,7 @@ export default function Vaults() {
             tvlByTime,
             popPriceResult
         ] = await Promise.all([
-            balancer.pools.find(balancerPoolId),
+            // balancer.pools.find(balancerPoolId),
             axios.get<DuneQueryResult<{
                 TotalSupply: number
                 CirculatingSupply: number
@@ -360,8 +362,8 @@ export default function Vaults() {
             }>('https://coins.llama.fi/prices/current/optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'),
         ])
 
-        const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
-        const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
+        // const popInBalPool = balancerPool?.tokens.find(token => token.symbol === 'BAL')
+        // const wethInBalPool = balancerPool?.tokens.find(token => token.symbol === 'WETH')
         const tvlByTokens = Object.keys(tvlByTime.data.tokensInUsd.slice(-1)[0].tokens)
         const popPrice = popPriceResult.data.coins['optimism:0x6F0fecBC276de8fC69257065fE47C5a03d986394'].price
 
@@ -387,20 +389,20 @@ export default function Vaults() {
                     count: tvlByTime.data.tokensInUsd.slice(-1)[0].tokens[item]
                 }
             }),
-            popInBalPool: Number(popInBalPool?.balance),
-            wethInBalPool: Number(wethInBalPool?.balance),
+            popInBalPool: 0, // Number(popInBalPool?.balance),
+            wethInBalPool: 0, // Number(wethInBalPool?.balance),
         })
 
         initDonutChart(liquidPopMarketChartElem.current,
             [
                 {
                     name: "WETH in 80/20 BAL pool, USD",
-                    y: Number(wethInBalPool?.token?.latestUSDPrice) * Number(wethInBalPool?.balance),
+                    y: 20, //Number(wethInBalPool?.token?.latestUSDPrice) * Number(wethInBalPool?.balance),
                     color: "#9B55FF"
                 },
                 {
                     name: "POP in 80/20 BAL pool, USD",
-                    y: Number(popInBalPool?.token?.latestUSDPrice) * Number(popInBalPool?.balance),
+                    y: 80, //Number(popInBalPool?.token?.latestUSDPrice) * Number(popInBalPool?.balance),
                     color: "#7AFB79"
                 },
             ]
