@@ -1,42 +1,16 @@
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
-import { Contract, constants } from "ethers";
-import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
+import { constants } from "ethers";
 import { useEffect, useState } from "react";
-import { Address, useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import TabSelector from "../common/TabSelector";
+import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import TabSelector from "@/components/common/TabSelector";
 import { Token } from "@/lib/types";
+import { handleAllowance } from "@/lib/approve";
+import { WalletClient } from "viem";
+import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
 
 const { VaultRouter: VAULT_ROUTER } = { VaultRouter: constants.AddressZero as Address }
-
-async function handleAllowance(token: any, connector: any, spender: string, inputAmount: number): Promise<boolean> {
-  const tokenContract = new Contract(
-    token?.address,
-    [
-      "function balanceOf(address) view returns (uint256)",
-      "function allowance(address owner, address spender) view returns (uint256)",
-      "function approve(address spender, uint256 amount) public"
-    ],
-    RPC_PROVIDERS[token?.chainId]
-  );
-  const account = await connector.getAccount()
-  const allowance = await tokenContract.allowance(account, spender)
-
-  if (Number(allowance) === 0 || Number(allowance) < inputAmount) {
-    showLoadingToast("Approving assets for deposit...")
-    const signer = await connector.getSigner()
-
-    try {
-      const tx = await tokenContract.connect(signer).approve(spender, "115792089237316195423570985008687907853269984665640")
-      await tx.wait(1)
-      showSuccessToast("Approved assets for deposit!")
-    } catch (error) {
-      showErrorToast(error)
-    }
-  }
-  return true
-}
 
 interface VaultInputsProps {
   vault: Token;
@@ -47,26 +21,25 @@ interface VaultInputsProps {
 }
 
 export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId }: VaultInputsProps): JSX.Element {
-  const { address: account, connector } = useAccount();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
+  const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
-  const [inputToken, setInputToken] = useState<any>()
-  const [outputToken, setOutputToken] = useState<any>()
+  const [inputToken, setInputToken] = useState<Token>()
+  const [outputToken, setOutputToken] = useState<Token>()
 
   const [inputBalance, setInputBalance] = useState<number>(0);
 
-  const hasGauge = !!gauge
+  const [isDeposit, setIsDeposit] = useState<boolean>(true);
 
   useEffect(() => {
-    if (tokenOptions.length > 0 && !inputToken?.address && !outputToken?.address) {
-      // set default input/output tokens
-      setInputToken(tokenOptions[0])
-      setOutputToken(hasGauge ? gauge : vault)
-    }
-  }, [tokenOptions])
+    // set default input/output tokens
+    setInputToken(asset)
+    setOutputToken(!!gauge ? gauge : vault)
+  }, [])
 
-  const isDeposit = outputToken?.address === (gauge || vault).address
 
   function handleChangeInput(e: any) {
     setInputBalance(Number(e.currentTarget.value));
@@ -75,12 +48,14 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
   function switchTokens() {
     if (isDeposit) {
       // Switch to Withdraw
-      setInputToken(hasGauge ? gauge : vault);
+      setInputToken(!!gauge ? gauge : vault);
       setOutputToken(asset)
+      setIsDeposit(false)
     } else {
       // Switch to Deposit
       setInputToken(asset);
-      setOutputToken(hasGauge ? gauge : vault)
+      setOutputToken(!!gauge ? gauge : vault)
+      setIsDeposit(true)
     }
   }
 
@@ -90,18 +65,46 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
     if (chain?.id !== Number(chainId)) switchNetwork?.(Number(chainId));
 
-    switch (inputToken.address) {
+    switch (inputToken?.address) {
       case asset.address:
         console.log("in asset")
-        if (outputToken.address === vault.address) {
+        if (outputToken?.address === vault.address) {
           console.log("out vault")
-          await handleAllowance(inputToken, connector, vault?.address, (inputBalance * (10 ** inputToken?.decimals)))
-          vaultDeposit(vault?.address, (inputBalance * (10 ** inputToken?.decimals)), connector)
+          await handleAllowance({
+            token: inputToken,
+            inputAmount: (inputBalance * (10 ** inputToken?.decimals)),
+            account: account as Address,
+            spender: vault.address,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
+          vaultDeposit({
+            address: vault.address,
+            account: account as Address,
+            amount: (inputBalance * (10 ** inputToken?.decimals)),
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
         }
-        else if (outputToken.address === gauge?.address) {
+        else if (outputToken?.address === gauge?.address) {
           console.log("out gauge")
-          await handleAllowance(inputToken, connector, VAULT_ROUTER, (inputBalance * (10 ** inputToken?.decimals)))
-          vaultDepositAndStake(VAULT_ROUTER, vault?.address, gauge?.address, (inputBalance * (10 ** inputToken?.decimals)), connector)
+          await handleAllowance({
+            token: inputToken,
+            inputAmount: (inputBalance * (10 ** inputToken?.decimals)),
+            account: account as Address,
+            spender: VAULT_ROUTER,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
+          vaultDepositAndStake({
+            address: VAULT_ROUTER,
+            account: account as Address,
+            amount: (inputBalance * (10 ** inputToken?.decimals)),
+            vault: vault?.address as Address,
+            gauge: gauge?.address as Address,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
         }
         else {
           console.log("out error")
@@ -111,13 +114,26 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         break;
       case vault.address:
         console.log("in vault")
-        if (outputToken.address === asset.address) {
+        if (outputToken?.address === asset.address) {
           console.log("out asset")
-          vaultRedeem(vault?.address, (inputBalance * (10 ** inputToken?.decimals)), connector)
+          vaultRedeem({
+            address: vault.address,
+            account: account as Address,
+            amount: (inputBalance * (10 ** inputToken?.decimals)),
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
         }
-        else if (outputToken.address === gauge?.address) {
+        else if (outputToken?.address === gauge?.address) {
           console.log("out gauge")
-          await handleAllowance(vault, connector, gauge?.address, (inputBalance * (10 ** vault?.decimals)))
+          await handleAllowance({
+            token: vault,
+            inputAmount: (inputBalance * (10 ** vault?.decimals)),
+            account: account as Address,
+            spender: gauge?.address as Address,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
           //gaugeDeposit()
         }
         else {
@@ -128,12 +144,27 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         break;
       case gauge?.address:
         console.log("in gauge")
-        if (outputToken.address === asset.address) {
+        if (outputToken?.address === asset.address) {
           console.log("out asset")
-          await handleAllowance(inputToken, connector, VAULT_ROUTER, (inputBalance * (10 ** inputToken?.decimals)))
-          vaultUnstakeAndWithdraw(VAULT_ROUTER, vault?.address, gauge?.address, (inputBalance * (10 ** inputToken?.decimals)), connector)
+          await handleAllowance({
+            token: inputToken,
+            inputAmount: (inputBalance * (10 ** vault?.decimals)),
+            account: account as Address,
+            spender: VAULT_ROUTER,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
+          vaultUnstakeAndWithdraw({
+            address: VAULT_ROUTER,
+            account: account as Address,
+            amount: (inputBalance * (10 ** inputToken?.decimals)),
+            vault: vault?.address as Address,
+            gauge: gauge?.address as Address,
+            publicClient,
+            walletClient: walletClient as WalletClient
+          })
         }
-        else if (outputToken.address === vault.address) {
+        else if (outputToken?.address === vault.address) {
           console.log("out vault")
           //gaugeWithdraw()
         }
@@ -186,7 +217,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onSelectToken={option => setOutputToken(option)}
       onMaxClick={() => { }}
       chainId={chainId}
-      value={(inputBalance * (Number(inputToken.price)) / Number(outputToken.price)) || 0}
+      value={(inputBalance * (Number(inputToken?.price)) / Number(outputToken?.price)) || 0}
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}

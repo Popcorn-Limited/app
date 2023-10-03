@@ -8,6 +8,7 @@ export type Token = {
   decimals: number;
   logoURI: string;
   balance: number;
+  price: number;
 };
 
 export type TokenConstant = {
@@ -64,4 +65,10 @@ export type OptionalMetadata = {
   },
   getTokenUrl?: string;
   resolver?: ProtocolName;
+}
+
+export type SimulationResponse = {
+  request: any | null;
+  success: boolean;
+  error: string | null;
 }

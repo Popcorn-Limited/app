@@ -1,14 +1,12 @@
 import axios from "axios";
-import { Address, usePublicClient } from "wagmi";
+import { Address, PublicClient, mainnet } from "wagmi";
 import { ChainId, networkMap } from "@/lib/utils/connectors";
-import { ERC20Abi, PopByChain, PopStakingByChain, VaultAbi } from "@/lib/constants";
+import { VaultAbi } from "@/lib/constants";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses";
-import { getAssetAndValueByVaults } from "@/lib/vault/getAssetAndAssetsPerShare";
-import { PublicClient } from "viem";
+import { Chain, createPublicClient, http } from "viem";
+import { arbitrum, optimism, polygon } from "viem/chains";
 
-// TODO -- update this with learnings from `getNetworth`
-
-function prepareContract(address: Address) {
+function prepareContract(address: Address, account: Address) {
   const vaultContract = {
     address,
     abi: VaultAbi
@@ -27,31 +25,66 @@ function prepareContract(address: Address) {
   },
   {
     ...vaultContract,
-    functionName: 'balanceOf'
+    functionName: 'balanceOf',
+    args: [account]
+  },
+  {
+    ...vaultContract,
+    functionName: 'decimals'
   }]
 }
 
+async function getVaultValues({ addresses, account, client }: { addresses: Address[], account: Address, client: PublicClient }): Promise<any[]> {
+  const res = await client.multicall({ contracts: addresses.map(address => prepareContract(address, account)).flat(), allowFailure: false })
 
-export async function getVaultNetworthByChain({ client }: { client: PublicClient }): Promise<number> {
-  const chainId = client.chain?.id as number
-  const vaultAddresses = await getVaultAddresses({ client })
-
-  const balances = await client.multicall({
-    contracts: vaultAddresses.map((address) => prepareContract(address)).flat()
+  return addresses.map((address, i) => {
+    if (i > 0) i = i * 5
+    const assetsPerShare = Number(res[i + 1]) === 0 ? 0 : Number(res[i + 1]) / Number(res[i + 2])
+    return {
+      vault: address,
+      asset: res[i] as Address,
+      assetsPerShare: assetsPerShare,
+      totalAssets: Number(res[i + 1]),
+      totalSupply: Number(res[i + 2]),
+      balance: Number(res[i + 3]),
+      decimals: Number(res[i + 4])
+    }
   })
-
-  const assetAndValues = await getAssetAndValueByVaults({ addresses: vaultAddresses, client })
-  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(assetAndValues.map(entry => `${networkMap[chainId].toLowerCase()}:${entry.asset},`))}`)
-  const vaultPrices = assetAndValues.map(entry => Number(data.coins[`${networkMap[chainId].toLowerCase()}:${entry.asset}`].price || 0) * entry.assetsPerShare)
-
-  return vaultPrices.map((price, i) => Number(balances[i + 2].result) * price).reduce((a, b) => a + b, 0)
 }
 
-export default async function getVaultNetworth(): Promise<{ [key: number]: number, total: number }> {
-  const ethereumNetworth = await getVaultNetworthByChain({ client: usePublicClient({ chainId: ChainId.Ethereum }) })
-  const polygonNetworth = await getVaultNetworthByChain({ client: usePublicClient({ chainId: ChainId.Polygon }) })
-  const optimismNetworth = await getVaultNetworthByChain({ client: usePublicClient({ chainId: ChainId.Optimism }) })
-  const arbitrumNetworth = await getVaultNetworthByChain({ client: usePublicClient({ chainId: ChainId.Arbitrum }) })
+export async function getVaultNetworthByChain({ account, chain }: { account: Address, chain: Chain }): Promise<number> {
+  const client = createPublicClient({
+    chain,
+    transport: http()
+  })
+  const addresses = await getVaultAddresses({ client })
+  const vaultValues = await getVaultValues({ addresses, account, client })
+  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(vaultValues.map(entry => `${networkMap[chain.id].toLowerCase()}:${entry.asset}`))}`)
+  const vaults = vaultValues.map((entry, i) => {
+    const assetPrice = Number(data.coins[`${networkMap[chain.id].toLowerCase()}:${entry.asset}`]?.price || 0)
+    return {
+      ...entry,
+      price: assetPrice * entry.assetsPerShare,
+      balanceValue: entry.balance === 0 ? 0 : (entry.balance * assetPrice * entry.assetsPerShare) / (10 ** ((entry.decimals as number) - 9))
+    }
+  })
+
+  return vaults.reduce((acc, entry) => acc + entry.balanceValue, 0)
+}
+
+type VaultNetworth = {
+  [ChainId.Ethereum]: number,
+  [ChainId.Polygon]: number,
+  [ChainId.Optimism]: number,
+  [ChainId.Arbitrum]: number,
+  total: number
+}
+
+export default async function getVaultNetworth({ account }: { account: Address }): Promise<VaultNetworth> {
+  const ethereumNetworth = await getVaultNetworthByChain({ account, chain: mainnet })
+  const polygonNetworth = await getVaultNetworthByChain({ account, chain: polygon })
+  const optimismNetworth = await getVaultNetworthByChain({ account, chain: optimism })
+  const arbitrumNetworth = await getVaultNetworthByChain({ account, chain: arbitrum })
 
   return {
     [ChainId.Ethereum]: ethereumNetworth,

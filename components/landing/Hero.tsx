@@ -22,7 +22,10 @@ export default function Hero(): JSX.Element {
   useEffect(() => {
     if (account && loading)
       // fetch and set networth
-      getTotalNetworth({ account }).then(res => { setNetworth(res.total); setLoading(false); });
+      getTotalNetworth({ account }).then(res => {
+        setNetworth(res.total);
+        setLoading(false);
+      });
   }, [account]);
 
 
@@ -32,16 +35,16 @@ export default function Hero(): JSX.Element {
         <div className="flex flex-col sm:flex-row sm:space-x-28 smmd:space-x-10">
           <StatusWithLabel
             label={"Deposits"}
-            content={<p className="text-3xl font-bold text-black">$ {NumberFormatter.format(networth.vault)}</p>}
+            content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.vault)}</p>}
           />
           <div className="flex flex-row space-x-28 smmd:space-x-10 items-center mt-4 sm:mt-0">
             <StatusWithLabel
               label={"Staked"}
-              content={<p className="text-3xl font-bold text-black">$ {NumberFormatter.format(networth.stake)}</p>}
+              content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
             />
             <StatusWithLabel
               label={"POP in Wallet"}
-              content={<p className="text-3xl font-bold text-black">$ {NumberFormatter.format(networth.pop)}</p>}
+              content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
             />
           </div>
         </div>
@@ -58,7 +61,7 @@ export default function Hero(): JSX.Element {
           />
           <StatusWithLabel
             label={"My Networth"}
-            content={<p className="text-3xl font-bold text-black">$ {NumberFormatter.format(networth.total)}</p>}
+            content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.total)}</p>}
             infoIconProps={{
               id: "networth",
               title: "My Networth",

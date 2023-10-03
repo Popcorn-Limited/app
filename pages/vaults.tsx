@@ -2,17 +2,17 @@
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { Address, useAccount, usePublicClient } from "wagmi";
-import { Chain, PublicClient, createPublicClient, http } from "viem";
+import { useAccount } from "wagmi";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import getVaultNetworth from "@/lib/vault/getVaultNetworth";
-import getVaultAddresses from "@/lib/vault/getVaultAddresses";
-import SweetVaults from "@/components/vault/SweetVaults";
 import useVaultTvl from "@/lib/useVaultTvl";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import { VaultData } from "@/lib/types";
+import SweetVault from "@/components/vault/SweetVault";
+import NetworkFilter from "@/components/network/NetworkFilter";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -32,6 +32,8 @@ const Vaults: NextPage = () => {
   const [vaults, setVaults] = useState<VaultData[]>([]);
   const vaultTvl = useVaultTvl();
 
+  const [searchString, handleSearch] = useState("");
+
   useEffect(() => {
     async function getVaults() {
       setInitalLoad(true)
@@ -49,14 +51,14 @@ const Vaults: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
 
-  // TODO -- update this with learnings from `getNetworth`
-  // useEffect(() => {
-  //   if (account && loading)
-  //     // fetch and set networth
-  //     getVaultNetworth().then(res => { setNetworth(res.total); setLoading(false); });
-  // }, [account]);
-
-  console.log({ vaults })
+  useEffect(() => {
+    if (account && loading)
+      // fetch and set networth
+      getVaultNetworth({ account }).then(res => {
+        setNetworth(res.total);
+        setLoading(false);
+      });
+  }, [account]);
 
   return (
     <NoSSR>
@@ -88,7 +90,7 @@ const Vaults: NextPage = () => {
             <div className="w-1/2">
               <p className="leading-6 text-base text-primaryDark">Deposits</p>
               <div className="text-3xl font-bold whitespace-nowrap">
-                {`$${NumberFormatter.format(networth)}`}
+                {`$${loading ? "..." : NumberFormatter.format(networth)}`}
               </div>
             </div>
           </div>
@@ -102,11 +104,34 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <SweetVaults
-        vaults={vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address))}
-        selectNetwork={selectNetwork}
-        deployer="0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"
-      />
+      <section className="mt-8 mb-10 md:flex flex-row items-center justify-between">
+        <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
+        <div className="md:w-96 flex px-5 py-1 items-center rounded-lg border border-customLightGray">
+          <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
+          <input
+            className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 leading-none mt-1"
+            type="text"
+            placeholder="Search..."
+            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+            defaultValue={searchString}
+          />
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+          return (
+            <SweetVault
+              key={`sv-${vault.address}-${vault.chainId}`}
+              vaultData={vault}
+              searchString={searchString}
+              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+            />
+          )
+        })
+          : <p>Loading Vaults...</p>
+        }
+      </section>
     </NoSSR>
   )
 };

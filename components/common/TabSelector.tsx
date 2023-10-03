@@ -1,6 +1,5 @@
 import { Dispatch } from "react";
 
-// TODO use this or components/Tabs
 interface TabSelectorProps {
   activeTab: any;
   setActiveTab: Dispatch<any>;

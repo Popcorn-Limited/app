@@ -1,12 +1,11 @@
-import axios from "axios";
 import { PublicClient, createPublicClient, http } from "viem";
 import { Chain, arbitrum, optimism, polygon } from "viem/chains";
 import { Address, mainnet } from "wagmi";
-import { ChainId, networkMap } from "@/lib/utils/connectors";
+import { ChainId } from "@/lib/utils/connectors";
 import { ERC20Abi, PopByChain, PopStakingByChain } from "@/lib/constants";
 import getVaultAddresses from "@/lib/vault/getVaultAddresses";
-import { getAssetAndValueByVaults } from "@/lib/vault/getAssetAndAssetsPerShare";
 import { resolvePrice } from "@/lib/resolver/price/price";
+import { getVaultNetworthByChain } from "@/lib/vault/getVaultNetworth";
 
 const BaseAddressesByChain: { [key: number]: Address[] } = {
   1: [PopByChain[ChainId.Ethereum], PopStakingByChain[ChainId.Ethereum]],
@@ -45,8 +44,6 @@ async function getBalancesByChain({ account, client, addresses }: { account: Add
     allowFailure: false
   })
 
-  //res = res.map((entry, i) => i !== 0 && i % 2 === 1 ? [res[i - 1], res[i]] : null).filter(entry => entry !== null) as [number, number][]
-
   const bals = addresses.map((address, i) => {
     if (i > 0) i = i * 2
     const bal = Number(res[i])
@@ -74,23 +71,7 @@ export async function getNetworthByChain({ account, chain }: { account: Address,
   const stakeNetworth = ((balances.find(entry => entry.address === PopStakingByChain[chain.id])?.balance || 0) * popPrice) / (1e18);
 
   // Get value of vault holdings
-  const assetAndValues = await getAssetAndValueByVaults({ addresses: vaultAddresses, client })
-  const { data } = await axios.get(`https://coins.llama.fi/prices/current/${String(assetAndValues.map(entry => `${networkMap[chain.id].toLowerCase()}:${entry.asset}`))}`)
-  const vaults = assetAndValues.map((entry, i) => {
-    const assetPrice = Number(data.coins[`${networkMap[chain.id].toLowerCase()}:${entry.asset}`]?.price || 0)
-    const balEntry = balances.find(b => b.address === entry.vault)
-    const bal = balEntry?.balance || 0
-    return {
-      vault: entry.vault,
-      asset: entry.asset,
-      assetsPerShare: entry.assetsPerShare,
-      assetPrice: assetPrice,
-      price: assetPrice * entry.assetsPerShare,
-      balance: bal,
-      balanceValue: bal === 0 ? 0 : (bal * assetPrice * entry.assetsPerShare) / (10 ** ((balEntry?.decimals as number) - 9))
-    }
-  })
-  const vaultNetworth = vaults.reduce((acc, entry) => acc + entry.balanceValue, 0)
+  const vaultNetworth = await getVaultNetworthByChain({ account, chain })
 
   return { pop: popNetworth, stake: stakeNetworth, vault: vaultNetworth, total: popNetworth + stakeNetworth + vaultNetworth }
 }

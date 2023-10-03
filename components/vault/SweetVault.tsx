@@ -105,10 +105,13 @@ function SweetVault({
 
       <section className="flex flex-col w-full md:w-4/12 gap-8">
         <div className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-          {/* <VaultInputs
+          <VaultInputs
+            vault={vault}
+            asset={asset}
+            gauge={gauge}
             tokenOptions={[vaultData.vault, vaultData.asset]}
-            hasGauge={!!vaultData.gauge?.address}
-          /> */}
+            chainId={vaultData.chainId}
+          />
         </div>
       </section>
 
@@ -128,6 +131,9 @@ function SweetVault({
         <div className="mt-8">
           <MarkdownRenderer content={`# Strategies \n${vaultData.metadata.optionalMetadata?.strategy?.description}`} />
         </div>
+        {/* <div className="mt-8">
+          <MarkdownRenderer content={`# Addresses \nVault: ${vault.address} \nAsset: ${asset.address}`} />
+        </div> */}
       </section>
 
     </div>

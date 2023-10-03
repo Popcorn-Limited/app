@@ -123,7 +123,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
         name: String(results[i + 0]),
         symbol: String(results[i + 1]),
         decimals: Number(results[i + 2]),
-        logoURI: "",  // TODO -- add logoURI
+        logoURI: "/images/tokens/pop.svg",
         balance: hasAccount ? Number(results[i + 9]) : 0
       },
       assetAddress: getAddress(results[i + 3] as string),
@@ -156,7 +156,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       symbol: String(assetAndAdapterMeta[i + 1]),
       decimals: entry.vault.decimals - 9,
       logoURI: "",
-      balance: hasAccount ? Number(assetAndAdapterMeta[i + 2]) : 0
+      balance: hasAccount ? Number(assetAndAdapterMeta[i + 2]) : 0,
+      price: 0,
     }
     const adapter = {
       address: getAddress(entry.adapterAddress),
@@ -164,7 +165,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       symbol: String(assetAndAdapterMeta[i + 4]),
       decimals: entry.vault.decimals,
       logoURI: "",  // wont be used, just here for consistency
-      balance: 0
+      balance: 0,
+      price: 0,
     }
     return {
       ...entry,
@@ -205,6 +207,8 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
     const pricePerShare = entry.assetsPerShare * assetPrice
     return {
       ...entry,
+      vault: { ...entry.vault, price: pricePerShare * 1e9 }, // @dev -- normalize vault price for previews (watch this if errors occur)
+      asset: { ...entry.asset, price: assetPrice },
       assetPrice: assetPrice,
       pricePerShare: pricePerShare,
       // @ts-ignore -- @dev ts still thinks entry.asset is just an `Address`
@@ -241,16 +245,18 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     name: String(assetAndAdapterMeta[0]),
     symbol: String(assetAndAdapterMeta[1]),
     decimals: Number(results[2]) - 9,
-    logoURI: "",  // TODO -- add logoURI
-    balance: hasAccount ? Number(assetAndAdapterMeta[2]) : 0
+    logoURI: "",
+    balance: hasAccount ? Number(assetAndAdapterMeta[2]) : 0,
+    price: price
   }
   const adapter = {
     address: getAddress(results[4] as string),
     name: String(assetAndAdapterMeta[3]),
     symbol: String(assetAndAdapterMeta[4]),
     decimals: Number(results[2]),
-    logoURI: "",  // wont be used, just here for consistency,
-    balance: 0
+    logoURI: "", // wont be used, just here for consistency,
+    balance: 0, // wont be used, just here for consistency,
+    price: 0, // wont be used, just here for consistency,
   }
   return {
     address: getAddress(vault),
@@ -259,10 +265,11 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
       name: String(results[0]),
       symbol: String(results[1]),
       decimals: Number(results[2]),
-      logoURI: "",  // TODO -- add logoURI
-      balance: hasAccount ? Number(results[9]) : 0
+      logoURI: "/images/tokens/pop.svg",
+      balance: hasAccount ? Number(results[9]) : 0,
+      price: pricePerShare * 1e9,  // @dev -- normalize vault price for previews (watch this if errors occur)
     },
-    asset,
+    asset: { ...asset, logoURI: getAssetIcon({ asset, adapter, chainId: client.chain.id }) },
     adapter,
     totalAssets: Number(results[5]),
     totalSupply: Number(results[6]),
