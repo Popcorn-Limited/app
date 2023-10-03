@@ -143,13 +143,6 @@ export default function MobileMenu(): JSX.Element {
                             <Link href="/" className=" text-primary leading-6 mt-4">
                               Popcorn
                             </Link>
-                            <Link
-                              href="/docs/Popcorn_whitepaper_v1.pdf"
-                              target="_blank"
-                              className=" text-primary leading-6 mt-4"
-                            >
-                              Whitepaper
-                            </Link>
                           </div>
                         </div>
 

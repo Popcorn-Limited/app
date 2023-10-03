@@ -39,8 +39,8 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-                Vault <br className="hidden md:inline" />
-                Boosts
+                Boost <br className="hidden md:inline" />
+                Vaults
               </>
             }
             customContent={<SmileyIcon size={"60"} color={"black"} className="group-hover:fill-[#C391FF]" />}
@@ -67,11 +67,11 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-                Archive
+                Staking
               </>
             }
             customContent={<PopIcon size={"60"} color={"black"} className="group-hover:fill-[#80FF77]" />}
-            description="Find all of our old and discontinued products here"
+            description="Find our staking products and discontinued products here"
             stats={[]}
             route="https://archive.pop.network"
           />
