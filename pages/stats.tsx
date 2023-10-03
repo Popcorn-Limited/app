@@ -509,7 +509,7 @@ export default function Vaults() {
                     </div>
                     <div className={`flex flex-col bg-[#FAF9F4] border border-warmGray rounded-[1rem]`}>
                         <div className={`h-[4rem] flex justify-between border-b border-[#353945] px-[1.5rem]`}>
-                            <p className={`text-[0.75rem] sm:text-[1rem] my-auto`}>Sweet Vault TVL</p>
+                            <p className={`text-[0.75rem] sm:text-[1rem] my-auto`}>Smart Vault TVL</p>
                             <SelectField value={tvlChain} options={chainOptions} onChange={opt => setTvlChain(opt)} />
                         </div>
                         <div className={`py-4 px-6 flex flex-col md:flex-row gap-[3.5rem]`}>
@@ -537,7 +537,7 @@ export default function Vaults() {
                                     <p className={`font-bold text-right`}>Coming Soon{/*statistics.totalRevenue.toLocaleString()*/}</p>
                                 </div>
                                 <div className={`flex justify-between`}>
-                                    <p>Sweet Vault Fees</p>
+                                    <p>Smart Vault Fees</p>
                                     <p className={`font-bold text-right`}>Coming Soon</p>
                                 </div>
                                 <div className={`flex justify-between`}>

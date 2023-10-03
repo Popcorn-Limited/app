@@ -19,7 +19,7 @@ function getBaseToken(vaultData: VaultData): Token[] {
   return baseToken;
 }
 
-function SweetVault({
+export default function SmartVault({
   vaultData,
   searchString,
   deployer,
@@ -140,5 +140,3 @@ function SweetVault({
   </Accordion>
   )
 }
-
-export default SweetVault;

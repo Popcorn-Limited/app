@@ -17,7 +17,7 @@ export default function Products(): JSX.Element {
           <Product
             title={
               <>
-                Sweet <br className="hidden md:inline" />
+                Smart <br className="hidden md:inline" />
                 Vaults
               </>
             }
