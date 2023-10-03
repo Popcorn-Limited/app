@@ -68,6 +68,7 @@ const Footer = () => {
           <div className="flex flex-col">
             {ProductLinks.map((link: FooterLink) =>
               <Link
+                key={link.label}
                 href={link.href}
                 passHref
                 target="_blank"
@@ -84,6 +85,7 @@ const Footer = () => {
           <div className="flex flex-col">
             {GeneralLinks.map((link: FooterLink) =>
               <Link
+                key={link.label}
                 href={link.href}
                 passHref
                 target="_blank"
@@ -100,6 +102,7 @@ const Footer = () => {
           <div className="flex flex-col">
             {BugBountyLinks.map((link: FooterLink) =>
               <Link
+                key={link.label}
                 href={link.href}
                 passHref
                 target="_blank"
