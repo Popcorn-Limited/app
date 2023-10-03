@@ -1,18 +1,17 @@
-import { ChevronDownIcon } from "@heroicons/react/outline";
-import { ChainId } from "lib/utils/connectors";
-import PopUpModal from "components/Modal/PopUpModal";
-import SingleActionModal from "components/Modal/SingleActionModal";
-import TokenIcon from "components/TokenIcon";
-import Image from "next/image";
 import { useState } from "react";
-import { SearchToken } from "components/SearchToken";
-import { Token } from "lib/types";
+import Image from "next/image";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { Token } from "@/lib/types";
+import { ChainId } from "@/lib/utils/connectors";
+import TokenIcon from "@/components/common/TokenIcon";
+import SearchToken from "@/components/SearchToken";
+import Modal from "@/components/modal/Modal";
 
 export interface SelectTokenProps {
   allowSelection: boolean;
   options: Token[];
   selectedToken: Token;
-  selectToken?: (token: Token) => void;
+  selectToken: (token: Token) => void;
   chainId: ChainId;
 }
 
@@ -23,71 +22,56 @@ export default function SelectToken({
   selectToken,
   chainId,
 }: SelectTokenProps): JSX.Element {
-  const [showSelectTokenModal, setShowSelectTokenModal] = useState(false);
-  const [showPopUp, setShowPopUp] = useState<boolean>(false);
-
-  const openPopUp = () => {
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
-    if (mediaQuery.matches) {
-      setShowSelectTokenModal(true);
-    } else {
-      setShowPopUp(true);
-    }
-  };
+  const [show, setShow] = useState(false);
 
   return (
     <>
+      {/* Desktop Token Search */}
+      {/* TODO - style this */}
+      <div className="hidden md:block">
+        <Modal visibility={[show, setShow]}>
+          <div>
+            <Image src="/images/blackCircle.svg" width={88} height={88} alt="default token icon" />
+            <h2>Select a token</h2>
+            <div className="mt-8">
+              <SearchToken
+                chainId={chainId}
+                options={options}
+                selectToken={(token) => {
+                  selectToken(token);
+                  setShow(false);
+                }}
+                selectedToken={selectedToken}
+              />
+            </div>
+          </div>
+        </Modal>
+      </div>
       <div className="relative w-auto justify-end">
         <span
           className={`flex flex-row items-center justify-end ${allowSelection ? "cursor-pointer group" : ""}`}
           onClick={() => {
-            allowSelection && openPopUp();
+            allowSelection && setShow(true);
           }}
         >
           <div className="md:mr-2 relative">
-            <TokenIcon token={selectedToken?.address} icon={selectedToken?.icon} imageSize="w-5 h-5" chainId={chainId} />
+            <TokenIcon token={selectedToken} icon={selectedToken?.logoURI} imageSize="w-5 h-5" chainId={chainId} />
           </div>
           <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
             {selectedToken?.symbol}
           </p>
-
           {allowSelection && (
-            <>
-              <ChevronDownIcon
-                className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary transform transition-all ease-in-out duration-200 ${
-                  showPopUp || showSelectTokenModal ? " rotate-180" : ""
-                }`}
-              />
-            </>
+            <ChevronDownIcon
+              className={`w-6 h-6 ml-2 text-secondaryLight group-hover:text-primary 
+              transform transition-all ease-in-out duration-200 ${show ? " rotate-180" : ""}`}
+            />
           )}
         </span>
       </div>
-      <SingleActionModal
-        image={<Image src="/images/blackCircle.svg" width={88} height={88} alt="default token icon" />}
-        visible={showSelectTokenModal}
-        title="Select a token"
-        keepOpen={false}
-        content={
-          <div className="mt-8">
-            <SearchToken
-              chainId={chainId}
-              options={options}
-              selectToken={(token) => {
-                selectToken(token);
-                setShowSelectTokenModal(false);
-              }}
-              selectedToken={selectedToken}
-            />
-          </div>
-        }
-        onDismiss={{
-          onClick: () => {
-            setShowSelectTokenModal(false);
-          },
-        }}
-      />
-      <div className="fixed z-100 left-0">
-        <PopUpModal
+      {/* Mobile Token Search */}
+      {/* TODO - add this */}
+      <div className="fixed md:hidden z-100 left-0">
+        {/* <PopUpModal
           visible={showPopUp}
           onClosePopUpModal={() => {
             setShowPopUp(false);
@@ -103,7 +87,7 @@ export default function SelectToken({
             }}
             selectedToken={selectedToken}
           />
-        </PopUpModal>
+        </PopUpModal> */}
       </div>
     </>
   );

@@ -1,12 +1,12 @@
-import { BigNumber, constants, utils } from "ethers";
-import { parseUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "viem";
+import { ZERO } from "./helpers";
 
 const MILLION = 1e6;
 const THOUSAND = 1e3;
 
-export function formatAndRoundBigNumber(value: BigNumber, decimals: number): string {
-  if (BigNumber.isBigNumber(value)) {
-    const formatedValue = Number(utils.formatUnits(value, decimals));
+export function formatAndRoundBigNumber(value: BigInt, decimals: number): string {
+  if (typeof value === "bigint") {
+    const formatedValue = Number(formatUnits(value, decimals));
 
     if (formatedValue > MILLION) {
       return `${(formatedValue / MILLION).toLocaleString(undefined, {
@@ -29,6 +29,7 @@ export function formatAndRoundBigNumber(value: BigNumber, decimals: number): str
 }
 
 export function formatAndRoundNumber(value: number, decimals: number): string {
+  if (value === 0) return "0"
   return formatNumber(value / (10 ** decimals))
 }
 
@@ -51,12 +52,18 @@ export function formatNumber(value: number): string {
   });
 }
 
-export function numberToBigNumber(value: number | string, decimals: number): BigNumber {
+export function numberToBigNumber(value: number | string, decimals: number): BigInt {
   if (typeof value === "number") {
-    return BigNumber.from(parseUnits(String(value), decimals));
+    return parseUnits(String(value), decimals);
   } else if (typeof value === "string") {
     if (value == "" || value == ".") value = "0";
-    return BigNumber.from(parseUnits(value, decimals));
+    return parseUnits(value, decimals);
   }
-  return constants.Zero;
+  return ZERO;
 }
+
+
+export const NumberFormatter = Intl.NumberFormat("en", {
+  //@ts-ignore
+  notation: "compact",
+});
