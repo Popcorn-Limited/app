@@ -44,6 +44,13 @@ export default function NetworkFilter({ supportedNetworks, selectNetwork }: Netw
   return (
     <>
       <div className="hidden md:flex flex-row items-center space-x-2">
+        <PseudoRadioButton
+          key={"all"}
+          label={<Image src={networkLogos[ChainId.ALL]} alt={"All"} height="24" width="24" />}
+          handleClick={() => setActiveAndSelectedNetwork(ChainId.ALL)}
+          isActive={activeNetwork == ChainId.ALL}
+          extraClasses="h-12 w-18 border border-customLightGray rounded-3xl text-primary flex justify-center items-center bg-white"
+        />
         {supportedNetworks.map((network) => (
           <PseudoRadioButton
             key={network}

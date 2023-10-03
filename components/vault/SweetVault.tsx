@@ -3,7 +3,7 @@ import { Address, useAccount, } from "wagmi";
 import { getAddress } from "viem";
 import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
 import MarkdownRenderer from "@/components/vault/MarkdownRenderer";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultInputs from "@/components/vault/VaultInputs";
@@ -87,14 +87,14 @@ function SweetVault({
         <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
           <p className="font-normal text-primaryLight">vAPY</p>
           <Title as="span" level={2} fontWeight="font-normal">
-            {apy ? `${formatNumber(apy)} %` : "0 %"}
+            {apy ? `${NumberFormatter.format(apy)} %` : "0 %"}
           </Title>
         </div>
 
         <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
           <p className="leading-6 text-primaryLight">TVL</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            $ {formatNumber(vaultData.tvl)}
+            $ {NumberFormatter.format(vaultData.tvl)}
           </Title>
         </div>
 
