@@ -10,6 +10,15 @@ import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import Page from "@/components/page/Page";
 import "@rainbow-me/rainbowkit/styles.css";
 import "../styles/globals.css";
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  injectedWallet,
+  rainbowWallet,
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  coin98Wallet,
+} from '@rainbow-me/rainbowkit/wallets';
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   alchemyProvider({
@@ -22,11 +31,25 @@ const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   }
 );
 
-const { connectors } = getDefaultWallets({
-  appName: 'popcorn',
-  projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', // From Wallet Connect
-  chains
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Suggested',
+    wallets: [
+      injectedWallet({ chains }),
+      rainbowWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+      metaMaskWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+    ],
+  },
+  {
+    groupName: 'Others',
+    wallets: [
+      coinbaseWallet({ chains, appName: 'Popcorn' }),
+      walletConnectWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+      coin98Wallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains })
+    ]      
+
+  }
+]);
 
 const config = createConfig({
   autoConnect: true,
