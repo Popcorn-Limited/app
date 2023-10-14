@@ -13,6 +13,7 @@ import useApproveBalance from "hooks/useApproveBalance";
 import useWaitForTx from 'lib/utils/hooks/useWaitForTx'
 import toast from 'react-hot-toast'
 import { useAllowance } from 'lib/Erc20/hooks'
+import axios from 'axios';
 
 import { OrderBookApi, OrderSigningUtils, OrderQuoteRequest, OrderQuoteSide, SigningScheme, SubgraphApi, OrderQuoteSideKindSell, OrderQuoteSideKindBuy } from '@cowprotocol/cow-sdk'
 
@@ -113,7 +114,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                 buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI Mainnet
                 from: account,
                 receiver: account,
-                sellAmountBeforeFee: (0.4 * 10 ** 18).toString(), // 0.4 WETH
+                sellAmountBeforeFee: (1 ** 18).toString(), // 1 FRAX
                 kind: OrderQuoteSideKindSell.SELL,
             }
 
@@ -217,17 +218,56 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
     //         </section>
     //     </div>
     // )
+    const [quoteData, setQuoteData] = useState<any>(null);
+
+    const getQuote = async () => {
+        const url = 'https://api.cow.fi/mainnet/api/v1/quote';
+        const body = {
+            sellToken: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            buyToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            receiver: "0x0000000000000000000000000000000000000000",
+            validTo: 1697270000,
+            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            partiallyFillable: false,
+            sellTokenBalance: "erc20",
+            buyTokenBalance: "erc20",
+            from: "0x55fe002aeff02f77364de339a1292923a15844b8",
+            kind: "sell",
+            sellAmountBeforeFee: "10000000000"
+        };
+
+        try {
+            const response = await axios.post(url, body, {
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            setQuoteData(response.data.quote.buyAmount);
+        } catch (error) {
+            console.error('Error fetching quote:', error);
+        }
+    };
+
+    useEffect(() => {
+        getQuote();
+    }, []);
+
     return (
         <div>
-            <div className="form">
+            {quoteData ? (
                 <div>
-                    <button onClick={getOrders}>Get orders</button>
+                    <pre>{JSON.stringify(quoteData, null, 2)}</pre>
                 </div>
-            </div>
-
+            ) : (
+                <p>Loading...</p>
+            )}
         </div>
-    )
+    );
 }
+
+
 
 
 function CowswapTest() {
