@@ -15,7 +15,7 @@ import toast from 'react-hot-toast'
 import { useAllowance } from 'lib/Erc20/hooks'
 import axios from 'axios';
 
-import { OrderBookApi, OrderSigningUtils, OrderQuoteRequest, OrderQuoteSide, SigningScheme, SubgraphApi, OrderQuoteSideKindSell, OrderQuoteSideKindBuy } from '@cowprotocol/cow-sdk'
+import { OrderBookApi, OrderSigningUtils, SubgraphApi } from '@cowprotocol/cow-sdk'
 
 
 const chainId = 1 // Mainnet
@@ -44,10 +44,10 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
     const { data: vault } = useToken({ address: vaultAddress as Address, chainId: 1 })
     const { data: asset } = useVaultToken(vaultAddress, 1);
 
-    const [inputToken, setInputToken] = useState<any>(asset)
-    const [outputToken, setOutputToken] = useState<any>(vault)
+    const [inputToken, setInputToken] = useState<any>("0x853d955aCEf822Db058eb8505911ED77F175b99e") // FRAX
+    const [outputToken, setOutputToken] = useState<any>("0x6B175474E89094C44Da98b954EedeAC495271d0F") // DAI
 
-    const [inputBalance, setInputBalance] = useState<number>(0);
+    const [inputBalance, setInputBalance] = useState<number>(100);
     const [outputPreview, setOutputPreview] = useState<number>(0);
 
     const [availableToken, setAvailableToken] = useState<any[]>([])
@@ -59,7 +59,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
     const [actionData, setActionData] = useState<string>("")
 
-    const showApproveButton = Number(allowance?.value) < inputBalance;
+    const showApproveButton = Number(allowance?.value) < Number(inputBalance);
     const isDeposit = inputToken?.address !== vaultAddress
 
     const handleChangeInput = ({ currentTarget: { value } }) => {
@@ -99,62 +99,21 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
         signer.sendTransaction({ data: actionData, to: COWSWAP_ROUTER, value: "0" }).then(res => console.log(res))
     }
 
-
     useEffect(() => {
-        orderBookApi.context.chainId = chainId
-    }, [chainId])
-
-    const getOrders = useCallback(
-        async (event: FormEvent) => {
-            event.preventDefault()
-
-            // Sell 1 FRAX for DAI on Mainnet network
-            const quoteRequest: OrderQuoteRequest = {
-                sellToken: '0x853d955aCEf822Db058eb8505911ED77F175b99e', // FRAX Mainnet
-                buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI Mainnet
-                from: account,
-                receiver: account,
-                sellAmountBeforeFee: (1 ** 18).toString(), // 1 FRAX
-                kind: OrderQuoteSideKindSell.SELL,
-            }
-
-            // Get quote
-            const { quote } = await orderBookApi.getQuote(quoteRequest)
-
-            // Sign order
-            const orderSigningResult = await OrderSigningUtils.signOrder({ ...quote, receiver: account }, chainId, signer)
-
-            // Send order to the order-book
-            const orderId = await orderBookApi.sendOrder({
-                ...quote,
-                signature: orderSigningResult.signature,
-                signingScheme: orderSigningResult.signingScheme as string as SigningScheme,
-            })
-
-            // Get order data
-            const order = await orderBookApi.getOrder(orderId)
-
-            console.log(order);
-        },
-        [chainId, signer, account]
-    )
-
-    useEffect(() => {
-        // Dummy quote data selling 10_000e18 FRAX to DAI
         const getQuote = async () => {
             const url = 'https://api.cow.fi/mainnet/api/v1/quote';
             const body = {
-                sellToken: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
-                buyToken: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                sellToken: inputToken,
+                buyToken: outputToken,
                 receiver: "0x0000000000000000000000000000000000000000",
-                validTo: 1697424983,
+                validTo: Math.floor(Date.now() / 1000) + 3600,
                 appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 partiallyFillable: false,
                 sellTokenBalance: "erc20",
                 buyTokenBalance: "erc20",
-                from: "0x55fe002aeff02f77364de339a1292923a15844b8",
+                from: account,
                 kind: "sell",
-                sellAmountBeforeFee: "10000000000000000000000"
+                sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString()
             };
 
             try {
@@ -227,10 +186,10 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                     />
                 </>
                 <MainActionButton
-                    label={showApproveButton ? "Approve" : (isDeposit ? "Deposit" : "Withdraw")}
+                    label={showApproveButton ? "Approve" : "Zap"}
                     type="button"
                     handleClick={handleDeposit}
-                    disabled={inputBalance === 0}
+                    disabled={Number(inputBalance) === 0}
                 />
             </section>
         </div>
