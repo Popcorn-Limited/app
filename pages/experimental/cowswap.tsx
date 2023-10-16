@@ -1,5 +1,5 @@
 import { Address, useAccount, useConnect, useDisconnect, useToken, useSigner } from 'wagmi'
-import { BigNumber, Contract, constants, ethers } from 'ethers'
+import { utils } from 'ethers'
 import NoSSR from "react-no-ssr";
 import { getBalances, getTokenAllowance, quote } from 'wido'
 import { parseUnits } from 'ethers/lib/utils.js'
@@ -108,7 +108,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
         async (event: FormEvent) => {
             event.preventDefault()
 
-            // Sell 0.4 WETH for GNO on Goerli network
+            // Sell 1 FRAX for DAI on Mainnet network
             const quoteRequest: OrderQuoteRequest = {
                 sellToken: '0x853d955aCEf822Db058eb8505911ED77F175b99e', // FRAX Mainnet
                 buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI Mainnet
@@ -140,134 +140,102 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
     )
 
     useEffect(() => {
-        async function getPreview() {
-            const quoteResult = await quote({
-                fromChainId: 1,  // Chain Id of from token
-                fromToken: inputToken?.address,  // Token address of from token
-                toChainId: 1,  // Chain Id of to token
-                toToken: outputToken?.address,  // Token address of to token
-                amount: formattedInputBalance?.toString(),  // Token amount of from token
-                slippagePercentage: 0.01,  // Acceptable max slippage for the swap
-                user: account, // Address of user placing the order.
-            })
-            setActionData(quoteResult.data)
-            setOutputPreview(quoteResult.toTokenAmount ? Number(quoteResult.toTokenAmount) / (10 ** outputToken.decimals) : 0)
-        }
-        if (account !== undefined) getPreview();
+        // Dummy quote data selling 10_000e18 FRAX to DAI
+        const getQuote = async () => {
+            const url = 'https://api.cow.fi/mainnet/api/v1/quote';
+            const body = {
+                sellToken: "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+                buyToken: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+                receiver: "0x0000000000000000000000000000000000000000",
+                validTo: 1697424983,
+                appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                partiallyFillable: false,
+                sellTokenBalance: "erc20",
+                buyTokenBalance: "erc20",
+                from: "0x55fe002aeff02f77364de339a1292923a15844b8",
+                kind: "sell",
+                sellAmountBeforeFee: "10000000000000000000000"
+            };
+
+            try {
+                const response = await axios.post(url, body, {
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                setOutputPreview(Number(parseFloat(utils.formatEther(response.data.quote.buyAmount.toString())).toFixed(3)));
+            } catch (error) {
+                console.error('Error fetching quote:', error);
+            }
+        };
+        if (account !== undefined) getQuote();
 
 
     }, [inputBalance, inputToken, outputToken, account])
 
-    // return (
-    //     <div className="flex flex-col w-full md:w-4/12 gap-8">
-    //         <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-    //             <InputTokenWithError
-    //                 captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
-    //                 onSelectToken={option => setInputToken(option)}
-    //                 onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(inputToken.balance) / (10 ** inputToken.decimals) } })}
-    //                 chainId={1}
-    //                 value={inputBalance}
-    //                 onChange={handleChangeInput}
-    //                 selectedToken={inputToken}
-    //                 errorMessage={""}
-    //                 tokenList={outputToken?.address === vault?.address ? availableToken : []}
-    //                 allowSelection={outputToken?.address === vault?.address}
-    //             />
-    //             <>
-    //                 <div className="relative py-4">
-    //                     <div className="absolute inset-0 flex items-center" aria-hidden="true">
-    //                         <div className="w-full border-t border-customLightGray" />
-    //                     </div>
-    //                     <div className="relative flex justify-center">
-    //                         <span className="bg-white px-4">
-    //                             <ArrowDownIcon
-    //                                 className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
-    //                                 aria-hidden="true"
-    //                                 onClick={() => {
-    //                                     if (outputToken.address === vault.address) {
-    //                                         setInputToken(vault);
-    //                                         setOutputToken(asset)
-    //                                     } else {
-    //                                         setInputToken(asset);
-    //                                         setOutputToken(vault)
-    //                                     }
-    //                                 }}
-    //                             />
-    //                         </span>
-    //                     </div>
-    //                 </div>
-    //                 <InputTokenWithError
-    //                     captionText={"Output Amount"}
-    //                     onSelectToken={option => setOutputToken(option)}
-    //                     onMaxClick={() => { }}
-    //                     chainId={1}
-    //                     value={outputPreview}
-    //                     onChange={() => { }}
-    //                     selectedToken={outputToken}
-    //                     errorMessage={""}
-    //                     tokenList={inputToken.address === vault?.address ? availableToken : []}
-    //                     allowSelection={inputToken.address === vault?.address}
-    //                 />
-    //             </>
-    //             <MainActionButton
-    //                 label={showApproveButton ? "Approve" : (isDeposit ? "Deposit" : "Withdraw")}
-    //                 type="button"
-    //                 handleClick={handleDeposit}
-    //                 disabled={inputBalance === 0}
-    //             />
-    //         </section>
-    //     </div>
-    // )
-    const [quoteData, setQuoteData] = useState<any>(null);
-
-    const getQuote = async () => {
-        const url = 'https://api.cow.fi/mainnet/api/v1/quote';
-        const body = {
-            sellToken: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-            buyToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-            receiver: "0x0000000000000000000000000000000000000000",
-            validTo: 1697270000,
-            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            partiallyFillable: false,
-            sellTokenBalance: "erc20",
-            buyTokenBalance: "erc20",
-            from: "0x55fe002aeff02f77364de339a1292923a15844b8",
-            kind: "sell",
-            sellAmountBeforeFee: "10000000000"
-        };
-
-        try {
-            const response = await axios.post(url, body, {
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            setQuoteData(response.data.quote.buyAmount);
-        } catch (error) {
-            console.error('Error fetching quote:', error);
-        }
-    };
-
-    useEffect(() => {
-        getQuote();
-    }, []);
-
     return (
-        <div>
-            {quoteData ? (
-                <div>
-                    <pre>{JSON.stringify(quoteData, null, 2)}</pre>
-                </div>
-            ) : (
-                <p>Loading...</p>
-            )}
+        <div className="flex flex-col w-full md:w-4/12 gap-8">
+            <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
+                <InputTokenWithError
+                    captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
+                    onSelectToken={option => setInputToken(option)}
+                    onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(inputToken.balance) / (10 ** inputToken.decimals) } })}
+                    chainId={1}
+                    value={inputBalance}
+                    onChange={handleChangeInput}
+                    selectedToken={inputToken}
+                    errorMessage={""}
+                    tokenList={outputToken?.address === vault?.address ? availableToken : []}
+                    allowSelection={outputToken?.address === vault?.address}
+                />
+                <>
+                    <div className="relative py-4">
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="w-full border-t border-customLightGray" />
+                        </div>
+                        <div className="relative flex justify-center">
+                            <span className="bg-white px-4">
+                                <ArrowDownIcon
+                                    className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
+                                    aria-hidden="true"
+                                    onClick={() => {
+                                        if (outputToken.address === vault.address) {
+                                            setInputToken(vault);
+                                            setOutputToken(asset)
+                                        } else {
+                                            setInputToken(asset);
+                                            setOutputToken(vault)
+                                        }
+                                    }}
+                                />
+                            </span>
+                        </div>
+                    </div>
+                    <InputTokenWithError
+                        captionText={"Output Amount"}
+                        onSelectToken={option => setOutputToken(option)}
+                        onMaxClick={() => { }}
+                        chainId={1}
+                        value={outputPreview}
+                        onChange={() => { }}
+                        selectedToken={outputToken}
+                        errorMessage={""}
+                        tokenList={inputToken.address === vault?.address ? availableToken : []}
+                        allowSelection={inputToken.address === vault?.address}
+                    />
+                </>
+                <MainActionButton
+                    label={showApproveButton ? "Approve" : (isDeposit ? "Deposit" : "Withdraw")}
+                    type="button"
+                    handleClick={handleDeposit}
+                    disabled={inputBalance === 0}
+                />
+            </section>
         </div>
-    );
+    )
 }
-
-
 
 
 function CowswapTest() {
