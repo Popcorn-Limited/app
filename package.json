@@ -33,7 +33,7 @@
     "slick-carousel": "^1.8.1",
     "tailwind-scrollbar-hide": "^1.1.7",
     "tailwindcss": "^3.2.6",
-    "vaultcraft-sdk": "0.1.12",
+    "vaultcraft-sdk": "0.1.14",
     "viem": "1.11.1",
     "wagmi": "1.4.2"
   },
