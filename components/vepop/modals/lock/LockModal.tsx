@@ -38,7 +38,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 1, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP approved!",
@@ -52,7 +52,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 1, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function LockModal({ show }: { show: [boolean, Function] }): JSX.
     if ((amount || 0) == 0) return;
     // Early exit if value is ZERO
 
-    if (chain.id !== Number(5)) switchNetwork?.(Number(5));
+    if (chain.id !== Number(1)) switchNetwork?.(Number(1));
 
     if (showApproveButton) await approveBalance(POP_LP, VOTING_ESCROW);
     // When approved continue to deposit

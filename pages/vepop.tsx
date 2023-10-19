@@ -163,7 +163,7 @@ function VePopContainer() {
                   Mint the token needed for testing on Goerli here: <br />
                   <a href={`https://goerli.etherscan.io/address/${POP}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">POP </a> <br />
                   <a href={`https://goerli.etherscan.io/address/${WETH}#writeContract`} className="text-blue-500" target="_blank" rel="noreferrer">WETH</a> <br />
-                  <a href={`https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
+                  <a href={`https://app.balancer.fi/#/ethereum/pool/0xd5a44704befd1cfcca67f7bc498a7654cc092959000200000000000000000609`} className="text-blue-500" target="_blank" rel="noreferrer">BalancerPool</a>
                 </div>
               </div>
             </section>

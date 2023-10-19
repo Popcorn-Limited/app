@@ -25,7 +25,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
   const [amount, setAmount] = useState<number>(0);
   const [maxPaymentAmount, setMaxPaymentAmount] = useState<number>(0);
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: WETH, account: OPOP as Address });
+  const { data: allowance } = useAllowance({ chainId: 1, address: WETH, account: OPOP as Address });
   const needAllowance = amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if ((amount || 0) == 0) return;
     // Early exit if value is ZERO
 
-    if (chain.id !== Number(5)) switchNetwork?.(Number(5));
+    if (chain.id !== Number(1)) switchNetwork?.(Number(1));
 
     if (needAllowance) await approveBalance(WETH, OPOP);
     exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), utils.parseEther(maxPaymentAmount.toFixed(18)).mul(BigNumber.from("10000")).toString());

@@ -41,8 +41,8 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: vePopBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-  const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
+  const { data: vePopBal } = useBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
+  const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
 
   const [amount, setAmount] = useState<number>(0);
   const [days, setDays] = useState(7);
@@ -56,7 +56,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     write: approve = noOp,
     isSuccess: isApproveSuccess,
     isLoading: isApproveLoading,
-  } = useApproveBalance(POP_LP, VOTING_ESCROW, 5, {
+  } = useApproveBalance(POP_LP, VOTING_ESCROW, 1, {
     onSuccess: (tx) => {
       waitForTx(tx, {
         successMessage: "POP LP approved!",
@@ -68,7 +68,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
     },
   });
 
-  const { data: allowance } = useAllowance({ chainId: 5, address: POP_LP, account: VOTING_ESCROW as Address });
+  const { data: allowance } = useAllowance({ chainId: 1, address: POP_LP, account: VOTING_ESCROW as Address });
   const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
   )
 
   async function handleMainAction() {
-    if (chain.id !== Number(5)) switchNetwork?.(Number(5));
+    if (chain.id !== Number(1)) switchNetwork?.(Number(1));
 
     if (mangementOption === ManagementOption.IncreaseLock) {
       if ((amount || 0) == 0) return;

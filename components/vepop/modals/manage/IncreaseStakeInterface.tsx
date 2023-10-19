@@ -15,8 +15,8 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
   { amountState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {
   const { address: account } = useAccount()
 
-  const { data: popLp } = useToken({ chainId: 5, address: POP_LP as Address });
-  const { data: popLpBal } = useBalanceOf({ chainId: 5, address: POP_LP, account })
+  const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
+  const { data: popLpBal } = useBalanceOf({ chainId: 1, address: POP_LP, account })
 
   const [amount, setAmount] = amountState
 
@@ -41,7 +41,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
           captionText={``}
           onSelectToken={() => { }}
           onMaxClick={handleMaxClick}
-          chainId={5}
+          chainId={1}
           value={amount}
           onChange={handleChangeInput}
           defaultValue={amount}
@@ -54,7 +54,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
           errorMessage={errorMessage}
           allowInput
           tokenList={[]}
-          getTokenUrl="https://app.balancer.fi/#/goerli/pool/0x1050f901a307e7e71471ca3d12dfcea01d0a0a1c0002000000000000000008b4" // temp link
+          getTokenUrl="https://app.balancer.fi/#/ethereum/pool/0xd5a44704befd1cfcca67f7bc498a7654cc092959000200000000000000000609" // temp link
         />
       </div>
 

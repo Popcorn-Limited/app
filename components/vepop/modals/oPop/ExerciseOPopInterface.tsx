@@ -30,18 +30,18 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const [amount, setAmount] = amountState;
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
-  const { data: oPopPrice } = useOPopPrice({ chainId: 5, address: OPOP_ORACLE })
+  const { data: oPopPrice } = useOPopPrice({ chainId: 1, address: OPOP_ORACLE })
   const { data: popPrice } = usePrice({ chainId: 1, address: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4" })
   const { data: wethPrice } = usePrice({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" })
-  const { data: oPopDiscount } = useOPopDiscount({ chainId: 5, address: OPOP_ORACLE })
+  const { data: oPopDiscount } = useOPopDiscount({ chainId: 1, address: OPOP_ORACLE })
 
-  const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
-  const { data: ethBal } = useBalance({ chainId: 5, address: account })
-  const { data: wethBal } = useBalanceOf({ chainId: 5, address: WETH, account })
+  const { data: oPopBal } = useBalanceOf({ chainId: 1, address: OPOP, account })
+  const { data: ethBal } = useBalance({ chainId: 1, address: account })
+  const { data: wethBal } = useBalanceOf({ chainId: 1, address: WETH, account })
 
-  const { data: oPop } = useToken({ chainId: 5, address: OPOP as Address });
-  const { data: pop } = useToken({ chainId: 5, address: POP as Address });
-  const { data: weth } = useToken({ chainId: 5, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
+  const { data: oPop } = useToken({ chainId: 1, address: OPOP as Address });
+  const { data: pop } = useToken({ chainId: 1, address: POP as Address });
+  const { data: weth } = useToken({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
 
 
   const handleMaxWeth = () => {
@@ -91,7 +91,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           captionText={"Amount oPOP"}
           onSelectToken={() => { }}
           onMaxClick={handleMaxOPop}
-          chainId={5}
+          chainId={1}
           value={amount}
           onChange={handleOPopInput}
           allowInput={true}
@@ -113,7 +113,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           captionText={"Amount WETH"}
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
-          chainId={5}
+          chainId={1}
           value={maxPaymentAmount * 1e3} // temp Goerli value
           onChange={handleEthInput}
           allowInput={true}
@@ -157,7 +157,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             className={`flex flex-row items-center justify-end`}
           >
             <div className="md:mr-2 relative">
-              <TokenIcon token={pop?.address} imageSize="w-5 h-5" chainId={5} />
+              <TokenIcon token={pop?.address} imageSize="w-5 h-5" chainId={1} />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
               {pop?.symbol}
