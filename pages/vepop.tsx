@@ -45,22 +45,22 @@ const {
 
 function VePopContainer() {
   const { address: account } = useAccount()
-  const { data: signer } = useSigner({ chainId: 5 })
+  const { data: signer } = useSigner({ chainId: 1 })
 
-  const { data: popLpBal } = useBalanceOf({ chainId: 5, address: POP_LP, account })
-  const { data: oPopBal } = useBalanceOf({ chainId: 5, address: OPOP, account })
-  const { data: lockedBal } = useLockedBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
-  const { data: veBal } = useBalanceOf({ chainId: 5, address: VOTING_ESCROW, account })
+  const { data: popLpBal } = useBalanceOf({ chainId: 1, address: POP_LP, account })
+  const { data: oPopBal } = useBalanceOf({ chainId: 1, address: OPOP, account })
+  const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
+  const { data: veBal } = useBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
 
-  const { data: oPopPrice } = useOPopPrice({ chainId: 5, address: OPOP_ORACLE })
+  const { data: oPopPrice } = useOPopPrice({ chainId: 1, address: OPOP_ORACLE })
 
-  const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 5 })
-  const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
+  const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 1 })
+  const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 1, account })
 
   const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: account, token: WETH })
 
   const [votes, setVotes] = useState([]);
-  const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 5, account })
+  const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 1, account })
   const canVote = account && Number(veBal?.value) > 0 && !hasAlreadyVoted
 
   const [showLockModal, setShowLockModal] = useState(false);
@@ -71,7 +71,7 @@ function VePopContainer() {
 
   useEffect(() => {
     if (!apy) {
-      getVeApy({ chainId: 5, address: FEE_DISTRIBUTOR, token: WETH }).then(res => setApy(res))
+      getVeApy({ chainId: 5, address: FEE_DISTRIBUTOR, token: "0x2D9B33e9918Dce388d1Cb8Bf09D4E827b899e9d9" }).then(res => setApy(res))
     }
   }, [apy])
 
