@@ -114,7 +114,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
   // Add core metadata
   let metadata = vaults.map((vault, i) => {
     if (i > 0) i = i * 10
-    const assetsPerShare = Number(results[i + 6]) > 0 ? Number(results[i + 5]) / Number(results[i + 6]) : Number(1)
+    const assetsPerShare = Number(results[i + 6]) > 0 ? Number(results[i + 5]) / Number(results[i + 6]) : Number(1e-9)
     const fees = results[i + 7] as [BigInt, BigInt, BigInt, BigInt]
     return {
       address: getAddress(vault),

@@ -4606,10 +4606,10 @@ valtio@1.11.2:
     proxy-compare "2.5.1"
     use-sync-external-store "1.2.0"
 
-vaultcraft-sdk@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/vaultcraft-sdk/-/vaultcraft-sdk-0.1.1.tgz#859567eb895d2160bcaeee739bb4ddc11f720ba3"
-  integrity sha512-iiB6h4YBv+nuQ/SL6yIpFJwINs2KnGI9jGWo8ZOTTSh+JXs8eWs7xXmkTlRhFAhSXjo0r4MpPM3Ue9v/2B+7oA==
+vaultcraft-sdk@0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/vaultcraft-sdk/-/vaultcraft-sdk-0.1.12.tgz#28dfa355f9e59b3cff8f9a6163b34c48047a6316"
+  integrity sha512-tOCEB0kGZfgVotJKO9+9ZjQ6ZWE3ytKq4A7Z8hVgVL+yvcOv/KKCKegbSiBo0Kw8YEa7Ff9Uqo4VXUZMaHqEPw==
   dependencies:
     axios "^1.5.0"
     dotenv "^16.3.1"
