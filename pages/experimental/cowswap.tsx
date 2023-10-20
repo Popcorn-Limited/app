@@ -15,20 +15,15 @@ import toast from 'react-hot-toast'
 import { useAllowance } from 'lib/Erc20/hooks'
 import axios from 'axios';
 
-import { OrderBookApi, OrderSigningUtils, SubgraphApi } from '@cowprotocol/cow-sdk'
-import {
-    domain,
-    Order,
-    SigningScheme,
-    signOrder,
-    OrderKind
-} from "@gnosis.pm/gp-v2-contracts"
+import { OrderBookApi, SupportedChainId, OrderSigningUtils, OrderKind, OrderQuoteSideKindSell, SubgraphApi, EcdsaSigningScheme, SigningScheme } from '@cowprotocol/cow-sdk'
 import { create } from 'domain';
 
 
 const chainId = 1 // Mainnet
 
-const orderBookApi = new OrderBookApi({ chainId })
+// const { sellToken, buyToken, validTo, buyAmount, sellAmount, receiver, feeAmount } = quoteResponse.quote
+
+const orderBookApi = new OrderBookApi({ chainId: SupportedChainId.MAINNET })
 const subgraphApi = new SubgraphApi({ chainId })
 const orderSigningUtils = new OrderSigningUtils()
 
@@ -54,6 +49,8 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
     const [inputToken, setInputToken] = useState<any>("0x853d955aCEf822Db058eb8505911ED77F175b99e") // FRAX
     const [outputToken, setOutputToken] = useState<any>("0x6B175474E89094C44Da98b954EedeAC495271d0F") // DAI
+
+    const [cowSwapQuoteResponse, setCowSwapQuoteResponse] = useState<any>("");
 
     const [inputBalance, setInputBalance] = useState<number>(100);
     const [outputPreview, setOutputPreview] = useState<number>(0);
@@ -98,106 +95,47 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
     useEffect(() => {
         const getQuote = async () => {
-            const url = 'https://api.cow.fi/mainnet/api/v1/quote';
-            const body = {
+            const quoteResponse = await orderBookApi.getQuote({
+                kind: OrderQuoteSideKindSell.SELL,
                 sellToken: inputToken,
                 buyToken: outputToken,
-                receiver: constants.AddressZero,
-                validTo: Math.floor(Date.now() / 1000) + 3600,
-                appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                partiallyFillable: false,
-                sellTokenBalance: "erc20",
-                buyTokenBalance: "erc20",
+                sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(), // 1 WETH
+                receiver: account,
                 from: account,
-                kind: "sell",
-                sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString()
-            };
-
-            console.log("PING", Math.floor(Date.now() / 1000) + 3600);
-
-            try {
-                const response = await axios.post(url, body, {
-                    headers: {
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                setOutputPreview(Number(parseFloat(utils.formatEther(response.data.quote.buyAmount.toString())).toFixed(3)));
-            } catch (error) {
-                console.error('Error fetching quote:', error);
-            }
-        };
+                validTo: Math.floor(Date.now() / 1000) + 3600,
+            })
+            console.log("quoteResponse", quoteResponse);
+            setCowSwapQuoteResponse(quoteResponse);
+            setOutputPreview(Number(parseFloat(utils.formatEther(quoteResponse.quote.buyAmount.toString())).toFixed(3)));
+        }
         if (account !== undefined) getQuote();
 
 
     }, [inputBalance, inputToken, outputToken, account])
 
-    async function getSignature() {
+    async function sendOrder() {
+        const { sellToken, buyToken, validTo, buyAmount, sellAmount, receiver, feeAmount } = cowSwapQuoteResponse.quote
         const order = {
-            sellToken: inputToken,
-            buyToken: outputToken,
-            sellAmount: utils.parseUnits(inputBalance.toString(), 18).toString(),
-            buyAmount: "0",
-            validTo: Math.floor(Date.now() / 1000) + 3600,
-            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            feeAmount: 14075734,
             kind: OrderKind.SELL,
-            partiallyFillable: false,
             receiver: account,
-        }
-
-        const rawSignature = await signOrder(
-            domain(1, "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"),
-            order,
-            signer,
-            SigningScheme.ETHSIGN
-        );
-        // Needed to turn the three part object into a single bytestring
-        const signature = utils.joinSignature(rawSignature.data);
-
-        console.log("signer", signer);
-        console.log("signature", signature)
-        console.log("rawSignature", rawSignature)
-
-        return signature
-    }
-
-    async function createOrder(signature) {
-        const endpoint = 'https://api.cow.fi/mainnet/api/v1/orders';
-
-        const data = {
             sellToken: inputToken,
             buyToken: outputToken,
-            sellAmount: utils.parseUnits(inputBalance.toString(), 18).toString(),
-            buyAmount: "0",
-            receiver: constants.AddressZero,
-            validTo: Math.floor(Date.now() / 1000) + 3600,
-            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            feeAmount: "14075734",
-            kind: "sell",
             partiallyFillable: false,
-            sellTokenBalance: "erc20",
-            buyTokenBalance: "erc20",
-            signingScheme: "ethsign",
-            signature: signature,
-            from: account
-        };
-
-        console.log("data", data);
-
-        try {
-            const response = await axios.post(endpoint, data, {
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            return response.data;
-        } catch (error) {
-            console.error('Error creating order:', error);
+            validTo: Math.floor(Date.now() / 1000) + 3600,
+            sellAmount: sellAmount,
+            buyAmount: buyAmount,
+            feeAmount: feeAmount,
+            // The appData allows you to attach arbitrary information (meta-data) to the order.
+            appData: '0x0000000000000000000000000000000000000000000000000000000000000000'
         }
+
+        const signedOrder = await OrderSigningUtils.signOrder(order, SupportedChainId.MAINNET, signer) as any
+
+        console.log("signedOrder", signedOrder);
+        const orderId = await orderBookApi.sendOrder({ ...order, ...signedOrder });
+
+        console.log("orderId", orderId);
+        return orderId;
     }
 
     async function handleZap() {
@@ -207,11 +145,9 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
         //if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId));
 
         if (showApproveButton) return approve();
-        // When approved continue to deposit
-        // signer.sendTransaction({ data: actionData, to: COWSWAP_ROUTER, value: "0" }).then(res => console.log(res))
-        const signature = await getSignature();
 
-        await createOrder(signature);
+        // When approved continue to zap
+        const orderId = await sendOrder();
     }
 
     return (
