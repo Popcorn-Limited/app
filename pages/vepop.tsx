@@ -1,35 +1,35 @@
-import { BigNumber, Contract, Wallet, constants, ethers, utils } from "ethers";
-import { useApproveBalance } from "hooks/useApproveBalance";
-import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
-import { getVotePeriodEndTime } from "lib/Gauges/utils";
-import { Pop } from "lib/types";
-import { RPC_PROVIDERS, formatAndRoundBigNumber, formatNumber, useConsistentRepolling } from "lib/utils";
-import useWaitForTx from "lib/utils/hooks/useWaitForTx";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { Address, useAccount, useContractRead, useSigner } from "wagmi";
+// @ts-ignore
 import NoSSR from "react-no-ssr";
-import MainActionButton from "components/MainActionButton";
+import { useEffect, useState } from "react";
 import { intervalToDuration } from "date-fns";
-import SecondaryActionButton from "components/SecondaryActionButton";
-import useGauges from "lib/Gauges/useGauges";
-import Gauge from "components/vepop/Gauge";
-import LockModal from "components/vepop/modals/lock/LockModal";
-import ManageLockModal from "components/vepop/modals/manage/ManageLockModal";
-import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
-import useOPopPrice from "lib/OPop/useOPopPrice";
-import useOPopDiscount from "lib/OPop/useOPopDiscount";
-import OPopModal from "components/vepop/modals/oPop/OPopModal";
-import useClaimableOPop from "lib/Gauges/useClaimableOPop";
-import { useClaimOPop } from "lib/OPop/useClaimOPop";
-import { showSuccessToast, showErrorToast } from "lib/Toasts";
-import { getVeAddresses } from "lib/utils/addresses";
 import { WalletIcon } from "@heroicons/react/24/outline";
-import { useHasAlreadyVoted } from "lib/Gauges/useHasAlreadyVoted";
-import { useUserWethReward } from "lib/FeeDistributor/useUserWethRewards";
-import { useClaimTokens } from "lib/FeeDistributor/useClaimToken";
-import useClaimableTokens from "lib/FeeDistributor/getVeApy";
-import getVeApy from "lib/FeeDistributor/getVeApy";
+
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+
+import useGauges from "@/lib/gauges/useGauges";
+import type { Gauge } from "@/lib/gauges/useGauges";
+
+import Gauge from "@/components/vepop/Gauge";
+import LockModal from "@/components/vepop/modals/lock/LockModal";
+import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
+import useLockedBalanceOf from "@/lib/Gauges/useLockedBalanceOf";
+import useOPopPrice from "@/lib/OPop/useOPopPrice";
+import useOPopDiscount from "@/lib/OPop/useOPopDiscount";
+import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
+import useClaimableOPop from "@/lib/Gauges/useClaimableOPop";
+import { useClaimOPop } from "@/lib/OPop/useClaimOPop";
+import { showSuccessToast, showErrorToast } from "@/lib/toasts";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { useHasAlreadyVoted } from "@/lib/gauges/useHasAlreadyVoted";
+import { useUserWethReward } from "@/lib/feeDistributor/useUserWethRewards";
+import { useClaimTokens } from "@/lib/feeDistributor/useClaimToken";
+import useClaimableTokens from "@/lib/feeDistributor/getVeApy";
+import getVeApy from "@/lib/feeDistributor/getVeApy";
+import { useAccount } from "wagmi";
+import { formatAndRoundBigNumber, formatNumber } from "@/lib/utils/formatBigNumber";
+import { Address, formatEther, zeroAddress } from "viem";
+import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 
 const {
   BalancerPool: POP_LP,
@@ -55,12 +55,12 @@ function VePopContainer() {
   const { data: oPopPrice } = useOPopPrice({ chainId: 1, address: OPOP_ORACLE })
 
   const { data: gauges } = useGauges({ address: GAUGE_CONTROLLER, chainId: 1 })
-  const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map(gauge => gauge.address), chainId: 1, account })
+  const { data: gaugeRewards } = useClaimableOPop({ addresses: gauges?.map((gauge: Gauge) => gauge.address), chainId: 1, account })
 
   const { data: userWethReward } = useUserWethReward({ chainId: 5, address: FEE_DISTRIBUTOR, user: account, token: WETH })
 
   const [votes, setVotes] = useState([]);
-  const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map(gauge => gauge.address), chainId: 1, account })
+  const { data: hasAlreadyVoted } = useHasAlreadyVoted({ addresses: gauges?.map((gauge: Gauge) => gauge.address), chainId: 1, account })
   const canVote = account && Number(veBal?.value) > 0 && !hasAlreadyVoted
 
   const [showLockModal, setShowLockModal] = useState(false);
@@ -94,8 +94,8 @@ function VePopContainer() {
     return formattedTime;
   }
 
-  const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address));
-  const { write: claimTokens = noOp } = useClaimTokens(FEE_DISTRIBUTOR, account, [WETH]);
+  const { write: claimOPop = noOp } = useClaimOPop(OPOP_MINTER, gaugeRewards?.amounts?.filter((gauge: Gauge) => Number(gauge.amount) > 0).map((gauge: Gauge) => gauge.address));
+  const { write: claimTokens = noOp } = useClaimTokens(FEE_DISTRIBUTOR, account as Address, [WETH]);
 
   function handleVotes(val: number, index: number) {
     setVotes((prevVotes) => {
@@ -129,7 +129,7 @@ function VePopContainer() {
       for (let n = 0; n < 8; n++) {
         const l = i * 8;
         v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
-        addr[n] = gauges[n + l] === undefined || votes[n + l] === 0 ? constants.AddressZero : gauges[n + l].address;
+        addr[n] = gauges[n + l] === undefined || votes[n + l] === 0 ? zeroAddress : gauges[n + l].address;
 
       }
 
@@ -137,7 +137,7 @@ function VePopContainer() {
         .then(() => {
           showSuccessToast();
         })
-        .catch(error => {
+        .catch((error: any) => {
           showErrorToast(error);
         });
     }
@@ -205,7 +205,7 @@ function VePopContainer() {
                 </span>
                 <span className="flex flex-row items-center justify-between">
                   <p className="">Claimable WETH</p>
-                  <p className="font-bold">{parseFloat(utils.formatEther(userWethReward)).toFixed(3)} wETH</p>
+                  <p className="font-bold">{parseFloat(formatEther(userWethReward)).toFixed(3)} wETH</p>
                 </span>
                 <div className="mt-5 flex flex-row items-center justify-between space-x-8">
                   <MainActionButton label="Claim WETH" handleClick={() => claimTokens()} disabled={Number(userWethReward) === 0} />
@@ -239,7 +239,7 @@ function VePopContainer() {
             </section>
 
             <section className="hidden md:block space-y-4">
-              {gauges?.length > 0 ? gauges.map((gauge, index) =>
+              {gauges?.length > 0 ? gauges.map((gauge: Gauge, index: number) =>
                 <Gauge key={gauge.address} gauge={gauge} index={index} votes={votes} handleVotes={handleVotes} veBal={veBal} canVote={canVote} />
               )
                 : <p>Loading Gauges...</p>

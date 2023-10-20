@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { ChainId } from "lib/utils/connectors";
-import TokenIcon from "components/TokenIcon";
-import { FC, useState } from "react";
-import { useDefaultTokenList } from "hooks/useDefaultTokenList";
-import { Token } from "lib/types";
+import { ChainId } from "@/lib/utils/connectors";
+import { Token } from "@/lib/types";
+import TokenIcon from "@/components/common/TokenIcon";
+import { getAssetsByChain } from "@/lib/constants";
 
 interface SearchTokenProps {
   selectToken: (token: Token) => void;
@@ -12,8 +12,8 @@ interface SearchTokenProps {
   chainId: ChainId;
 }
 
-export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, selectedToken, chainId }) => {
-  const quickOptionsTokens = useDefaultTokenList(chainId);
+export default function SearchToken({ options, selectToken, selectedToken, chainId }: SearchTokenProps): JSX.Element {
+  const quickOptionsTokens = getAssetsByChain(chainId);
 
   const [search, setSearch] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<Token[]>(options);
@@ -44,7 +44,7 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
         />
       </div>
       {options
-        .filter((option) => quickOptionsTokens.find((token) => token === option.address))
+        .filter((option) => quickOptionsTokens.find((token) => token.address == option.address))
         .map((quickOption) => (
           <div className="inline-flex mr-2 my-3" key={quickOption?.symbol}>
             <button
@@ -54,7 +54,7 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
               }}
             >
               <span className="relative mr-2">
-                <TokenIcon token={quickOption?.address} imageSize="w-5 h-5" chainId={chainId} />
+                <TokenIcon token={quickOption} imageSize="w-5 h-5" chainId={chainId} />
               </span>
               <span>{quickOption.name}</span>
             </button>
@@ -72,12 +72,12 @@ export const SearchToken: FC<SearchTokenProps> = ({ options, selectToken, select
             >
               <span
                 className={`flex items-center py-3 px-3 ${selectedToken.address === option.address
-                    ? "text-black font-semibold"
-                    : "text-primary font-normal  cursor-pointer"
+                  ? "text-black font-semibold"
+                  : "text-primary font-normal  cursor-pointer"
                   }`}
               >
                 <span className="w-5 h-5 inline-flex mr-3 flex-shrink-0 cursor-pointer">
-                  <img src={option.icon} alt={option.symbol} className="h-full w-full object-contain" />
+                  <img src={option.logoURI} alt={option.symbol} className="h-full w-full object-contain" />
                 </span>
                 <span className="cursor-pointer">{option.symbol}</span>
               </span>

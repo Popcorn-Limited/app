@@ -3,7 +3,7 @@ import { AssetWithName } from "components/SweetVault/AssetWithName";
 import useAdapterToken from "hooks/useAdapter";
 import useVaultToken from "hooks/useVaultToken";
 import useCurrentGaugeWeight from "lib/Gauges/useCurrentGaugeWeight";
-import { Gauge } from "lib/Gauges/useGauges";
+import { Gauge } from "@/lib/gauges/useGauges";
 import useUpcomingGaugeWeight from "lib/Gauges/useUpcomingGaugeWeight";
 import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
 import { BigNumberWithFormatted } from "lib/types";

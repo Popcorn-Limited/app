@@ -162,26 +162,6 @@ input[type="number"] {
   }
 }
 
-.banner-text {
-  color: var(--primary-color-black-000000, #000);
-  font-family: 'KH Teka';
-  font-size: 56px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 56px; /* 100% of 56px */
-}
-
-.banner-highlight-text {
-  color: var(--secondary-colors-purple-vibrant-purple-9-b-55-ff, #9B55FF);
-  font-family: 'KH Teka';
-  font-size: 56px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 56px; /* 100% of 56px */
-  text-decoration: underline;
-}
-
-
 .button-custom {
   /* border-radius: 0.25rem; */
   padding: 15px;
@@ -278,11 +258,6 @@ input[type="number"] {
   content: "";
   position: absolute;
   left: 40%;
-}
-
-
-.rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
-  box-shadow: none !important;
 }
 
 .__react_component_tooltip {

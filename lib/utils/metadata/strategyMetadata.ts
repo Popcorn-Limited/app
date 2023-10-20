@@ -42,7 +42,7 @@ export function addGenericStrategyDescription(key: string, symbol: string): stri
     case "lpCompounding":
       return `**${symbol} LP-Compounding** \- The vault stakes the user\'s LP Token in a ${symbol} gauge, earning the platform\'s governance token. Earned token is swapped for more LP Token. To complete the compounding cycle, the new LP Token is added to the farm, ready to go for the next earning event. The transaction cost required to do all this is socialized among the vault's users.`
     case "compoundFolding":
-      return `**Compound Folding** \- The ${symbol} Sweet Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint ${symbol} from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more ${symbol}, and then deposited back into the strategy.`
+      return `**Compound Folding** \- The ${symbol} Smartt Vault supplies and borrows DAI on Compound Finance simultaneously to earn COMP. Flashmints are then used to mint ${symbol} from MakerDAO to flashlend and fold the position to boost APY. Earned tokens are then harvested, sold for more ${symbol}, and then deposited back into the strategy.`
     case "lending":
       return `**Lending** \- The vault supplies assets into ${symbol} to earn lending interest.`
     case "automatedAssetStrategy":
@@ -51,6 +51,8 @@ export function addGenericStrategyDescription(key: string, symbol: string): stri
       return `**Senior Tranche** \- The vault supplies assets into a senior tranche of ${symbol}. Senior tranches offer stable returns with built-in coverage but reduced upside.`
     case "juniorTranche":
       return `**Junior Tranche** \- The vault supplies assets into a junior tranche of ${symbol}. Junior tranches offer higher returns but with higher risk since they minize the risk of the corresponding senior Tranche.`
+    default:
+      return ""
   }
 }
 
