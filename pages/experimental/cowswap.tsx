@@ -1,5 +1,5 @@
 import { Address, useAccount, useConnect, useDisconnect, useToken, useSigner } from 'wagmi'
-import { utils } from 'ethers'
+import { utils, constants } from 'ethers'
 import NoSSR from "react-no-ssr";
 import { getBalances, getTokenAllowance, quote } from 'wido'
 import { parseUnits } from 'ethers/lib/utils.js'
@@ -16,6 +16,14 @@ import { useAllowance } from 'lib/Erc20/hooks'
 import axios from 'axios';
 
 import { OrderBookApi, OrderSigningUtils, SubgraphApi } from '@cowprotocol/cow-sdk'
+import {
+    domain,
+    Order,
+    SigningScheme,
+    signOrder,
+    OrderKind
+} from "@gnosis.pm/gp-v2-contracts"
+import { create } from 'domain';
 
 
 const chainId = 1 // Mainnet
@@ -88,24 +96,13 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
         },
     });
 
-    async function handleDeposit() {
-        if ((inputBalance || 0) == 0) return;
-        // Early exit if value is ZERO
-
-        //if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId));
-
-        if (showApproveButton) return approve();
-        // When approved continue to deposit
-        signer.sendTransaction({ data: actionData, to: COWSWAP_ROUTER, value: "0" }).then(res => console.log(res))
-    }
-
     useEffect(() => {
         const getQuote = async () => {
             const url = 'https://api.cow.fi/mainnet/api/v1/quote';
             const body = {
                 sellToken: inputToken,
                 buyToken: outputToken,
-                receiver: "0x0000000000000000000000000000000000000000",
+                receiver: constants.AddressZero,
                 validTo: Math.floor(Date.now() / 1000) + 3600,
                 appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 partiallyFillable: false,
@@ -115,6 +112,8 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                 kind: "sell",
                 sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString()
             };
+
+            console.log("PING", Math.floor(Date.now() / 1000) + 3600);
 
             try {
                 const response = await axios.post(url, body, {
@@ -133,6 +132,87 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
 
     }, [inputBalance, inputToken, outputToken, account])
+
+    async function getSignature() {
+        const order = {
+            sellToken: inputToken,
+            buyToken: outputToken,
+            sellAmount: utils.parseUnits(inputBalance.toString(), 18).toString(),
+            buyAmount: "0",
+            validTo: Math.floor(Date.now() / 1000) + 3600,
+            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            feeAmount: 14075734,
+            kind: OrderKind.SELL,
+            partiallyFillable: false,
+            receiver: account,
+        }
+
+        const rawSignature = await signOrder(
+            domain(1, "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"),
+            order,
+            signer,
+            SigningScheme.ETHSIGN
+        );
+        // Needed to turn the three part object into a single bytestring
+        const signature = utils.joinSignature(rawSignature.data);
+
+        console.log("signer", signer);
+        console.log("signature", signature)
+        console.log("rawSignature", rawSignature)
+
+        return signature
+    }
+
+    async function createOrder(signature) {
+        const endpoint = 'https://api.cow.fi/mainnet/api/v1/orders';
+
+        const data = {
+            sellToken: inputToken,
+            buyToken: outputToken,
+            sellAmount: utils.parseUnits(inputBalance.toString(), 18).toString(),
+            buyAmount: "0",
+            receiver: constants.AddressZero,
+            validTo: Math.floor(Date.now() / 1000) + 3600,
+            appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            feeAmount: "14075734",
+            kind: "sell",
+            partiallyFillable: false,
+            sellTokenBalance: "erc20",
+            buyTokenBalance: "erc20",
+            signingScheme: "ethsign",
+            signature: signature,
+            from: account
+        };
+
+        console.log("data", data);
+
+        try {
+            const response = await axios.post(endpoint, data, {
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('Error creating order:', error);
+        }
+    }
+
+    async function handleZap() {
+        if ((inputBalance || 0) == 0) return;
+        // Early exit if value is ZERO
+
+        //if (chain.id !== Number(chainId)) switchNetwork?.(Number(chainId));
+
+        if (showApproveButton) return approve();
+        // When approved continue to deposit
+        // signer.sendTransaction({ data: actionData, to: COWSWAP_ROUTER, value: "0" }).then(res => console.log(res))
+        const signature = await getSignature();
+
+        await createOrder(signature);
+    }
 
     return (
         <div className="flex flex-col w-full md:w-4/12 gap-8">
@@ -188,7 +268,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                 <MainActionButton
                     label={showApproveButton ? "Approve" : "Zap"}
                     type="button"
-                    handleClick={handleDeposit}
+                    handleClick={handleZap}
                     disabled={Number(inputBalance) === 0}
                 />
             </section>
