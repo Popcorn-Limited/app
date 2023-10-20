@@ -11,6 +11,32 @@ export type Token = {
   price: number;
 };
 
+export type veAddresses = {
+  POP: `0x${string}`;
+  WETH: `0x${string}`;
+  BalancerPool: `0x${string}`;
+  BalancerOracle: `0x${string}`;
+  oPOP: `0x${string}`;
+  VaultRegistry: `0x${string}`;
+  Vault1DAI: `0x${string}`;
+  Vault2USDC: `0x${string}`;
+  Vault2OUSD: `0x${string}`;
+  Minter: `0x${string}`;
+  TokenAdmin: `0x${string}`;
+  VotingEscrow: `0x${string}`;
+  GaugeController: `0x${string}`;
+  GaugeFactory: `0x${string}`;
+  SmartWalletChecker: `0x${string}`;
+  VotingEscrowDelegation: `0x${string}`;
+  Vault1DAIGauge: `0x${string}`;
+  Vault2USDCGauge: `0x${string}`;
+  Vault2OUSDGauge: `0x${string}`;
+  VaultRouter: `0x${string}`;
+  FeeDistributor: `0x${string}`;
+};
+
+
+
 export type TokenConstant = {
   chains: number[];
   address: { [key: string]: Address };
