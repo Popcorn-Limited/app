@@ -13,23 +13,13 @@ import useApproveBalance from "hooks/useApproveBalance";
 import useWaitForTx from 'lib/utils/hooks/useWaitForTx'
 import toast from 'react-hot-toast'
 import { useAllowance } from 'lib/Erc20/hooks'
-import axios from 'axios';
-
-import { OrderBookApi, SupportedChainId, OrderSigningUtils, OrderKind, OrderQuoteSideKindSell, SubgraphApi, EcdsaSigningScheme, SigningScheme } from '@cowprotocol/cow-sdk'
-import { create } from 'domain';
 
 
-const chainId = 1 // Mainnet
-
-// const { sellToken, buyToken, validTo, buyAmount, sellAmount, receiver, feeAmount } = quoteResponse.quote
+import { OrderBookApi, SupportedChainId, OrderSigningUtils, OrderKind, OrderQuoteSideKindSell, SubgraphApi } from '@cowprotocol/cow-sdk'
 
 const orderBookApi = new OrderBookApi({ chainId: SupportedChainId.MAINNET })
-const subgraphApi = new SubgraphApi({ chainId })
-const orderSigningUtils = new OrderSigningUtils()
-
 
 function noOp() { }
-
 
 export default function CowswapPage() {
     return (
@@ -40,19 +30,18 @@ export default function CowswapPage() {
 }
 
 const COWSWAP_TOKEN_MANAGER = "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD"
-const COWSWAP_ROUTER = "0x7Fb69e8fb1525ceEc03783FFd8a317bafbDfD394"
 
 function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
     const { address: account } = useAccount();
     const { data: vault } = useToken({ address: vaultAddress as Address, chainId: 1 })
     const { data: asset } = useVaultToken(vaultAddress, 1);
 
-    const [inputToken, setInputToken] = useState<any>("0x853d955aCEf822Db058eb8505911ED77F175b99e") // FRAX
+    const [inputToken, setInputToken] = useState<any>("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2") // FRAX
     const [outputToken, setOutputToken] = useState<any>("0x6B175474E89094C44Da98b954EedeAC495271d0F") // DAI
 
     const [cowSwapQuoteResponse, setCowSwapQuoteResponse] = useState<any>("");
 
-    const [inputBalance, setInputBalance] = useState<number>(100);
+    const [inputBalance, setInputBalance] = useState<number>(0);
     const [outputPreview, setOutputPreview] = useState<number>(0);
 
     const [availableToken, setAvailableToken] = useState<any[]>([])
@@ -95,23 +84,31 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
     useEffect(() => {
         const getQuote = async () => {
-            const quoteResponse = await orderBookApi.getQuote({
-                kind: OrderQuoteSideKindSell.SELL,
-                sellToken: inputToken,
-                buyToken: outputToken,
-                sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(), // 1 WETH
-                receiver: account,
-                from: account,
-                validTo: Math.floor(Date.now() / 1000) + 3600,
-            })
-            console.log("quoteResponse", quoteResponse);
-            setCowSwapQuoteResponse(quoteResponse);
-            setOutputPreview(Number(parseFloat(utils.formatEther(quoteResponse.quote.buyAmount.toString())).toFixed(3)));
-        }
+            try {
+                const quoteResponse = await orderBookApi.getQuote({
+                    kind: OrderQuoteSideKindSell.SELL,
+                    sellToken: inputToken,
+                    buyToken: outputToken,
+                    sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(), // 1 WETH
+                    receiver: account,
+                    from: account,
+                    validTo: Math.floor(Date.now() / 1000) + 3600,
+                });
+                console.log("quoteResponse", quoteResponse);
+                setCowSwapQuoteResponse(quoteResponse);
+                setOutputPreview(Number(parseFloat(utils.formatEther(quoteResponse.quote.buyAmount.toString())).toFixed(3)));
+            } catch (error) {
+                toast.error("Error fetching quote - Try inputing different amount", {
+                    position: "top-center",
+                });
+            }
+        };
+
         if (account !== undefined) getQuote();
 
+    }, [inputBalance, inputToken, outputToken, account]);
 
-    }, [inputBalance, inputToken, outputToken, account])
+
 
     async function sendOrder() {
         const { sellToken, buyToken, validTo, buyAmount, sellAmount, receiver, feeAmount } = cowSwapQuoteResponse.quote
@@ -162,8 +159,8 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                     onChange={handleChangeInput}
                     selectedToken={inputToken}
                     errorMessage={""}
-                    tokenList={outputToken?.address === vault?.address ? availableToken : []}
-                    allowSelection={outputToken?.address === vault?.address}
+                    tokenList={availableToken}
+                    allowSelection={true}
                 />
                 <>
                     <div className="relative py-4">
@@ -176,13 +173,9 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                                     className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full cursor-pointer hover:text-primary hover:border-primary"
                                     aria-hidden="true"
                                     onClick={() => {
-                                        if (outputToken.address === vault.address) {
-                                            setInputToken(vault);
-                                            setOutputToken(asset)
-                                        } else {
-                                            setInputToken(asset);
-                                            setOutputToken(vault)
-                                        }
+                                        setInputToken(outputToken);
+                                        setOutputToken(inputToken);
+                                        setInputBalance(outputPreview);
                                     }}
                                 />
                             </span>
@@ -197,8 +190,8 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                         onChange={() => { }}
                         selectedToken={outputToken}
                         errorMessage={""}
-                        tokenList={inputToken.address === vault?.address ? availableToken : []}
-                        allowSelection={inputToken.address === vault?.address}
+                        tokenList={availableToken}
+                        allowSelection={true}
                     />
                 </>
                 <MainActionButton
