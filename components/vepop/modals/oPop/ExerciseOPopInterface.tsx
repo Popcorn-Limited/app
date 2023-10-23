@@ -1,5 +1,5 @@
 import { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
-import { Address, useAccount, useBalance, usePublicClient, useToken } from "wagmi";
+import { useAccount, useBalance, usePublicClient, useToken } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import TokenIcon from "@/components/common/TokenIcon";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -30,9 +30,9 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const [amount, setAmount] = amountState;
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
-  const { data: oPopBal } = useBalance({ chainId: 1, address: OPOP })
+  const { data: oPopBal } = useBalance({ chainId: 1, address: account, token: OPOP })
   const { data: ethBal } = useBalance({ chainId: 1, address: account })
-  const { data: wethBal } = useBalance({ chainId: 1, address: WETH })
+  const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH })
 
   const { data: oPop } = useToken({ chainId: 1, address: OPOP });
   const { data: pop } = useToken({ chainId: 1, address: POP });

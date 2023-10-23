@@ -43,7 +43,7 @@ const Vaults: NextPage = () => {
   const vaultTvl = useVaultTvl();
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
-  const { data: oBal } = useBalance({ chainId: 1, address: OPOP })
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP })
 
   const [searchString, handleSearch] = useState("");
 

@@ -1,5 +1,5 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { Address, useBalance, useToken } from "wagmi";
+import { Address, useAccount, useBalance, useToken } from "wagmi";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
@@ -21,10 +21,15 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
   )
 }
 
-export default function LockPopInterface({ amountState, daysState }:
-  { amountState: [number, Dispatch<SetStateAction<number>>], daysState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {
-  const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
-  const { data: popLpBal } = useBalance({ chainId: 1, address: POP_LP })
+interface LockPopInterfaceProps {
+  amountState: [number, Dispatch<SetStateAction<number>>];
+  daysState: [number, Dispatch<SetStateAction<number>>];
+}
+
+export default function LockPopInterface({ amountState, daysState }: LockPopInterfaceProps): JSX.Element {
+  const { address: account } = useAccount()
+  const { data: popLp } = useToken({ chainId: 1, address: POP_LP });
+  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP })
 
   const [amount, setAmount] = amountState
   const [days, setDays] = daysState

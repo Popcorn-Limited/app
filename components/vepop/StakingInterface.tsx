@@ -1,15 +1,14 @@
 import { intervalToDuration } from "date-fns";
-import { Dispatch, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Address, useAccount, useBalance } from "wagmi";
 import { getVotePeriodEndTime } from "@/lib/gauges/utils";
 import MainActionButton from "@/components/button/MainActionButton";
 import SecondaryActionButton from "@/components//button/SecondaryActionButton";
 import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { formatAndRoundBigNumber } from "@/lib/utils/formatBigNumber";
-import LockModal from "@/components/vepop/modals/lock/LockModal";
-import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
-import { SetStateAction } from "jotai";
+import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { formatEther } from "viem";
+import { ZERO } from "@/lib/constants";
 
 function votingPeriodEnd(): number[] {
   const periodEnd = getVotePeriodEndTime();
@@ -38,20 +37,20 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
   const { address: account } = useAccount()
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address })
-  const { data: veBal } = useBalance({ chainId: 1, address: VOTING_ESCROW })
-  const { data: popLpBal } = useBalance({ chainId: 1, address: POP_LP })
-
+  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
+  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP })
+  
   return (
     <>
       <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
         <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
         <span className="flex flex-row items-center justify-between mt-6">
           <p className="">My POP LP</p>
-          <p className="font-bold">{popLpBal?.formatted || "0"}</p>
+          <p className="font-bold">{NumberFormatter.format(Number(formatEther(popLpBal?.value || ZERO))) || "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between">
           <p className="">My Locked POP LP</p>
-          <p className="font-bold">{lockedBal ? formatAndRoundBigNumber(lockedBal?.amount, 18) : "0"}</p>
+          <p className="font-bold">{lockedBal ? NumberFormatter.format(Number(formatEther(lockedBal?.amount))) : "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between">
           <p className="">Locked Until</p>
@@ -59,7 +58,7 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
         </span>
         <span className="flex flex-row items-center justify-between">
           <p className="">My vePOP</p>
-          <p className="font-bold">{veBal?.formatted || "0"}</p>
+          <p className="font-bold">{NumberFormatter.format(Number(formatEther(veBal?.value || ZERO))) || "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
           <p className="">Voting period ends</p>

@@ -1,6 +1,6 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { Address, useBalance, useToken } from "wagmi";
+import { Address, useAccount, useBalance, useToken } from "wagmi";
 import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber";
 import { ZERO } from "@/lib/constants";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
@@ -14,12 +14,10 @@ interface IncreaseStakeInterfaceProps {
   lockedBal: { amount: bigint, end: bigint }
 }
 
-export default function IncreaseStakeInterface({ amountState, lockedBal }: IncreaseStakeInterfaceProps
-): JSX.Element {
+export default function IncreaseStakeInterface({ amountState, lockedBal }: IncreaseStakeInterfaceProps): JSX.Element {
+  const { address: account } = useAccount()
   const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
-  const { data: popLpBal } = useBalance({ chainId: 1, address: POP_LP })
-
-  console.log({ popLpBal })
+  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP })
 
   const [amount, setAmount] = amountState
 

@@ -3,7 +3,7 @@ import NavbarLink from "@/components/navbar/NavbarLink"
 
 const links: { label: string, url: string, onClick?: Function }[] = [
   {
-    label: "Smmart Vaults",
+    label: "Smart Vaults",
     url: "/vaults",
   },
   {

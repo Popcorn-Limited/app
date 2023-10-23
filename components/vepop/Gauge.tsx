@@ -24,8 +24,6 @@ export default function Gauge({ vault, index, votes, handleVotes, canVote }: { v
     }
   }
 
-  console.log({weights})
-
   return (
     <Accordion
       header={<>

@@ -40,7 +40,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: vePopBal } = useBalance({ chainId: 1, address: VOTING_ESCROW })
+  const { data: vePopBal } = useBalance({ chainId: 1, address:account, token: VOTING_ESCROW })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address }) as { data: { amount: bigint, end: bigint } }
 
   const [amount, setAmount] = useState<number>(0);
