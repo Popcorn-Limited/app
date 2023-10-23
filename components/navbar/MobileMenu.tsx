@@ -65,12 +65,7 @@ export default function MobileMenu(): JSX.Element {
   const closePopUp = () => {
     setShowPopUp(false);
   };
-
-  function handleCloseAll() {
-    toggleMenu(false);
-    toggleProductsMenu(false);
-  }
-
+  
   return (
     <>
       <div className={`flex flex-row justify-between items-center py-6 font-khTeka ${router.pathname === "/" ? "bg-[#FAF9F4]" : ""}`}>
