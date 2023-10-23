@@ -59,10 +59,9 @@ export async function sendVotes({ vaults, votes, account, clients }: SendVotesPr
     for (let n = 0; n < 8; n++) {
       const l = i * 8;
       v[n] = votes[n + l] === undefined ? 0 : votes[n + l];
-      addr[n] = vaults[n + l] === undefined || votes[n + l] === 0 ? zeroAddress : vaults[n + l].address;
+      addr[n] = vaults[n + l] === undefined || votes[n + l] === 0 ? zeroAddress : vaults[n + l].gauge?.address as Address;
 
     }
-
 
     const { request, success, error: simulationError } = await simulateCall({
       account,

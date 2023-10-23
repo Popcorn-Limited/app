@@ -55,7 +55,7 @@ export default function Gauge({ vault, index, votes, handleVotes, canVote }: { v
             <p className="text-primaryLight font-normal">My Votes</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(weights?.[2].power) / 1e10).toFixed() || 0} %
+                {(Number(weights?.[2].power) / 100).toFixed()} %
               </Title>
             </p>
           </div>

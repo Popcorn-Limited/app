@@ -56,79 +56,74 @@ function VePopContainer() {
   }, [account])
 
   function handleVotes(val: number, index: number) {
-    setVotes((prevVotes) => {
-      const updatedVotes = [...prevVotes];
-      const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
+    const updatedVotes = [...votes];
+    const updatedTotalVotes = updatedVotes.reduce((a, b) => a + b, 0) - updatedVotes[index] + val;
 
-      if (updatedTotalVotes <= 10000) {
-        // TODO should we adjust the val to the max possible value if it exceeds 10000?
-        updatedVotes[index] = val;
-      }
+    if (updatedTotalVotes <= 10000) {
+      // TODO should we adjust the val to the max possible value if it exceeds 10000?
+      updatedVotes[index] = val;
+    }
 
-      return prevVotes;
-    });
+    setVotes((prevVotes) => updatedVotes);
   }
 
   return (
     <>
-      {(!votes || votes.length === 0) ? <></>
-        : <>
-          <LockModal show={[showLockModal, setShowLockModal]} />
-          <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
-          <div>
-            <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
-              <div className="lg:w-[1050px]">
-                <h1 className="text-3xl">
-                  Lock <span className="text-customPurple">20WETH-80POP</span> for <b>vePOP</b>, voting Power & <b>oPOP</b>
-                </h1>
-                <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
-                  Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
-                </p>
-              </div>
-            </section>
-
-            <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
-              <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-              <VeRewards />
-            </section>
-
-            <section className="hidden md:block space-y-4">
-              {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
-                <Gauge key={vault.address} vault={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
-              )
-                : <p>Loading Gauges...</p>
-              }
-            </section>
-
-            <section className="md:hidden">
-              <p className="text-primary">Gauge Voting not available on mobile.</p>
-            </section>
-
-            <div className="hidden md:block absolute left-0 bottom-10 w-full ">
-              {canVote && <>
-                <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
-                  <p className="mt-1">
-                    Voting power used: <span className="text-[#05BE64]">
-                      {
-                        veBal && veBal.value
-                          ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
-                          : "0"
-                      }%
-                    </span>
-                  </p>
-                  <button
-                    className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
-                    onClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}
-                  >
-                    Submit Votes
-                  </button>
-                </div>
-              </>}
-            </div>
-
+      <LockModal show={[showLockModal, setShowLockModal]} />
+      <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
+      <div>
+        <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
+          <div className="lg:w-[1050px]">
+            <h1 className="text-3xl">
+              Lock <span className="text-customPurple">20WETH-80POP</span> for <b>vePOP</b>, voting Power & <b>oPOP</b>
+            </h1>
+            <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
+              Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
+            </p>
           </div>
-        </>}
-    </ >
+        </section>
+
+        <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
+          <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
+          <VeRewards />
+        </section>
+
+        <section className="hidden md:block space-y-4">
+          {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
+            <Gauge key={vault.address} vault={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
+          )
+            : <p>Loading Gauges...</p>
+          }
+        </section>
+
+        <section className="md:hidden">
+          <p className="text-primary">Gauge Voting not available on mobile.</p>
+        </section>
+
+        <div className="hidden md:block absolute left-0 bottom-10 w-full ">
+          {canVote && <>
+            <div className="z-10 mx-auto w-96 bg-white px-6 py-4 shadow-custom rounded-lg flex flex-row items-center justify-between">
+              <p className="mt-1">
+                Voting power used: <span className="text-[#05BE64]">
+                  {
+                    veBal && veBal.value
+                      ? (votes?.reduce((a, b) => a + b, 0) / 100).toFixed(2)
+                      : "0"
+                  }%
+                </span>
+              </p>
+              <button
+                className="bg-[#FEE25D] rounded-lg py-3 px-3 text-center font-medium text-black leading-none"
+                onClick={() => sendVotes({ vaults, votes, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } })}
+              >
+                Submit Votes
+              </button>
+            </div>
+          </>}
+        </div>
+
+      </div>
+    </>
   )
 }
 
