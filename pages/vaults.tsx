@@ -2,9 +2,9 @@
 import NoSSR from "react-no-ssr";
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { Address, useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { ChainId, SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
 import getVaultNetworth from "@/lib/vault/getVaultNetworth";
@@ -13,6 +13,11 @@ import { getVaultsByChain } from "@/lib/vault/getVault";
 import { VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
+import MainActionButton from "@/components/button/MainActionButton";
+import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { claimOPop } from "@/lib/oPop/interactions";
+import { WalletClient } from "viem";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -22,8 +27,13 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
 ]
 
+const { oPOP: OPOP } = getVeAddresses();
+
+
 const Vaults: NextPage = () => {
   const { address: account } = useAccount();
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
@@ -32,16 +42,25 @@ const Vaults: NextPage = () => {
   const [vaults, setVaults] = useState<VaultData[]>([]);
   const vaultTvl = useVaultTvl();
 
+  const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
+  const { data: oBal } = useBalance({ chainId: 1, address: OPOP })
+
   const [searchString, handleSearch] = useState("");
 
   useEffect(() => {
     async function getVaults() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
-      const fetchedVaults = await Promise.all(
+      const fetchedVaults = (await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
-      );
-      setVaults(fetchedVaults.flat());
+      )).flat();
+      const rewards = await getGaugeRewards({
+        gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+        account: account as Address,
+        publicClient
+      })
+      setGaugeRewards(rewards)
+      setVaults(fetchedVaults);
     }
     if (!account && !initalLoad) getVaults();
     if (account && !accountLoad) getVaults()
@@ -73,8 +92,8 @@ const Vaults: NextPage = () => {
           </p>
         </div>
 
-        <div className="w-full md:w-2/12">
-          <div className="flex flex-row items-center mt-8">
+        <div className="w-full md:w-8/12 md:divide-x md:flex md:flex-row space-y-4 md:space-y-0 mt-4 md:mt-0">
+          <div className="flex flex-row items-center md:w-4/12">
             <div className="w-1/2">
               <p className="leading-6 text-base text-primaryDark">TVL</p>
               <div className="text-3xl font-bold whitespace-nowrap">
@@ -88,6 +107,45 @@ const Vaults: NextPage = () => {
                 {`$${loading ? "..." : NumberFormatter.format(networth)}`}
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-row items-center md:w-8/12 md:pl-12">
+            <div className="w-1/2 md:w-1/3">
+              <p className="leading-6 text-base text-primaryDark">My oPOP</p>
+              <div className="text-3xl font-bold whitespace-nowrap">
+                {`${oBal ? NumberFormatter.format(Number(oBal?.value)) : "0"}`}
+              </div>
+            </div>
+
+            <div className="w-1/2 md:w-1/3">
+              <p className="leading-6 text-base text-primaryDark">Claimable oPOP</p>
+              <div className="text-3xl font-bold whitespace-nowrap">
+                {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total)) : "0"}`}
+              </div>
+            </div>
+
+            <div className="hidden md:block w-1/3">
+              <MainActionButton
+                label="Claim oPOP"
+                handleClick={() =>
+                  claimOPop({
+                    gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                    account: account as Address,
+                    clients: { publicClient, walletClient: walletClient as WalletClient }
+                  })}
+              />
+            </div>
+          </div>
+          <div className="md:hidden">
+            <MainActionButton
+              label="Claim oPOP"
+              handleClick={() =>
+                claimOPop({
+                  gauges: gaugeRewards?.amounts?.filter(gauge => Number(gauge.amount) > 0).map(gauge => gauge.address) as Address[],
+                  account: account as Address,
+                  clients: { publicClient, walletClient: walletClient as WalletClient }
+                })}
+            />
           </div>
         </div>
       </section>

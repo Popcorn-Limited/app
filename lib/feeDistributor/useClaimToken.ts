@@ -1,4 +1,4 @@
-import { showErrorToast, showSuccessToast } from "lib/Toasts";
+import { showErrorToast, showSuccessToast } from "lib/toasts";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 
 export function useClaimTokens(address: `0x${string}`, user: `0x${string}`, tokens: string[]) {

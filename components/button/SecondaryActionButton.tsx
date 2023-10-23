@@ -1,30 +1,15 @@
-import RightArrowIcon from "@/components/svg/RightArrowIcon";
-import React, { useState } from "react";
 import { ButtonProps } from "@/components/button/MainActionButton";
 
-export default function SecondaryActionButton({ label, handleClick, hidden, disabled = false }: ButtonProps): JSX.Element {
-  const [arrowColor, setArrowColor] = useState("645F4B");
-  const [arrowClass, setArrowClass] = useState("transform translate-x-0");
-
-  const animateArrow = () => {
-    setArrowColor("000000");
-    setArrowClass("transform -translate-x-1/2");
-    setTimeout(() => {
-      setArrowColor("645F4B");
-      setArrowClass("transform translate-x-0");
-    }, 500);
-  };
+export default function SecondaryActionButton({ label, handleClick, disabled = false, hidden = false }: ButtonProps): JSX.Element {
   return (
     <button
-      className={`${hidden ? "hidden" : ""
-        } w-full flex justify-between items-center text-primary hover:text-black transition-all ease-in-out font-medium leading-4 md:leading-7 relative`}
-      onMouseEnter={animateArrow}
+      type="button"
+      className={`whitespace-nowrap px-8 py-3 font-medium text-base transition-all ease-in-out duration-500 w-full flex flex-row items-center justify-center bg-white border border-primary text-primary rounded-4xl hover:bg-primary hover:text-white disabled:bg-white disabled:border-secondaryLight disabled:text-secondaryLight disabled:hover:border-secondaryLight disabled:hover:text-secondaryLight disabled:hover:bg-white ${hidden ? "hidden" : ""
+        }`}
       onClick={handleClick}
+      disabled={disabled}
     >
-      <span>{label}</span>
-      <div className={`'absolute right-0 transition-all ease-in-out duration-500 ${arrowClass}`}>
-        <RightArrowIcon color={arrowColor} />
-      </div>
+      {label}
     </button>
   );
 };

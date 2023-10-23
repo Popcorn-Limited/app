@@ -9,18 +9,11 @@ module.exports = {
     ignoreBuildErrors: true,
   },
   env: {
-    RPC_URL: process.env.RPC_URL,
-    CHAIN_ID: process.env.CHAIN_ID,
-    APP_ENV: process.env.APP_ENV,
-    INFURA_PROJECT_ID: process.env.INFURA_PROJECT_ID,
-    ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
     PINATA_API_SECRET: process.env.PINATA_API_SECRET,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     IPFS_URL: process.env.IPFS_URL,
     DUNE_API_KEY: process.env.DUNE_API_KEY,
-    NEXT_PUBLIC_ENABLE_TESTNETS: process.env.ENABLE_TESTNETS,
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-    NEXT_PUBLIC_ZERION_KEY: process.env.ZERION_KEY,
   },
   images: {
     domains: ["rawcdn.githack.com"],

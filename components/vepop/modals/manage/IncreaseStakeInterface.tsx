@@ -1,22 +1,25 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { calcDaysToUnlock, calculateVeOut } from "lib/Gauges/utils";
-import { useBalanceOf } from "lib/Erc20/hooks";
-import { Address, useAccount, useToken } from "wagmi";
-import InputTokenWithError from "components/InputTokenWithError";
-import { formatAndRoundBigNumber, safeRound } from "lib/utils";
-import { constants } from "ethers";
-import { validateInput } from "components/SweetVault/internals/input";
-import { LockedBalance } from "lib/Gauges/useLockedBalanceOf";
-import { getVeAddresses } from "lib/utils/addresses";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { Address, useBalance, useToken } from "wagmi";
+import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber";
+import { ZERO } from "@/lib/constants";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { calcDaysToUnlock, calculateVeOut } from "@/lib/gauges/utils";
+import { validateInput } from "@/lib/utils/helpers";
 
 const { BalancerPool: POP_LP } = getVeAddresses();
 
-export default function IncreaseStakeInterface({ amountState, lockedBal }:
-  { amountState: [number, Dispatch<SetStateAction<number>>], lockedBal: LockedBalance }): JSX.Element {
-  const { address: account } = useAccount()
+interface IncreaseStakeInterfaceProps {
+  amountState: [number, Dispatch<SetStateAction<number>>];
+  lockedBal: { amount: bigint, end: bigint }
+}
 
+export default function IncreaseStakeInterface({ amountState, lockedBal }: IncreaseStakeInterfaceProps
+): JSX.Element {
   const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
-  const { data: popLpBal } = useBalanceOf({ chainId: 1, address: POP_LP, account })
+  const { data: popLpBal } = useBalance({ chainId: 1, address: POP_LP })
+
+  console.log({ popLpBal })
 
   const [amount, setAmount] = amountState
 
@@ -24,7 +27,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
     return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(safeRound(popLpBal?.value || constants.Zero, 18));
+  const handleMaxClick = () => setAmount(Number(safeRound(popLpBal?.value || ZERO, 18)));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? Number(value as any) : 0);
@@ -48,7 +51,7 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
           selectedToken={
             {
               ...popLp,
-              balance: Number(popLpBal?.value || 0),
+              balance: Number(popLpBal?.value || 0) || 0,
             } as any
           }
           errorMessage={errorMessage}
@@ -72,7 +75,11 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }:
       <div>
         <p className="text-primary font-semibold mb-1">New Voting Power</p>
         <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
-          <p className="text-primaryDark">{amount > 0 ? calculateVeOut(amount + (Number(lockedBal?.amount) / 1e18), calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2) : "Enter the amount to view your voting power"}</p>
+          <p className="text-primaryDark">
+            {amount > 0 ?
+              calculateVeOut(amount + (Number(lockedBal?.amount) / 1e18), calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2)
+              : "Enter the amount to view your voting power"}
+          </p>
         </div>
       </div>
 

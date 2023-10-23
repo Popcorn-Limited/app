@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Address, useAccount, } from "wagmi";
+import { Address, useAccount, usePublicClient, } from "wagmi";
 import { getAddress } from "viem";
 import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
@@ -11,6 +11,7 @@ import Accordion from "@/components/common/Accordion";
 import TokenIcon from "@/components/common/TokenIcon";
 import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
+import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 
 
 function getBaseToken(vaultData: VaultData): Token[] {
@@ -28,6 +29,7 @@ export default function SmartVault({
   searchString: string,
   deployer?: Address
 }) {
+  const publicClient = usePublicClient();
   const [yieldOptions] = useAtom(yieldOptionsAtom);
   const { address: account } = useAccount();
   const vault = vaultData.vault;
@@ -43,6 +45,14 @@ export default function SmartVault({
       yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
     }
   }, [apy])
+
+  const [gaugeApr, setGaugeApr] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (vault?.price && gaugeApr.length === 0 && !!gauge) {
+      calculateAPR({ vaultPrice: vault?.price, gauge: gauge?.address, publicClient }).then(res => setGaugeApr(res))
+    }
+  }, [vault, gaugeApr])
 
   // Is loading / error
   if (!vaultData || baseToken.length === 0) return <></>
@@ -89,6 +99,7 @@ export default function SmartVault({
           <Title as="span" level={2} fontWeight="font-normal">
             {apy ? `${NumberFormatter.format(apy)} %` : "0 %"}
           </Title>
+          {gaugeApr.length > 0 && <span className="text-secondaryLight text-base inline">{`+ (${formatNumber(gaugeApr[0])} % - ${formatNumber(gaugeApr[1])} %)`}</span>}
         </div>
 
         <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">

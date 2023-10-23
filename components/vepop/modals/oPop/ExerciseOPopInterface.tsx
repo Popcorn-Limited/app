@@ -1,20 +1,15 @@
 import { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
-import { Address, useAccount, useBalance, useNetwork, useSwitchNetwork, useToken } from "wagmi";
-import { exerciseOPop } from "lib/OPop/useExerciseOPop";
-import InputTokenWithError from "components/InputTokenWithError";
-import { constants, utils } from "ethers";
+import { Address, useAccount, useBalance, usePublicClient, useToken } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import InputNumber from "components/InputNumber";
-import TokenIcon from "components/TokenIcon";
-import useOPopPrice from "lib/OPop/useOPopPrice";
-import useOPopDiscount from "lib/OPop/useOPopDiscount";
-import { usePrice } from "lib/Price";
-import { formatAndRoundBigNumber, safeRound } from "lib/utils";
-import { validateInput } from "components/AssetInputWithAction/internals/input";
-import { getVeAddresses } from "lib/utils/addresses";
-import { useEthToUsd } from "lib/utils/resolvers/price-resolvers/ethToUsd";
+import TokenIcon from "@/components/common/TokenIcon";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import { BalancerOracleAbi, ZERO } from "@/lib/constants";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { formatAndRoundBigNumber, safeRound } from "@/lib/utils/formatBigNumber";
+import { validateInput } from "@/lib/utils/helpers";
+import { Token } from "@/lib/types";
+import { llama } from "@/lib/resolver/price/resolver";
+import { useEthToUsd } from "@/lib/oPop/ethToUsd";
 
 const {
   POP: POP,
@@ -23,51 +18,77 @@ const {
   WETH: WETH
 } = getVeAddresses();
 
-export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }:
-  { amountState: [number, Dispatch<SetStateAction<number>>], maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {
+interface ExerciseOPopInterfaceProps {
+  amountState: [number, Dispatch<SetStateAction<number>>];
+  maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>];
+}
+
+export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }: ExerciseOPopInterfaceProps): JSX.Element {
   const { address: account } = useAccount();
+  const publicClient = usePublicClient();
 
   const [amount, setAmount] = amountState;
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
-  const { data: oPopPrice } = useOPopPrice({ chainId: 1, address: OPOP_ORACLE })
-  const { data: popPrice } = usePrice({ chainId: 1, address: "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4" })
-  const { data: wethPrice } = usePrice({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" })
-  const { data: oPopDiscount } = useOPopDiscount({ chainId: 1, address: OPOP_ORACLE })
-
-  const { data: oPopBal } = useBalanceOf({ chainId: 1, address: OPOP, account })
+  const { data: oPopBal } = useBalance({ chainId: 1, address: OPOP })
   const { data: ethBal } = useBalance({ chainId: 1, address: account })
-  const { data: wethBal } = useBalanceOf({ chainId: 1, address: WETH, account })
+  const { data: wethBal } = useBalance({ chainId: 1, address: WETH })
 
-  const { data: oPop } = useToken({ chainId: 1, address: OPOP as Address });
-  const { data: pop } = useToken({ chainId: 1, address: POP as Address });
-  const { data: weth } = useToken({ chainId: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" as Address }); // temp - WETH
+  const { data: oPop } = useToken({ chainId: 1, address: OPOP });
+  const { data: pop } = useToken({ chainId: 1, address: POP });
+  const { data: weth } = useToken({ chainId: 1, address: WETH });
 
+  const [oPopPrice, setOPopPrice] = useState<bigint>(ZERO);
+  const [oPopDiscount, setOPopDiscount] = useState<number>(0);
+  const [popPrice, setPopPrice] = useState<number>(0);
+  const [wethPrice, setWethPrice] = useState<number>(0);
 
-  const handleMaxWeth = () => {
-    const maxEth = safeRound(ethBal?.value || constants.Zero, 18);
+  const [initialLoad, setInitialLoad] = useState<boolean>(false)
+
+  useEffect(() => {
+    function setUpPrices() {
+      setInitialLoad(true)
+
+      llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 }).then(res => setPopPrice(res))
+      llama({ address: WETH, chainId: 1 }).then(res => setWethPrice(res))
+      publicClient.readContract({
+        address: OPOP_ORACLE,
+        abi: BalancerOracleAbi,
+        functionName: 'getPrice',
+      }).then(res => setOPopPrice(res))
+      publicClient.readContract({
+        address: OPOP_ORACLE,
+        abi: BalancerOracleAbi,
+        functionName: 'multiplier',
+      }).then(res => setOPopDiscount(res))
+    }
+    if (!initialLoad) setUpPrices()
+  }, [initialLoad])
+
+  function handleMaxWeth() {
+    const maxEth = Number(safeRound(ethBal?.value || ZERO, 18));
 
     setMaxPaymentAmount(maxEth);
     setAmount(getOPopAmount(maxEth))
   };
 
-  const handleMaxOPop = () => {
-    const maxOPop = safeRound(oPopBal?.value || constants.Zero, 18);
+  function handleMaxOPop() {
+    const maxOPop = Number(safeRound(oPopBal?.value || ZERO, 18));
 
     setMaxPaymentAmount(getPaymentAmount(maxOPop));
     setAmount(maxOPop)
   };
 
   function getPaymentAmount(oPopAmount: number) {
-    const oPopValue = oPopAmount * (Number(oPopPrice?.value) / 1e18);
+    const oPopValue = oPopAmount * (Number(oPopPrice) / 1e18);
 
-    return oPopValue / (Number(wethPrice?.value) / 1e18);
+    return oPopValue / wethPrice;
   }
 
   function getOPopAmount(paymentAmount: number) {
-    const ethValue = paymentAmount * (Number(wethPrice?.value) / 1e18);
+    const ethValue = paymentAmount * wethPrice;
 
-    return ethValue / (Number(oPopPrice?.value) / 1e18);
+    return ethValue / (Number(oPopPrice) / 1e18);
   }
 
   const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -85,7 +106,10 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   return (
     <div className="mb-8 text-start">
       <h2 className="text-start text-5xl">Exercise oPOP</h2>
-      <p className="text-primary font-semibold">Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oPopPrice?.value), 18)} | POP Price: $ {formatAndRoundBigNumber(popPrice?.value, 18)} | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
+      <p className="text-primary font-semibold">
+        Strike Price: $ {formatAndRoundBigNumber(useEthToUsd(oPopPrice) || ZERO, 18)}
+        | POP Price: $ {popPrice}
+        | Discount: {(Number(oPopDiscount) / 100).toFixed(2)} %</p>
       <div className="mt-8">
         <InputTokenWithError
           captionText={"Amount oPOP"}
@@ -99,7 +123,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             {
               ...oPop,
               icon: "/images/icons/oPOP.svg",
-              balance: oPopBal?.value || constants.Zero,
+              balance: oPopBal?.value || ZERO,
             } as any
           }
           errorMessage={amount > (Number(oPopBal?.value) / 1e18) ? "Insufficient Balance" : ""}
@@ -122,7 +146,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
               ...weth,
               decimals: 18,
               icon: "https://etherscan.io/token/images/weth_28.png",
-              balance: wethBal?.value || constants.Zero,
+              balance: wethBal?.value || ZERO,
             } as any
           }
           tokenList={[]}
@@ -157,7 +181,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             className={`flex flex-row items-center justify-end`}
           >
             <div className="md:mr-2 relative">
-              <TokenIcon token={pop?.address} imageSize="w-5 h-5" chainId={1} />
+              <TokenIcon token={{ logoURI: "/images/icons/POP.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
               {pop?.symbol}

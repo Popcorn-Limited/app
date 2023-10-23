@@ -1,58 +1,82 @@
-import { RPC_PROVIDERS } from "lib/utils";
-import { defi_llama } from "lib/utils/resolvers/price-resolvers/resolvers";
-import { getVeAddresses } from "lib/utils/addresses"
-import GaugeControllerAbi from "lib/utils/constants/abi/GaugeController"
-import LiquidityGaugeAbi from "lib/utils/constants/abi/LiquidityGauge"
 import { thisPeriodTimestamp } from "@/lib/gauges/utils";
-import { Address } from "viem";
+import { Address, PublicClient, formatEther } from "viem";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { llama } from "@/lib/resolver/price/resolver";
+import { GaugeAbi, GaugeControllerAbi } from "@/lib/constants";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses()
 
-const provider = RPC_PROVIDERS[5];
 
-async function getGaugeData(_gauge: Address) {
-  const gaugeContract = new Contract(_gauge, LiquidityGaugeAbi, provider);
+async function getGaugeData(gauge: Address, publicClient: PublicClient): Promise<[boolean, number, number, number, number]> {
+  const gaugeContract = {
+    address: gauge,
+    abi: GaugeAbi
+  }
 
-  const is_killed = await gaugeContract.is_killed();
-  const inflation_rate = await gaugeContract.inflation_rate();
-  const relative_weight = await gaugeContract.getCappedRelativeWeight(thisPeriodTimestamp());
-  const tokenless_production = await gaugeContract.tokenless_production();
-  const working_supply = await gaugeContract.working_supply();
+  const data = await publicClient.multicall({
+    contracts: [
+      {
+        ...gaugeContract,
+        functionName: 'is_killed',
+      },
+      {
+        ...gaugeContract,
+        functionName: 'inflation_rate',
+      },
+      {
+        ...gaugeContract,
+        functionName: 'getCappedRelativeWeight',
+        args: [BigInt(thisPeriodTimestamp())]
+      },
+      {
+        ...gaugeContract,
+        functionName: 'tokenless_production',
+      },
+      {
+        ...gaugeContract,
+        functionName: 'working_supply',
+      },
+    ],
+    allowFailure: false
+  })
 
-  return [is_killed, Number(inflation_rate) / 1e18, Number(relative_weight) / 1e18, Number(tokenless_production), Number(working_supply) / 1e18];
+  return [data[0], Number(formatEther(data[1])), Number(formatEther(data[2])), Number(data[3]), Number(formatEther(data[4]))];
 }
 
-async function getGaugeControllerData(_gauge: Address) {
-  const gaugeControllerContract = new Contract(GAUGE_CONTROLLER, GaugeControllerAbi, provider);
-
-  const gauge_exists = await gaugeControllerContract.gauge_exists(_gauge);
-
-  return [gauge_exists];
+interface CalculateAPRProps {
+  vaultPrice: number;
+  gauge: Address;
+  publicClient: PublicClient;
 }
 
-export default async function calculateAPR(vaultTokenPriceUSD: number, gaugeAddress: Address) {
+export default async function calculateAPR({ vaultPrice, gauge, publicClient }: CalculateAPRProps): Promise<number[]> {
   /// fetch the price of token0, token1 and LIT in USD
-  const popPriceUSD = await defi_llama("0x6F0fecBC276de8fC69257065fE47C5a03d986394", 10)
+  const popPriceUSD = await llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 })
 
   /// calculate the lowerAPR and upperAPR
   let lowerAPR = 0;
   let upperAPR = 0;
 
-  if (gaugeAddress) {
-    const [is_killed, inflation_rate, relative_weight, tokenless_production, working_supply] = await getGaugeData(gaugeAddress);
-    const [gauge_exists] = await getGaugeControllerData(gaugeAddress);
+  if (gauge) {
+    const [is_killed, inflation_rate, relative_weight, tokenless_production, working_supply] = await getGaugeData(gauge, publicClient);
+    const gauge_exists = await publicClient.readContract({
+      address: GAUGE_CONTROLLER,
+      abi: GaugeControllerAbi,
+      functionName: 'gauge_exists',
+      args: [gauge]
+    })
 
     /// @dev the price of oPOP is determined by applying the discount factor to the POP price.
     /// as of this writing, the discount factor of 50% but is subject to change. Additional dev
     /// work is needed to programmatically apply the discount factor at any given point in time.
-    const oPopPriceUSD = (Number(popPriceUSD.value) / 1e18) * 0.5;
+    const oPopPriceUSD = popPriceUSD * 0.5;
 
     if (gauge_exists == true && is_killed == false) {
       const relative_inflation = inflation_rate * relative_weight;
       if (relative_inflation > 0) {
         const annualRewardUSD = relative_inflation * 86400 * 365 * oPopPriceUSD;
         const effectiveSupply = working_supply > 0 ? working_supply : 1;
-        const workingSupplyUSD = effectiveSupply * vaultTokenPriceUSD;
+        const workingSupplyUSD = effectiveSupply * vaultPrice;
 
         lowerAPR = (((annualRewardUSD * tokenless_production) / 100) / workingSupplyUSD) * 100;
         upperAPR = (annualRewardUSD / workingSupplyUSD) * 100;
@@ -60,7 +84,7 @@ export default async function calculateAPR(vaultTokenPriceUSD: number, gaugeAddr
     }
   } else {
     console.log('~~~~~ No Gauge Found ~~~~~');
-    return;
+    return [];
   }
 
   console.log(`lowerAPR: ${Number(lowerAPR).toFixed(2)}%`);

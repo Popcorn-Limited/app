@@ -1,4 +1,4 @@
-import { Address, Chain, ReadContractParameters, createPublicClient, getAddress, http } from "viem"
+import { Address, Chain, ChainDisconnectedError, ReadContractParameters, createPublicClient, getAddress, http } from "viem"
 import { PublicClient } from "wagmi"
 import axios from "axios"
 import { VaultAbi } from "@/lib/constants/abi/Vault"
@@ -10,6 +10,10 @@ import getVaultAddresses from "@/lib/vault/getVaultAddresses"
 import getAssetIcon from "@/lib/vault/getAssetIcon"
 import getVaultName from "@/lib/vault/getVaultName"
 import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
+import { getVeAddresses } from "../utils/addresses"
+import getGauges from "@/lib/gauges/getGauges"
+import type { Gauge } from "@/lib/gauges/getGauges"
+
 
 function prepareVaultContract(vault: Address, account: Address): ReadContractParameters[] {
   const vaultContract = {
@@ -216,6 +220,32 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
     }
   })
 
+
+  // Add gauges
+  if (client.chain.id === 1) {
+    const {
+      GaugeController: GAUGE_CONTROLLER,
+    } = getVeAddresses();
+    const gauges = await getGauges({ address: GAUGE_CONTROLLER, publicClient: client })
+    metadata = metadata.map((entry, i) => {
+      const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
+      const gauge = foundGauge ? {
+        address: foundGauge.address,
+        name: `${entry.vault.name}-gauge`,
+        symbol: `st-${entry.vault.name}`,
+        decimals: foundGauge.decimals,
+        logoURI: "",  // wont be used, just here for consistency
+        balance: foundGauge.balance,
+        price: entry.pricePerShare,
+      } : undefined
+
+      return {
+        ...entry,
+        gauge
+      }
+    })
+  }
+
   return metadata as unknown as VaultData[]
 }
 
@@ -258,7 +288,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     balance: 0, // wont be used, just here for consistency,
     price: 0, // wont be used, just here for consistency,
   }
-  return {
+  const result = {
     address: getAddress(vault),
     vault: {
       address: getAddress(vault),
@@ -292,4 +322,24 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     },
     chainId: client.chain.id
   }
+
+  // Add gauges
+  if (client.chain.id === 1) {
+    const {
+      GaugeController: GAUGE_CONTROLLER,
+    } = getVeAddresses();
+    const gauges = await getGauges({ address: GAUGE_CONTROLLER, publicClient: client })
+    const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === result.address)
+    // @ts-ignore
+    result.gauge = foundGauge ? {
+      address: foundGauge.address,
+      name: `${result.vault.name}-gauge`,
+      symbol: `st-${result.vault.name}`,
+      decimals: foundGauge.decimals,
+      logoURI: "",  // wont be used, just here for consistency
+      balance: foundGauge.balance,
+      price: result.pricePerShare,
+    } : undefined
+  }
+  return result;
 }

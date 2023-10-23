@@ -1,6 +1,6 @@
 import { veAddresses } from "lib/types";
 
-const veAddresses = {
+const VeAddresses = {
     POP: "0xD0Cd466b34A24fcB2f87676278AF2005Ca8A78c4",
     WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -28,5 +28,5 @@ const veAddresses = {
 };
 
 export function getVeAddresses(): veAddresses {
-    return veAddresses as veAddresses;
+    return VeAddresses as veAddresses;
 }

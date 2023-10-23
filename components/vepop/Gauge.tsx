@@ -1,36 +1,22 @@
-import Accordion from "components/Accordion";
-import { AssetWithName } from "components/SweetVault/AssetWithName";
-import useAdapterToken from "hooks/useAdapter";
-import useVaultToken from "hooks/useVaultToken";
-import useCurrentGaugeWeight from "lib/Gauges/useCurrentGaugeWeight";
-import { Gauge } from "@/lib/gauges/useGauges";
-import useUpcomingGaugeWeight from "lib/Gauges/useUpcomingGaugeWeight";
-import useVaultMetadata from "lib/Vault/hooks/useVaultMetadata";
-import { BigNumberWithFormatted } from "lib/types";
-import Slider from "rc-slider";
 import { useState } from "react";
-import { getVeAddresses } from "lib/utils/addresses";
-import Title from "components/content/Title";
-import { Contract } from "ethers";
-import { RPC_PROVIDERS } from "lib/utils";
-import { useAccount } from "wagmi";
-import useGaugeWeights from "lib/Gauges/useGaugeWeights";
+import { Address, useAccount } from "wagmi";
+import Slider from "rc-slider";
+import AssetWithName from "@/components/vault/AssetWithName";
+import { VaultData } from "@/lib/types";
+import Accordion from "@/components/common/Accordion";
+import Title from "@/components/common/Title";
+import useGaugeWeights from "@/lib/gauges/useGaugeWeights";
 
-const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
-
-export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote }: { gauge: Gauge, index: number, votes: number[], handleVotes: Function, veBal: BigNumberWithFormatted, canVote: boolean }): JSX.Element {
+export default function Gauge({ vault, index, votes, handleVotes, canVote }: { vault: VaultData, index: number, votes: number[], handleVotes: Function, canVote: boolean }): JSX.Element {
   const { address: account } = useAccount()
-  const { data: token } = useVaultToken({ vaultAddress: gauge.vault, chainId: gauge.chainId });
-  const { data: adapter } = useAdapterToken({ vaultAddress: gauge.vault, chainId: gauge.chainId });
-  const vaultMetadata = useVaultMetadata({ vaultAddress: gauge.vault, chainId: gauge.chainId });
 
-  const { data: weights } = useGaugeWeights({ address: gauge.address, account: account, chainId: gauge.chainId })
+  const { data: weights } = useGaugeWeights({ address: vault.gauge?.address as Address, account: account as Address, chainId: vault.chainId })
 
   const [amount, setAmount] = useState(0);
 
-  function onChange(value) {
+  function onChange(value: number) {
     const currentVoteForThisGauge = votes[index];
-    const potentialNewTotalVotes = votes.reduce((a, b) => a + b, 0) - currentVoteForThisGauge + value;
+    const potentialNewTotalVotes = votes.reduce((a, b) => a + b, 0) - currentVoteForThisGauge + Number(value);
 
     if (potentialNewTotalVotes <= 10000) {
       handleVotes(value, index);
@@ -38,17 +24,15 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
     }
   }
 
+  console.log({weights})
+
   return (
     <Accordion
       header={<>
         <div className="w-full flex flex-row flex-wrap items-center justify-between">
 
           <div className="flex items-center justify-between select-none w-full md:w-3/12">
-            <AssetWithName
-              token={token}
-              vault={vaultMetadata}
-              chainId={gauge.chainId}
-            />
+            <AssetWithName vault={vault} />
           </div>
 
           <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
@@ -73,7 +57,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
             <p className="text-primaryLight font-normal">My Votes</p>
             <p className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
               <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
-                {(Number(weights?.[2]) / 1e10).toFixed() || 0} %
+                {(Number(weights?.[2].power) / 1e10).toFixed() || 0} %
               </Title>
             </p>
           </div>
@@ -99,7 +83,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
                     backgroundColor: '#fff',
                   }}
                   value={amount}
-                  onChange={canVote ? (val) => onChange(val) : () => { }}
+                  onChange={canVote ? (val: any) => onChange(Number(val)) : () => { }}
                   max={10000}
                 />
               </div>
@@ -122,7 +106,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
           <span className="flex flex-row flex-wrap items-center justify-between">
             <p className="text-primaryLight font-normal">Gauge address:</p>
             <p className="font-bold text-primary">
-              {gauge.address}
+              {vault.gauge?.address}
             </p>
           </span>
         </div>
@@ -130,7 +114,7 @@ export default function Gauge({ gauge, index, votes, handleVotes, veBal, canVote
           <span className="flex flex-row flex-wrap items-center justify-between">
             <p className="text-primaryLight font-normal">Vault address:</p>
             <p className="font-bold text-primary">
-              {gauge.vault}
+              {vault.address}
             </p>
           </span>
         </div>

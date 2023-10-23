@@ -51,7 +51,7 @@ export default function Products(): JSX.Element {
                 content: <p>Coming soon</p>,
               },
             ]}
-            route=""
+            route="vepop"
           />
           <Product
             title={

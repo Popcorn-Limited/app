@@ -62,7 +62,7 @@ export default function InputTokenWithError({
               </svg>
             </div>
             <p className="text-secondaryLight group-hover/max:text-primary mb-2.5">
-              {`${formatNumber(Number(selectedToken?.balance) / (10 ** (selectedToken?.decimals as number)))}`}
+              {`${selectedToken?.balance ? formatNumber(Number(selectedToken?.balance) / (10 ** (selectedToken?.decimals as number))) : "0"}`}
             </p>
           </>}
         </div>

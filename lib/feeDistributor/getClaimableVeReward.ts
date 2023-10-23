@@ -1,18 +1,17 @@
-import { Chain, createPublicClient, http } from "viem";
-import { llama } from "@/lib/resolver/price/resolver";
-import { thisPeriodTimestamp } from "@/lib/gauges/utils";
-import { RPC_URLS } from "@/lib/utils/connectors";
+import { Chain, createPublicClient, http } from 'viem';
+import { thisPeriodTimestamp } from '@/lib/gauges/utils';
+import { ZERO } from '@/lib/constants';
+import { RPC_URLS } from '@/lib/utils/connectors';
 
-interface ClaimableTokensArgs {
+interface GetVeRewardsProps {
   chain: Chain;
   address: `0x${string}`;
+  user: `0x${string}`;
   token: `0x${string}`;
-}
+};
 
-export default async function getVeApy({ chain, address, token }: ClaimableTokensArgs): Promise<number> {
-  const popPriceUSD = await llama({ address: "0x6F0fecBC276de8fC69257065fE47C5a03d986394", chainId: 10 })
-  const wethPriceUSD = await llama({ address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", chainId: 1 })
-  const timestamp = BigInt(String(thisPeriodTimestamp() - 604800));
+export default async function getClaimableVeReward({ chain, address, user, token }: GetVeRewardsProps): Promise<bigint> {
+  const timestamp = BigInt(String(thisPeriodTimestamp()));
 
   const client = createPublicClient({ chain, transport: http(RPC_URLS[chain.id]) })
   const data = await client.multicall({
@@ -26,6 +25,12 @@ export default async function getVeApy({ chain, address, token }: ClaimableToken
       {
         address,
         abi: abiFeeDistributor,
+        functionName: "getUserBalanceAtTimestamp",
+        args: [user, timestamp]
+      },
+      {
+        address,
+        abi: abiFeeDistributor,
         functionName: "getTokensDistributedInWeek",
         args: [token, timestamp]
       },
@@ -33,16 +38,12 @@ export default async function getVeApy({ chain, address, token }: ClaimableToken
     allowFailure: false
   })
 
-  if (Number(data[1]) > 0 && Number(data[0]) > 0) {
-    const rewardValue = Number(data[1]) * wethPriceUSD
-    const supplyValue = Number(data[0]) * popPriceUSD;
-    const apy = (rewardValue / supplyValue) * 52;
-    return apy;
+  if (Number(data[1]) && Number(data[2]) > 0 && Number(data[0]) > 0) {
+    return (data[1] * data[2]) / data[0];
   }
 
-  return 0;
-};
-
+  return ZERO;
+}
 
 const abiFeeDistributor = [
   {

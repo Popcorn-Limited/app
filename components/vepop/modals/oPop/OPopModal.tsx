@@ -1,32 +1,30 @@
-import Modal from "components/Modal/Modal";
-import { useEffect, useState } from "react";
-import MainActionButton from "components/MainActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { useExerciseOPop, exerciseOPop } from "lib/OPop/useExerciseOPop";
-import ExerciseOPopInterface from "./ExerciseOPopInterface";
-import OptionInfo from "./OptionInfo";
-import { getVeAddresses } from "lib/utils/addresses";
-import { useAllowance } from "lib/Erc20/hooks";
-import { approveBalance } from "hooks/useApproveBalance";
-import { Address } from "wagmi";
-import { utils, BigNumber } from "ethers";
+import Modal from "@/components/modal/Modal";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Address, WalletClient, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import OptionInfo from "@/components/vepop/modals/oPop/OptionInfo";
+import ExerciseOPopInterface from "@/components/vepop/modals/oPop/ExerciseOPopInterface";
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { Token } from "@/lib/types";
+import { handleAllowance } from "@/lib/approve";
+import { parseEther } from "viem";
+import { exerciseOPop } from "@/lib/oPop/interactions";
 
 const { BalancerOracle: OPOP_ORACLE, WETH: WETH, oPOP: OPOP } = getVeAddresses();
 
-export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.Element {
+export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
 
   const [step, setStep] = useState(0);
   const [showModal, setShowModal] = show;
 
   const [amount, setAmount] = useState<number>(0);
   const [maxPaymentAmount, setMaxPaymentAmount] = useState<number>(0);
-
-  const { data: allowance } = useAllowance({ chainId: 1, address: WETH, account: OPOP as Address });
-  const needAllowance = amount > Number(allowance?.value || 0);
 
   useEffect(() => {
     if (!showModal) setStep(0)
@@ -40,28 +38,36 @@ export default function OPopModal({ show }: { show: [boolean, Function] }): JSX.
     if ((amount || 0) == 0) return;
     // Early exit if value is ZERO
 
-    if (chain.id !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
-    if (needAllowance) await approveBalance(WETH, OPOP);
-    exerciseOPop(OPOP, account, utils.parseEther(String(amount)).toString(), utils.parseEther(maxPaymentAmount.toFixed(18)).mul(BigNumber.from("10000")).toString());
+    await handleAllowance({
+      token: { address: WETH } as Token,
+      inputAmount: (amount * (10 ** 18) || 0),
+      account: account as Address,
+      spender: OPOP,
+      publicClient,
+      walletClient: walletClient as WalletClient
+    })
+
+    exerciseOPop({
+      account: account as Address,
+      amount: parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
+      maxPaymentAmount: parseEther(maxPaymentAmount.toFixed(18)) * BigInt("10000"),
+      clients: { publicClient, walletClient: walletClient as WalletClient }
+    });
     setShowModal(false);
   }
 
   return (
-    <Modal show={showModal} setShowModal={setShowModal} >
+    <Modal visibility={[showModal, setShowModal]}>
       <>
         {step === 0 && <OptionInfo />}
         {step === 1 && <ExerciseOPopInterface amountState={[amount, setAmount]} maxPaymentAmountState={[maxPaymentAmount, setMaxPaymentAmount]} />}
 
         <div className="space-y-4">
           {step === 0 && <MainActionButton label="Next" handleClick={() => setStep(step + 1)} />}
-          {
-            step === 1 && (
-              needAllowance
-                ? <SecondaryActionButton label={"Approve wETH"} handleClick={handleExerciseOPop} />
-                : <MainActionButton label={"Exercise oPOP"} handleClick={handleExerciseOPop} />
-            )
-          }          {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
+          {step === 1 && <MainActionButton label={"Exercise oPOP"} handleClick={handleExerciseOPop} />}
+          {step === 1 && <SecondaryActionButton label="Back" handleClick={() => setStep(step - 1)} />}
         </div>
       </>
     </Modal >

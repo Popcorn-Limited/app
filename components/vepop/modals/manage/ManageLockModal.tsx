@@ -1,30 +1,26 @@
-import Modal from "components/Modal/Modal";
-import { useEffect, useState } from "react";
-import MainActionButton from "components/MainActionButton";
-import TertiaryActionButton from "components/TertiaryActionButton";
-import SecondaryActionButton from "components/SecondaryActionButton";
-import useWaitForTx from "lib/utils/hooks/useWaitForTx";
-import { useCreateLock, useIncreaseLockAmount, useIncreaseLockTime, useWithdrawLock } from "lib/Gauges/utils";
-import { useApproveBalance } from "hooks/useApproveBalance";
-import toast from "react-hot-toast";
-import { useAllowance, useBalanceOf } from "lib/Erc20/hooks";
-import { Address, useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { Address, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
+import { WalletClient } from "viem";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getVeAddresses } from "lib/utils/addresses";
+import useLockedBalanceOf from "@/lib/gauges/useLockedBalanceOf";
+import Modal from "@/components/modal/Modal";
+import MainActionButton from "@/components/button/MainActionButton";
+import SecondaryActionButton from "@/components/button/SecondaryActionButton";
+import { showErrorToast } from "@/lib/toasts";
+import { handleAllowance } from "@/lib/approve";
+import { Token } from "@/lib/types";
+import { increaseLockAmount, increaseLockTime, withdrawLock } from "@/lib/gauges/interactions";
 import SelectManagementOption from "./SelectManagementOption";
 import IncreaseStakeInterface from "./IncreaseStakeInterface";
 import IncreaseStakePreview from "./IncreaseStakePreview";
-import UnstakePreview from "./UnstakePreview";
+import IncreaseTimeInterface from "./IncreaseTimeInteface";
 import IncreaseTimePreview from "./IncreaseTimePreview";
-import IncreaseTimeInterface from "./IncreaseTimeInterface";
-import useLockedBalanceOf from "lib/Gauges/useLockedBalanceOf";
-import { showSuccessToast, showErrorToast } from "lib/Toasts";
-import { getVeAddresses } from "lib/utils/addresses";
+import UnstakePreview from "./UnstakePreview";
 
 const {
   BalancerPool: POP_LP,
   VotingEscrow: VOTING_ESCROW,
 } = getVeAddresses();
-
-function noOp() { }
 
 export enum ManagementOption {
   IncreaseLock,
@@ -32,67 +28,61 @@ export enum ManagementOption {
   Unlock
 }
 
-export default function ManageLockModal({ show }: { show: [boolean, Function] }): JSX.Element {
+export default function ManageLockModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address: account } = useAccount();
+
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient()
 
   const [showModal, setShowModal] = show;
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: vePopBal } = useBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
-  const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account })
+  const { data: vePopBal } = useBalance({ chainId: 1, address: VOTING_ESCROW })
+  const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address }) as { data: { amount: bigint, end: bigint } }
 
   const [amount, setAmount] = useState<number>(0);
   const [days, setDays] = useState(7);
-  const isIncreaseLockValid = ((parseInt(lockedBal?.end.toHexString() || '0', 16) - Math.floor(Date.now() / 1000)) / (604800)) < 207
-
-  const { waitForTx } = useWaitForTx();
-  const { write: increaseLockAmount } = useIncreaseLockAmount(VOTING_ESCROW, amount);
-  const { write: increaseLockTime } = useIncreaseLockTime(VOTING_ESCROW, Number(lockedBal?.end || 0) + (days * 86400));
-  const { write: withdrawLock } = useWithdrawLock(VOTING_ESCROW);
-  const {
-    write: approve = noOp,
-    isSuccess: isApproveSuccess,
-    isLoading: isApproveLoading,
-  } = useApproveBalance(POP_LP, VOTING_ESCROW, 1, {
-    onSuccess: (tx) => {
-      waitForTx(tx, {
-        successMessage: "POP LP approved!",
-        errorMessage: "Something went wrong",
-      });
-    },
-    onError: (error) => {
-      showErrorToast(error);
-    },
-  });
-
-  const { data: allowance } = useAllowance({ chainId: 1, address: POP_LP, account: VOTING_ESCROW as Address });
-  const showApproveButton = isApproveSuccess ? false : amount > Number(allowance?.value || 0);
+  const isIncreaseLockValid = ((Number(lockedBal?.end) - Math.floor(Date.now() / 1000)) / (604800)) < 207
 
   useEffect(() => {
-    if (!showModal) { setStep(0); setMangementOption(null) }
+    if (!showModal) {
+      setStep(0);
+      // @ts-ignore
+      setMangementOption(null)
+    }
   },
     [showModal]
   )
 
   async function handleMainAction() {
-    if (chain.id !== Number(1)) switchNetwork?.(Number(1));
+    if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+
+    const clients = { publicClient, walletClient: walletClient as WalletClient }
 
     if (mangementOption === ManagementOption.IncreaseLock) {
       if ((amount || 0) == 0) return;
-      // Early exit if value is ZERO
-      if (showApproveButton) return approve();
-      increaseLockAmount()
+      await handleAllowance({
+        token: { address: POP_LP } as Token,
+        inputAmount: (amount * (10 ** 18) || 0),
+        account: account as Address,
+        spender: VOTING_ESCROW,
+        publicClient,
+        walletClient: walletClient as WalletClient
+      })
+      increaseLockAmount({ amount, account: account as Address, clients })
     }
-    if (mangementOption === ManagementOption.IncreaseTime) increaseLockTime()
-    if (mangementOption === ManagementOption.Unlock) withdrawLock()
-    setShowModal(false)
+
+    if (mangementOption === ManagementOption.IncreaseTime) increaseLockTime({ unlockTime: Number(lockedBal?.end || 0) + (days * 86400), account: account as Address, clients })
+    if (mangementOption === ManagementOption.Unlock) withdrawLock({ account: account as Address, clients })
+
+    setShowModal(false);
   }
 
   return (
-    <Modal show={showModal} setShowModal={setShowModal} >
+    <Modal visibility={[showModal, setShowModal]}>
       <>
         {step === 0 && <SelectManagementOption setStep={setStep} setManagementOption={setMangementOption} />}
 
@@ -107,7 +97,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Function] })
             {step === 2 &&
               <>
                 <IncreaseStakePreview amount={amount} lockedBal={lockedBal} />
-                <MainActionButton label={showApproveButton ? "Approve POP LP" : "Increase Lock Amount"} handleClick={handleMainAction} />
+                <MainActionButton label={"Increase Lock Amount"} handleClick={handleMainAction} />
               </>
             }
           </>

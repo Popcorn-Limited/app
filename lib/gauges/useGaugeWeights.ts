@@ -1,20 +1,17 @@
-import { BigNumber, constants } from "ethers";
-import { BigNumberWithFormatted, Pop } from "lib/types";
-import { formatAndRoundBigNumber } from "lib/utils";
-import { Address, useContractRead, useContractReads } from "wagmi";
-import { getVotePeriodEndTime } from "./utils";
-import { getVeAddresses } from "lib/utils/addresses";
+import { Address, zeroAddress } from "viem";
+import { useContractReads } from "wagmi";
+import { getVotePeriodEndTime } from "@/lib/gauges/utils";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import { GaugeControllerAbi } from "@/lib/constants";
 
 const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
 
 
-export default function useGaugeWeights({ address, account, chainId }: { address: string, account: string, chainId: number }): Pop.HookResult<BigNumber[]> {
+export default function useGaugeWeights({ address, account, chainId }: { address: Address, account: Address, chainId: number }) {
   const contract = {
     address: GAUGE_CONTROLLER,
     chainId: Number(chainId),
-    abi: ["function gauge_relative_weight(address,uint256) view returns (uint256)",
-      "function gauge_relative_weight(address) view returns (uint256)",
-      "function vote_user_slopes(address user, address gauge) external view returns (uint256)"]
+    abi: GaugeControllerAbi
   }
 
   return useContractReads({
@@ -27,14 +24,15 @@ export default function useGaugeWeights({ address, account, chainId }: { address
       {
         ...contract,
         functionName: "gauge_relative_weight",
-        args: [address, getVotePeriodEndTime() / 1000]
+        args: [address, BigInt(getVotePeriodEndTime() / 1000)]
       },
       {
         ...contract,
         functionName: "vote_user_slopes",
-        args: [account || constants.AddressZero, address]
+        args: [account || zeroAddress, address]
       }
     ],
     enabled: !!address && !!chainId,
-  }) as Pop.HookResult<BigNumber[]>
+    allowFailure: false,
+  })
 }

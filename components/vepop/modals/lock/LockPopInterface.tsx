@@ -1,13 +1,12 @@
-import InputNumber from "components/InputNumber";
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { calcUnlockTime, calculateVeOut } from "lib/Gauges/utils";
-import { useBalanceOf } from "lib/Erc20/hooks";
-import { Address, useAccount, useToken } from "wagmi";
-import InputTokenWithError from "components/InputTokenWithError";
-import { safeRound } from "lib/utils";
-import { constants } from "ethers";
-import { validateInput } from "components/SweetVault/internals/input";
-import { getVeAddresses } from "lib/utils/addresses";
+import { Address, useBalance, useToken } from "wagmi";
+import { getVeAddresses } from "@/lib/utils/addresses";
+import InputTokenWithError from "@/components/input/InputTokenWithError";
+import InputNumber from "@/components/input/InputNumber";
+import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
+import { ZERO } from "@/lib/constants";
+import { safeRound } from "@/lib/utils/formatBigNumber";
+import { validateInput } from "@/lib/utils/helpers";
 
 const { BalancerPool: POP_LP } = getVeAddresses();
 
@@ -24,10 +23,8 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
 
 export default function LockPopInterface({ amountState, daysState }:
   { amountState: [number, Dispatch<SetStateAction<number>>], daysState: [number, Dispatch<SetStateAction<number>>] }): JSX.Element {
-  const { address: account } = useAccount()
-
   const { data: popLp } = useToken({ chainId: 1, address: POP_LP as Address });
-  const { data: popLpBal } = useBalanceOf({ chainId: 1, address: POP_LP, account })
+  const { data: popLpBal } = useBalance({ chainId: 1, address: POP_LP })
 
   const [amount, setAmount] = amountState
   const [days, setDays] = daysState
@@ -36,7 +33,7 @@ export default function LockPopInterface({ amountState, daysState }:
     return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(safeRound(popLpBal?.value || constants.Zero, 18));
+  const handleMaxClick = () => setAmount(Number(safeRound(popLpBal?.value || ZERO, 18)));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? Number(value as any) : 0);
