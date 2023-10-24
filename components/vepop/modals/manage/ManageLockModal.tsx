@@ -13,7 +13,7 @@ import { increaseLockAmount, increaseLockTime, withdrawLock } from "@/lib/gauges
 import SelectManagementOption from "./SelectManagementOption";
 import IncreaseStakeInterface from "./IncreaseStakeInterface";
 import IncreaseStakePreview from "./IncreaseStakePreview";
-import IncreaseTimeInterface from "./IncreaseTimeInteface";
+import IncreaseTimeInterface from "./IncreaseTimeInterface";
 import IncreaseTimePreview from "./IncreaseTimePreview";
 import UnstakePreview from "./UnstakePreview";
 
