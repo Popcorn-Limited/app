@@ -11,7 +11,7 @@ import { formatEther } from "viem";
 const { BalancerPool: POP_LP } = getVeAddresses();
 
 interface IncreaseStakeInterfaceProps {
-  amountState: [number, Dispatch<SetStateAction<number>>];
+  amountState: [string, Dispatch<SetStateAction<string>>];
   lockedBal: { amount: bigint, end: bigint }
 }
 
@@ -23,13 +23,13 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
   const [amount, setAmount] = amountState
 
   const errorMessage = useMemo(() => {
-    return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
+    return (Number(amount) || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(Number(formatEther(safeRound(popLpBal?.value || ZERO, 18))));
+  const handleMaxClick = () => setAmount(formatEther(safeRound(popLpBal?.value || ZERO, 18)));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    setAmount(validateInput(value).isValid ? Number(value as any) : 0);
+    setAmount(validateInput(value).isValid ? value : "0");
   };
 
   return (
@@ -44,9 +44,8 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
           onSelectToken={() => { }}
           onMaxClick={handleMaxClick}
           chainId={1}
-          value={amount}
+          value={String(amount)}
           onChange={handleChangeInput}
-          defaultValue={amount}
           selectedToken={
             {
               ...popLp,
@@ -75,8 +74,8 @@ export default function IncreaseStakeInterface({ amountState, lockedBal }: Incre
         <p className="text-primary font-semibold mb-1">New Voting Power</p>
         <div className="w-full bg-[#d7d7d726] border border-customLightGray rounded-lg p-4">
           <p className="text-primaryDark">
-            {amount > 0 ?
-              calculateVeOut(amount + (Number(lockedBal?.amount) / 1e18), calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2)
+            {Number(amount) > 0 ?
+              calculateVeOut(Number(amount) + (Number(lockedBal?.amount) / 1e18), calcDaysToUnlock(Number(lockedBal?.end))).toFixed(2)
               : "Enter the amount to view your voting power"}
           </p>
         </div>

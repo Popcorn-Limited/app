@@ -23,7 +23,7 @@ function LockTimeButton({ label, isActive, handleClick }: { label: string, isAct
 }
 
 interface LockPopInterfaceProps {
-  amountState: [number, Dispatch<SetStateAction<number>>];
+  amountState: [string, Dispatch<SetStateAction<string>>];
   daysState: [number, Dispatch<SetStateAction<number>>];
 }
 
@@ -36,13 +36,13 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
   const [days, setDays] = daysState
 
   const errorMessage = useMemo(() => {
-    return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
+    return (Number(amount) || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(Number(formatEther(safeRound(popLpBal?.value || ZERO, 18))));
+  const handleMaxClick = () => setAmount(formatEther(safeRound(popLpBal?.value || ZERO, 18)));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    setAmount(validateInput(value).isValid ? Number(value as any) : 0);
+    setAmount(validateInput(value).isValid ? value : "0");
   };
 
   const handleSetDays: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
@@ -61,9 +61,8 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
           onSelectToken={() => { }}
           onMaxClick={handleMaxClick}
           chainId={1}
-          value={amount}
+          value={String(amount)}
           onChange={handleChangeInput}
-          defaultValue={amount}
           selectedToken={
             {
               ...popLp,
@@ -112,7 +111,7 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
         <p className="text-primary font-semibold mb-1">Voting Power</p>
         <div className="w-full bg-customLightGray border border-customLightGray rounded-lg p-4">
 
-          <p className="text-primaryDark">{amount > 0 ? calculateVeOut(amount, days).toFixed(2) : "Enter the amount to view your voting power"}</p>
+          <p className="text-primaryDark">{Number(amount) > 0 ? calculateVeOut(Number(amount), days).toFixed(2) : "Enter the amount to view your voting power"}</p>
         </div>
       </div>
 

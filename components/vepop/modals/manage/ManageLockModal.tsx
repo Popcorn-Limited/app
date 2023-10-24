@@ -40,10 +40,10 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: vePopBal } = useBalance({ chainId: 1, address:account, token: VOTING_ESCROW })
+  const { data: vePopBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address }) as { data: { amount: bigint, end: bigint } }
 
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<string>("0");
   const [days, setDays] = useState(7);
   const isIncreaseLockValid = ((Number(lockedBal?.end) - Math.floor(Date.now() / 1000)) / (604800)) < 207
 
@@ -59,20 +59,21 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
 
   async function handleMainAction() {
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
+    const val = Number(amount)
 
     const clients = { publicClient, walletClient: walletClient as WalletClient }
 
     if (mangementOption === ManagementOption.IncreaseLock) {
-      if ((amount || 0) == 0) return;
+      if ((val || 0) == 0) return;
       await handleAllowance({
         token: { address: POP_LP } as Token,
-        inputAmount: (amount * (10 ** 18) || 0),
+        inputAmount: (val * (10 ** 18) || 0),
         account: account as Address,
         spender: VOTING_ESCROW,
         publicClient,
         walletClient: walletClient as WalletClient
       })
-      increaseLockAmount({ amount, account: account as Address, clients })
+      increaseLockAmount({ amount: val, account: account as Address, clients })
     }
 
     if (mangementOption === ManagementOption.IncreaseTime) increaseLockTime({ unlockTime: Number(lockedBal?.end || 0) + (days * 86400), account: account as Address, clients })

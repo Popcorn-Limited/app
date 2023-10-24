@@ -1,6 +1,7 @@
 import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
 
-export default function LockPreview({ amount, days }: { amount: number, days: number }): JSX.Element {
+export default function LockPreview({ amount, days }: { amount: string, days: number }): JSX.Element {
+  const val = Number(amount);
   return (
     <div className="space-y-8 mb-8 text-start">
 
@@ -9,7 +10,7 @@ export default function LockPreview({ amount, days }: { amount: number, days: nu
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p className="text-[#141416]">{amount > 0 ? amount.toFixed(2) : "0"} POP</p>
+          <p className="text-[#141416]">{val > 0 ? val.toFixed(2) : "0"} POP</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
@@ -17,7 +18,7 @@ export default function LockPreview({ amount, days }: { amount: number, days: nu
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Initial Voting Power</p>
-          <p className="text-[#141416]">{amount > 0 ? calculateVeOut(amount, days).toFixed(2) : "0"}</p>
+          <p className="text-[#141416]">{val > 0 ? calculateVeOut(val, days).toFixed(2) : "0"}</p>
         </div>
       </div>
 

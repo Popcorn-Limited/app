@@ -18,8 +18,6 @@ const {
   VotingEscrow: VOTING_ESCROW
 } = getVeAddresses()
 
-function noOp() { }
-
 export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateAction<boolean>>] }): JSX.Element {
   const { address: account } = useAccount();
   const { chain } = useNetwork();
@@ -31,7 +29,7 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
   const [step, setStep] = useState(0);
   const [showModal, setShowModal] = show;
 
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<string>("0");
   const [days, setDays] = useState(7);
 
   useEffect(() => {
@@ -41,21 +39,24 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
   )
 
   async function handleLock() {
-    if ((amount || 0) == 0) return;
+    const val = Number(amount)
+
+    if ((val || 0) == 0) return;
     // Early exit if value is ZERO
+
 
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
     await handleAllowance({
       token: { address: POP_LP } as Token,
-      inputAmount: (amount * (10 ** 18) || 0),
+      inputAmount: (val * (10 ** 18) || 0),
       account: account as Address,
       spender: VOTING_ESCROW,
       publicClient,
       walletClient: walletClient as WalletClient
     })
     // When approved continue to deposit
-    createLock(({ amount: (amount || 0), days, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } }));
+    createLock(({ amount: (val || 0), days, account: account as Address, clients: { publicClient, walletClient: walletClient as WalletClient } }));
     setShowModal(false);
   }
 
