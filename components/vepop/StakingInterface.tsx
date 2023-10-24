@@ -37,9 +37,9 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
   const { address: account } = useAccount()
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address })
-  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
-  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP })
-  
+  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW, watch: true })
+  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP, watch: true })
+
   return (
     <>
       <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">

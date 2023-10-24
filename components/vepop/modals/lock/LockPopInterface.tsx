@@ -1,5 +1,5 @@
 import { Dispatch, FormEventHandler, SetStateAction, useMemo } from "react";
-import { Address, useAccount, useBalance, useToken } from "wagmi";
+import { useAccount, useBalance, useToken } from "wagmi";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import InputNumber from "@/components/input/InputNumber";
@@ -7,6 +7,7 @@ import { calcUnlockTime, calculateVeOut } from "@/lib/gauges/utils";
 import { ZERO } from "@/lib/constants";
 import { safeRound } from "@/lib/utils/formatBigNumber";
 import { validateInput } from "@/lib/utils/helpers";
+import { formatEther } from "viem";
 
 const { BalancerPool: POP_LP } = getVeAddresses();
 
@@ -38,7 +39,7 @@ export default function LockPopInterface({ amountState, daysState }: LockPopInte
     return (amount || 0) > Number(popLpBal?.formatted) ? "* Balance not available" : "";
   }, [amount, popLpBal?.formatted]);
 
-  const handleMaxClick = () => setAmount(Number(safeRound(popLpBal?.value || ZERO, 18)));
+  const handleMaxClick = () => setAmount(Number(formatEther(safeRound(popLpBal?.value || ZERO, 18))));
 
   const handleChangeInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
     setAmount(validateInput(value).isValid ? Number(value as any) : 0);

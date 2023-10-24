@@ -15,5 +15,6 @@ export default function useLockedBalanceOf({ chainId, address, account }: { chai
     args: (!!account && [account]) || [],
     scopeKey: `lockedBalanceOf:${chainId}:${address}:${account}`,
     enabled: !!(chainId && address && account),
+    watch: true
   })
 }

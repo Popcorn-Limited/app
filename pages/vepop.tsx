@@ -21,7 +21,7 @@ function VePopContainer() {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
 
-  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
+  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW, watch: true })
 
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
