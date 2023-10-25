@@ -40,7 +40,7 @@ function VePopContainer() {
       const allVaults = await getVaultsByChain({ chain: mainnet, account })
       const vaultsWithGauges = allVaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
-      if (vaultsWithGauges.length > 0 && votes.length === 0) {
+      if (vaultsWithGauges.length > 0 && votes.length === 0 && publicClient.chain.id === 1) {
         setVotes(vaultsWithGauges.map(gauge => 0));
 
         const hasVoted = await hasAlreadyVoted({
@@ -85,6 +85,7 @@ function VePopContainer() {
 
         <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
+
           {/* <VeRewards /> */}
         </section>
 

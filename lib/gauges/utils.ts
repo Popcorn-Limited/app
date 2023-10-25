@@ -1,9 +1,4 @@
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { nextThursday } from "date-fns"
-import { useState, useEffect } from "react";
-import { parseEther } from "viem";
-import { ChainId } from "@/lib/utils/connectors";
-import { showSuccessToast, showErrorToast } from "@/lib/toasts";
 
 export function calcUnlockTime(days: number, start = Date.now()): number {
   const week = 86400 * 7;
