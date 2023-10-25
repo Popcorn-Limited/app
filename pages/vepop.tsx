@@ -85,7 +85,7 @@ function VePopContainer() {
 
         <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <VeRewards />
+          {/* <VeRewards /> */}
         </section>
 
         <section className="hidden md:block space-y-4">
