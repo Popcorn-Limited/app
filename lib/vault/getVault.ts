@@ -217,30 +217,30 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       tvl: (entry.totalSupply * pricePerShare) / (10 ** entry.asset.decimals)
     }
   })
-    // Add gauges
-    if (client.chain.id === 1) {
-      const {
-        GaugeController: GAUGE_CONTROLLER,
-      } = getVeAddresses();
-      const gauges = await getGauges({ address: GAUGE_CONTROLLER, publicClient: client })
-      metadata = metadata.map((entry, i) => {
-        const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
-        const gauge = foundGauge ? {
-          address: foundGauge.address,
-          name: `${entry.vault.name}-gauge`,
-          symbol: `st-${entry.vault.name}`,
-          decimals: foundGauge.decimals,
-          logoURI: "",  // wont be used, just here for consistency
-          balance: foundGauge.balance,
-          price: entry.pricePerShare,
-        } : undefined
-  
-        return {
-          ...entry,
-          gauge
-        }
-      })
-    }
+  // Add gauges
+  if (client.chain.id === 1) {
+    const {
+      GaugeController: GAUGE_CONTROLLER,
+    } = getVeAddresses();
+    const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
+    metadata = metadata.map((entry, i) => {
+      const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
+      const gauge = foundGauge ? {
+        address: foundGauge.address,
+        name: `${entry.vault.name}-gauge`,
+        symbol: `st-${entry.vault.name}`,
+        decimals: foundGauge.decimals,
+        logoURI: "",  // wont be used, just here for consistency
+        balance: foundGauge.balance,
+        price: entry.pricePerShare,
+      } : undefined
+
+      return {
+        ...entry,
+        gauge
+      }
+    })
+  }
 
   return metadata as unknown as VaultData[]
 }
@@ -318,7 +318,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     },
     chainId: client.chain.id
   }
-  
+
   // Add gauges
   if (client.chain.id === 1) {
     const {

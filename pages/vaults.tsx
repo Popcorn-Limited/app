@@ -43,7 +43,7 @@ const Vaults: NextPage = () => {
   const vaultTvl = useVaultTvl();
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
-  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP })
+  const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP, watch: true })
 
   const [searchString, handleSearch] = useState("");
 
@@ -113,14 +113,14 @@ const Vaults: NextPage = () => {
             <div className="w-1/2 md:w-1/3">
               <p className="leading-6 text-base text-primaryDark">My oPOP</p>
               <div className="text-3xl font-bold whitespace-nowrap">
-                {`${oBal ? NumberFormatter.format(Number(oBal?.value)) : "0"}`}
+                {`${oBal ? NumberFormatter.format(Number(oBal?.value) / 1e18) : "0"}`}
               </div>
             </div>
 
             <div className="w-1/2 md:w-1/3">
               <p className="leading-6 text-base text-primaryDark">Claimable oPOP</p>
               <div className="text-3xl font-bold whitespace-nowrap">
-                {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total)) : "0"}`}
+                {`$${gaugeRewards ? NumberFormatter.format(Number(gaugeRewards?.total) / 1e18) : "0"}`}
               </div>
             </div>
 

@@ -8,10 +8,10 @@ import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import { WalletClient } from "viem";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
-import { ADDRESS_ZERO } from "@/lib/constants";
 import { validateInput } from "@/lib/utils/helpers";
+import { getVeAddresses } from "@/lib/utils/addresses";
 
-const { VaultRouter: VAULT_ROUTER } = { VaultRouter: ADDRESS_ZERO as Address }
+const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
 interface VaultInputsProps {
   vault: Token;

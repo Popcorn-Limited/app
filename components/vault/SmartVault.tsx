@@ -86,7 +86,7 @@ export default function SmartVault({
           <div className="text-primary text-xl md:text-3xl leading-6 md:leading-8">
             <Title level={2} fontWeight="font-normal" as="span" className="mr-1 text-primary">
               {account ? (!!gauge ?
-                formatAndRoundNumber(gauge?.balance || 0, vault.decimals) :
+                formatAndRoundNumber(gauge?.balance || 0, gauge.decimals) :
                 formatAndRoundNumber(vault.balance, vault.decimals)
               ) : "-"}
             </Title>
