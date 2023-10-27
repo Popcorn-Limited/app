@@ -56,7 +56,7 @@ export async function exerciseOPop({ amount, maxPaymentAmount, account, clients 
     },
     functionName: "exercise",
     publicClient: clients.publicClient,
-    args: [amount, maxPaymentAmount]
+    args: [amount, maxPaymentAmount, account]
   })
 
   if (success) {

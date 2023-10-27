@@ -7,12 +7,13 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
 import { VaultData } from "@/lib/types";
 import { getVaultsByChain } from "@/lib/vault/getVault";
-import VeRewards from "@/components/vepop/VeRewards";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
 import Gauge from "@/components/vepop/Gauge";
 import LockModal from "@/components/vepop/modals/lock/LockModal";
 import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
+import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
+import OPopInterface from "@/components/vepop/OPopInterface";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -32,6 +33,7 @@ function VePopContainer() {
 
   const [showLockModal, setShowLockModal] = useState(false);
   const [showMangementModal, setShowMangementModal] = useState(false);
+  const [showOPopModal, setShowOPopModal] = useState(false);
 
   useEffect(() => {
     async function initialSetup() {
@@ -71,6 +73,7 @@ function VePopContainer() {
     <>
       <LockModal show={[showLockModal, setShowLockModal]} />
       <ManageLockModal show={[showMangementModal, setShowMangementModal]} />
+      <OPopModal show={[showOPopModal, setShowOPopModal]} />
       <div>
         <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
           <div className="lg:w-[1050px]">
@@ -85,9 +88,8 @@ function VePopContainer() {
 
         <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-
-          {/* <VeRewards /> */}
-        </section>
+          <OPopInterface setShowOPopModal={setShowOPopModal} />
+        </section >
 
         <section className="hidden md:block space-y-4">
           {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
@@ -123,7 +125,7 @@ function VePopContainer() {
           </>}
         </div>
 
-      </div>
+      </div >
     </>
   )
 }

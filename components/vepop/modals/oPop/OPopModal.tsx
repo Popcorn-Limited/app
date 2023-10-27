@@ -23,26 +23,26 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
   const [step, setStep] = useState(0);
   const [showModal, setShowModal] = show;
 
-  const [amount, setAmount] = useState<number>(0);
-  const [maxPaymentAmount, setMaxPaymentAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<string>("0");
+  const [maxPaymentAmount, setMaxPaymentAmount] = useState<string>("0");
 
   useEffect(() => {
     if (!showModal) setStep(0)
-    setAmount(0);
-    setMaxPaymentAmount(0);
+    setAmount("0");
+    setMaxPaymentAmount("0");
   },
     [showModal]
   )
 
   async function handleExerciseOPop() {
-    if ((amount || 0) == 0) return;
+    if ((Number(amount) || 0) == 0) return;
     // Early exit if value is ZERO
 
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
     await handleAllowance({
       token: { address: WETH } as Token,
-      inputAmount: (amount * (10 ** 18) || 0),
+      inputAmount: (Number(amount) * (10 ** 18) || 0),
       account: account as Address,
       spender: OPOP,
       publicClient,
@@ -52,7 +52,7 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
     exerciseOPop({
       account: account as Address,
       amount: parseEther(Number(amount).toLocaleString("fullwide", { useGrouping: false })),
-      maxPaymentAmount: parseEther(maxPaymentAmount.toFixed(18)) * BigInt("10000"),
+      maxPaymentAmount: parseEther(maxPaymentAmount),
       clients: { publicClient, walletClient: walletClient as WalletClient }
     });
     setShowModal(false);

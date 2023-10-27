@@ -10,6 +10,7 @@ import { validateInput } from "@/lib/utils/helpers";
 import { Token } from "@/lib/types";
 import { llama } from "@/lib/resolver/price/resolver";
 import { useEthToUsd } from "@/lib/oPop/ethToUsd";
+import { formatEther } from "viem";
 
 const {
   POP: POP,
@@ -18,9 +19,11 @@ const {
   WETH: WETH
 } = getVeAddresses();
 
+const SLIPPAGE = 0.01 // @dev adding some slippage to the call -- TODO -> we should later allow users to change that
+
 interface ExerciseOPopInterfaceProps {
-  amountState: [number, Dispatch<SetStateAction<number>>];
-  maxPaymentAmountState: [number, Dispatch<SetStateAction<number>>];
+  amountState: [string, Dispatch<SetStateAction<string>>];
+  maxPaymentAmountState: [string, Dispatch<SetStateAction<string>>];
 }
 
 export default function ExerciseOPopInterface({ amountState, maxPaymentAmountState }: ExerciseOPopInterfaceProps): JSX.Element {
@@ -31,14 +34,13 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   const [maxPaymentAmount, setMaxPaymentAmount] = maxPaymentAmountState;
 
   const { data: oPopBal } = useBalance({ chainId: 1, address: account, token: OPOP })
-  const { data: ethBal } = useBalance({ chainId: 1, address: account })
   const { data: wethBal } = useBalance({ chainId: 1, address: account, token: WETH })
 
   const { data: oPop } = useToken({ chainId: 1, address: OPOP });
   const { data: pop } = useToken({ chainId: 1, address: POP });
   const { data: weth } = useToken({ chainId: 1, address: WETH });
 
-  const [oPopPrice, setOPopPrice] = useState<bigint>(ZERO);
+  const [oPopPrice, setOPopPrice] = useState<bigint>(ZERO); // oPOP price in ETH (needs to be multiplied with the eth price to arrive at USD prices)
   const [oPopDiscount, setOPopDiscount] = useState<number>(0);
   const [popPrice, setPopPrice] = useState<number>(0);
   const [wethPrice, setWethPrice] = useState<number>(0);
@@ -66,41 +68,41 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
   }, [initialLoad])
 
   function handleMaxWeth() {
-    const maxEth = Number(safeRound(ethBal?.value || ZERO, 18));
+    const maxEth = formatEther(safeRound(wethBal?.value || ZERO, 18));
 
     setMaxPaymentAmount(maxEth);
-    setAmount(getOPopAmount(maxEth))
+    setAmount(getOPopAmount(Number(maxEth)))
   };
 
   function handleMaxOPop() {
-    const maxOPop = Number(safeRound(oPopBal?.value || ZERO, 18));
+    const maxOPop = formatEther(safeRound(oPopBal?.value || ZERO, 18));
 
-    setMaxPaymentAmount(getPaymentAmount(maxOPop));
+    setMaxPaymentAmount(getMaxPaymentAmount(Number(maxOPop)));
     setAmount(maxOPop)
   };
 
-  function getPaymentAmount(oPopAmount: number) {
-    const oPopValue = oPopAmount * (Number(oPopPrice) / 1e18);
+  function getMaxPaymentAmount(oPopAmount: number) {
+    const oPopValue = oPopAmount * ((Number(oPopPrice) / 1e18) * wethPrice);
 
-    return oPopValue / wethPrice;
+    return String((oPopValue / wethPrice) * (1 + SLIPPAGE));
   }
 
   function getOPopAmount(paymentAmount: number) {
     const ethValue = paymentAmount * wethPrice;
 
-    return ethValue / (Number(oPopPrice) / 1e18);
+    return String(ethValue / (((Number(oPopPrice) / 1e18) * wethPrice) * (1 - SLIPPAGE)));
   }
 
   const handleOPopInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const amount = validateInput(value).isValid ? Number(value as any) : 0
+    const amount = validateInput(value).isValid ? value : "0"
     setAmount(amount);
-    setMaxPaymentAmount(getPaymentAmount(amount));
+    setMaxPaymentAmount(getMaxPaymentAmount(Number(amount)));
   };
 
   const handleEthInput: FormEventHandler<HTMLInputElement> = ({ currentTarget: { value } }) => {
-    const amount = validateInput(value).isValid ? Number(value as any) : 0
+    const amount = validateInput(value).isValid ? value : "0"
     setMaxPaymentAmount(amount);
-    setAmount(getOPopAmount(amount));
+    setAmount(getOPopAmount(Number(amount)));
   };
 
   return (
@@ -122,11 +124,11 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           selectedToken={
             {
               ...oPop,
-              icon: "/images/icons/oPOP.svg",
+              logoURI: "/images/tokens/oPop.svg",
               balance: oPopBal?.value || ZERO,
             } as any
           }
-          errorMessage={amount > (Number(oPopBal?.value) / 1e18) ? "Insufficient Balance" : ""}
+          errorMessage={Number(amount) > (Number(oPopBal?.value) / 1e18) ? "Insufficient Balance" : ""}
           tokenList={[]}
         />
         <div className="flex justify-center -mt-2 mb-4">
@@ -138,19 +140,19 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
           onSelectToken={() => { }}
           onMaxClick={handleMaxWeth}
           chainId={1}
-          value={maxPaymentAmount * 1e3} // temp Goerli value
+          value={maxPaymentAmount}
           onChange={handleEthInput}
           allowInput={true}
           selectedToken={
             {
               ...weth,
               decimals: 18,
-              icon: "https://etherscan.io/token/images/weth_28.png",
+              logoURI: "https://etherscan.io/token/images/weth_28.png",
               balance: wethBal?.value || ZERO,
             } as any
           }
           tokenList={[]}
-          errorMessage={(maxPaymentAmount * 1e3) > (Number(wethBal?.value) / 1e18) ? "Insufficient Balance" : ""}
+          errorMessage={Number(maxPaymentAmount) > (Number(wethBal?.value) / 1e18) ? "Insufficient Balance" : ""}
         />
       </div>
 
@@ -181,7 +183,7 @@ export default function ExerciseOPopInterface({ amountState, maxPaymentAmountSta
             className={`flex flex-row items-center justify-end`}
           >
             <div className="md:mr-2 relative">
-              <TokenIcon token={{ logoURI: "/images/icons/POP.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
+              <TokenIcon token={{ logoURI: "/images/tokens/pop.svg" } as Token} imageSize="w-5 h-5" chainId={1} />
             </div>
             <p className="font-medium text-lg leading-none hidden md:block text-black group-hover:text-primary">
               {pop?.symbol}

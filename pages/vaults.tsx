@@ -54,12 +54,15 @@ const Vaults: NextPage = () => {
       const fetchedVaults = (await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
       )).flat();
-      const rewards = await getGaugeRewards({
-        gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
-        account: account as Address,
-        publicClient
-      })
-      setGaugeRewards(rewards)
+
+      if (account) {
+        const rewards = await getGaugeRewards({
+          gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+          account: account as Address,
+          publicClient
+        })
+        setGaugeRewards(rewards)
+      }
       setVaults(fetchedVaults);
     }
     if (!account && !initalLoad) getVaults();

@@ -13,6 +13,8 @@ import getOptionalMetadata from "@/lib/vault/getOptionalMetadata"
 import { getVeAddresses } from "../utils/addresses"
 import getGauges, { Gauge } from "../gauges/getGauges"
 
+const { GaugeController: GAUGE_CONTROLLER } = getVeAddresses();
+
 function prepareVaultContract(vault: Address, account: Address): ReadContractParameters[] {
   const vaultContract = {
     address: vault,
@@ -219,9 +221,6 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
   })
   // Add gauges
   if (client.chain.id === 1) {
-    const {
-      GaugeController: GAUGE_CONTROLLER,
-    } = getVeAddresses();
     const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient: client })
     metadata = metadata.map((entry, i) => {
       const foundGauge = gauges.find((gauge: Gauge) => gauge.lpToken === entry.address)
