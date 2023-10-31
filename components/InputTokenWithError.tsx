@@ -34,12 +34,15 @@ function InputTokenWithError({
 
   return (
     <>
-      {captionText && <p className="text-primary">{captionText}</p>}
+      {captionText && <p className="font-teka text-white text-left text-[20px] leading-[16px] font-semibold tracking-normal mb-2">{captionText}</p>}
       <div className="mt-1 relative flex items-center w-full">
         <div
           className={`w-full flex px-5 py-4 items-center rounded-lg border ${errorMessage ? "border-customRed" : "border-customLightGray"}`}
         >
           <InputNumber {...props} />
+
+          <div className="border-l border-[#D7D7D780] text-[#141416] ml-20">|</div>
+
           <SelectToken
             chainId={chainId}
             allowSelection={allowSelection!}
