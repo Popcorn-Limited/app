@@ -93,14 +93,11 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                     kind: OrderQuoteSideKindSell.SELL,
                     sellToken: inputToken,
                     buyToken: outputToken,
-                    sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(), // 1 WETH
+                    sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(),
                     receiver: account,
                     from: account,
                     validTo: Math.floor(Date.now() / 1000) + 3600,
                 });
-                console.log("PING", input);
-
-                console.log("quoteResponse", quoteResponse);
                 setCowSwapQuoteResponse(quoteResponse);
                 setOutputPreview(Number(parseFloat(utils.formatEther(quoteResponse.quote.buyAmount.toString())).toFixed(3)));
             } catch (error) {
@@ -204,7 +201,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
 
                 </div>
                 <InputTokenWithError
-                    captionText={"Deposit Amount"}
+                    captionText={"Zap Input"}
                     onSelectToken={option => setInputToken(option)}
                     onMaxClick={() => handleChangeInput({ currentTarget: { value: Number(inputToken.balance) / (10 ** inputToken.decimals) } })}
                     chainId={1}
@@ -232,7 +229,7 @@ function CowswapSweetVault({ vaultAddress }: { vaultAddress: string }) {
                         </svg>
                     </div>
                     <InputTokenWithError
-                        captionText={"Output Amount"}
+                        captionText={"Zap Output"}
                         onSelectToken={option => setOutputToken(option)}
                         onMaxClick={() => { }}
                         chainId={1}
