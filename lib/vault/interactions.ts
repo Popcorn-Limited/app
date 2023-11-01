@@ -3,7 +3,7 @@ import { SimulationResponse } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient, WalletClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
-import axios from "axios";
+import zap from "./zap";
 
 interface VaultWriteProps {
   address: Address;
@@ -41,7 +41,15 @@ interface VaultRouterSimulateProps {
   publicClient: PublicClient;
 }
 
-
+interface ZapIntoVaultProps {
+  sellToken: Address;
+  asset: Address;
+  vault: Address;
+  account: Address;
+  amount: number;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
+}
 
 async function simulateVaultCall({ address, account, amount, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
   try {
@@ -167,41 +175,12 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
 }
 
 
-// export async function zapIntoVault() {
-  const quote = (await axios.post(
-    "https://api.cow.fi/mainnet/api/v1/quote",
-    JSON.stringify({
-      sellToken: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      buyToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      from: "0x55fe002aeff02f77364de339a1292923a15844b8",
-      receiver: "0x55fe002aeff02f77364de339a1292923a15844b8",
-      validTo: Math.floor(Date.now() / 1000) + 3600,
-      partiallyFillable: false,
-      kind: "sell",
-      sellAmountBeforeFee: "10000000000"
-    }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )).data.quote
-
-  const order = {
-    kind: OrderKind.SELL,
-    receiver: account,
-    sellToken: inputToken,
-    buyToken: outputToken,
-    partiallyFillable: false,
-    validTo: Math.floor(Date.now() / 1000) + 3600,
-    sellAmount: sellAmount,
-    buyAmount: buyAmount,
-    feeAmount: feeAmount,
-    // The appData allows you to attach arbitrary information (meta-data) to the order.
-    appData: '0x0000000000000000000000000000000000000000000000000000000000000000'
-  }
-
-  // const signedOrder = await OrderSigningUtils.signOrder(order, SupportedChainId.MAINNET, signer) as any
-
-  // console.log("signedOrder", signedOrder);
-  // const orderId = await orderBookApi.sendOrder({ ...order, ...signedOrder });
-
-  // console.log("orderId", orderId);
-  // return orderId;
-// }
+export async function zapIntoVault({ sellToken, asset, vault, account, amount, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+  showLoadingToast("Zapping into asset...")
+  await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient })
+  // await fullfillment
+  // approve vault
+  // get returned value
+  const depositAmount = 0
+  return vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+}
