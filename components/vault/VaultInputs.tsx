@@ -183,7 +183,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             console.log("out vault")
             // handle cow router allowance
             await handleAllowance({
-              token: inputToken,
+              token: inputToken as Token,
               inputAmount: (inputBalance * (10 ** vault?.decimals)),
               account: account as Address,
               spender: VAULT_ROUTER,
@@ -196,7 +196,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             console.log("out gauge")
             // handle cow router allowance
             await handleAllowance({
-              token: inputToken,
+              token: inputToken as Token,
               inputAmount: (inputBalance * (10 ** vault?.decimals)),
               account: account as Address,
               spender: VAULT_ROUTER,
@@ -232,7 +232,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       selectedToken={inputToken}
       errorMessage={""}
       tokenList={tokenOptions}
-      allowSelection={true}
+      allowSelection={isDeposit}
       allowInput
     />
     <div className="relative py-4">
@@ -258,8 +258,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}
-      tokenList={[]}
-      allowSelection={false}
+      tokenList={tokenOptions}
+      allowSelection={!isDeposit}
       allowInput={false}
     />
     <div className="mt-8">

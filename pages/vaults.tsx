@@ -14,6 +14,7 @@ import NetworkFilter from "@/components/network/NetworkFilter";
 import useVaultTvl from "@/lib/vault/useVaultTvl";
 import useNetworkFilter from "@/lib/utils/useNetworkFilter";
 import getZapAssets from "@/lib/utils/getZapAssets";
+import { numberFormat } from "highcharts";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -31,7 +32,7 @@ const Vaults: NextPage = () => {
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useState<VaultData[]>([]);
-  const [zapAssets, setZapAssets] = useState<Token[]>([]);
+  const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
 
   const vaultTvl = useVaultTvl();
 
@@ -46,10 +47,9 @@ const Vaults: NextPage = () => {
       );
       setVaults(fetchedVaults.flat());
 
-      const fetchedZapAssets = await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getZapAssets({ chain, account }))
-      );
-      setZapAssets(fetchedZapAssets.flat());
+      const newZapAssets: { [key: number]: Token[] } = {}
+      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
+      setZapAssets(newZapAssets);
     }
     if (!account && !initalLoad) getVaults();
     if (account && !accountLoad) getVaults()
@@ -121,7 +121,7 @@ const Vaults: NextPage = () => {
               key={`sv-${vault.address}-${vault.chainId}`}
               vaultData={vault}
               searchString={searchString}
-              zapAssets={zapAssets}
+              zapAssets={zapAssets[vault.chainId]}
               deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
             />
           )

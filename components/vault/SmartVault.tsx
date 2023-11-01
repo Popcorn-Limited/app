@@ -3,7 +3,7 @@ import { Address, useAccount, } from "wagmi";
 import { getAddress } from "viem";
 import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
-import { NumberFormatter, formatAndRoundNumber, formatNumber } from "@/lib/utils/formatBigNumber";
+import { NumberFormatter, formatAndRoundNumber } from "@/lib/utils/formatBigNumber";
 import MarkdownRenderer from "@/components/vault/MarkdownRenderer";
 import AssetWithName from "@/components/vault/AssetWithName";
 import VaultInputs from "@/components/vault/VaultInputs";
@@ -13,10 +13,11 @@ import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
 
 
-function getBaseToken(vaultData: VaultData): Token[] {
-  const baseToken = [vaultData.vault, vaultData.asset]
-  if (!!vaultData.gauge) baseToken.push(vaultData.gauge)
-  return baseToken;
+function getTokenOptions(vaultData: VaultData, zapAssets: Token[]): Token[] {
+  const tokenOptions = [vaultData.vault, vaultData.asset]
+  if (!!vaultData.gauge) tokenOptions.push(vaultData.gauge)
+  tokenOptions.push(...zapAssets.filter(asset => getAddress(asset.address) !== getAddress(vaultData.asset.address)))
+  return tokenOptions;
 }
 
 export default function SmartVault({
@@ -35,7 +36,7 @@ export default function SmartVault({
   const vault = vaultData.vault;
   const asset = vaultData.asset;
   const gauge = vaultData.gauge;
-  const baseToken = getBaseToken(vaultData);
+  const tokenOptions = getTokenOptions(vaultData, zapAssets);
 
   const [apy, setApy] = useState<number | undefined>(0);
 
@@ -47,7 +48,7 @@ export default function SmartVault({
   }, [apy])
 
   // Is loading / error
-  if (!vaultData || baseToken.length === 0) return <></>
+  if (!vaultData || tokenOptions.length === 0) return <></>
   // Dont show if we filter by deployer
   if (!!deployer && getAddress(deployer) !== getAddress(vaultData?.metadata?.creator)) return <></>
   // Vault is not in search term
@@ -111,7 +112,7 @@ export default function SmartVault({
             vault={vault}
             asset={asset}
             gauge={gauge}
-            tokenOptions={[vaultData.vault, vaultData.asset, ...zapAssets]}
+            tokenOptions={tokenOptions}
             chainId={vaultData.chainId}
           />
         </div>
