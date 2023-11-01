@@ -13,10 +13,10 @@ import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
 
 
-function getTokenOptions(vaultData: VaultData, zapAssets: Token[]): Token[] {
+function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
   const tokenOptions = [vaultData.vault, vaultData.asset]
   if (!!vaultData.gauge) tokenOptions.push(vaultData.gauge)
-  tokenOptions.push(...zapAssets.filter(asset => getAddress(asset.address) !== getAddress(vaultData.asset.address)))
+  if (zapAssets) tokenOptions.push(...zapAssets.filter(asset => getAddress(asset.address) !== getAddress(vaultData.asset.address)))
   return tokenOptions;
 }
 
@@ -28,7 +28,7 @@ export default function SmartVault({
 }: {
   vaultData: VaultData,
   searchString: string,
-  zapAssets: Token[],
+  zapAssets?: Token[],
   deployer?: Address
 }) {
   const [yieldOptions] = useAtom(yieldOptionsAtom);

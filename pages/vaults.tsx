@@ -42,14 +42,14 @@ const Vaults: NextPage = () => {
     async function getVaults() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
+      const newZapAssets: { [key: number]: Token[] } = {}
+      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
+      setZapAssets(newZapAssets);
+
       const fetchedVaults = await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
       );
       setVaults(fetchedVaults.flat());
-
-      const newZapAssets: { [key: number]: Token[] } = {}
-      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
-      setZapAssets(newZapAssets);
     }
     if (!account && !initalLoad) getVaults();
     if (account && !accountLoad) getVaults()
@@ -115,17 +115,19 @@ const Vaults: NextPage = () => {
       </section>
 
       <section className="flex flex-col gap-4">
-        {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
-          return (
-            <SmartVault
-              key={`sv-${vault.address}-${vault.chainId}`}
-              vaultData={vault}
-              searchString={searchString}
-              zapAssets={zapAssets[vault.chainId]}
-              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
-            />
-          )
-        })
+        {vaults.length > 0 &&
+          Object.keys(zapAssets).length > 0
+          ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+            return (
+              <SmartVault
+                key={`sv-${vault.address}-${vault.chainId}`}
+                vaultData={vault}
+                searchString={searchString}
+                zapAssets={zapAssets[vault.chainId]}
+                deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+              />
+            )
+          })
           : <p>Loading Vaults...</p>
         }
       </section>
