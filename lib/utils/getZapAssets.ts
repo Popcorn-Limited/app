@@ -1,6 +1,6 @@
 import { Token } from "@/lib/types";
 import assets from "@/lib/constants/assets";
-import { Address, Chain, createPublicClient, http } from "viem";
+import { Address, Chain, createPublicClient, getAddress, http } from "viem";
 import axios from "axios";
 import { RPC_URLS, networkMap } from "@/lib/utils/connectors";
 import { ERC20Abi } from "@/lib/constants";
@@ -43,4 +43,41 @@ export default async function getZapAssets({ chain, account }: { chain: Chain, a
       price
     }
   })
+}
+
+export async function getAvailableZapAssets() {
+  const numTokens = Number((await axios({
+    url: "https://api.thegraph.com/subgraphs/name/cowprotocol/cow",
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    data: JSON.stringify({
+      query: `
+      query getNumTokens {
+        totals {
+          tokens
+        }
+      }`,
+    })
+  })).data.data.totals[0].tokens);
+
+  let addresses = []
+  for (let i = 0; i < numTokens;) {
+    const tokens = (await axios({
+      url: "https://api.thegraph.com/subgraphs/name/cowprotocol/cow",
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      data: JSON.stringify({
+        query: `
+        query MyQuery {
+          tokens(first: 1000, skip:${i}) {
+            address
+          }
+        }`,
+      })
+    })).data.data.tokens;
+    addresses.push(...tokens.map((token: any) => getAddress(token.address)))
+    i += 1000
+  }
+  addresses = addresses.flat()
+  return addresses
 }

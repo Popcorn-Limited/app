@@ -306,8 +306,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={""}
-      tokenList={[]}
-      allowSelection={false}
+      tokenList={tokenOptions}
+      allowSelection={isDeposit}
       allowInput
     />
     <div className="relative py-4">
@@ -333,8 +333,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}
-      tokenList={[]}
-      allowSelection={false}
+      tokenList={tokenOptions}
+      allowSelection={!isDeposit}
       allowInput={false}
     />
     <div className="mt-8">

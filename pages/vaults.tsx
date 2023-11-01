@@ -18,7 +18,7 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
-import getZapAssets from "@/lib/utils/getZapAssets";
+import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -42,7 +42,7 @@ const Vaults: NextPage = () => {
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useState<VaultData[]>([]);
   const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
-
+  const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
   const vaultTvl = useVaultTvl();
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
@@ -59,11 +59,14 @@ const Vaults: NextPage = () => {
       SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
       setZapAssets(newZapAssets);
 
+      // get available zapAddresses
+      setAvailableZapAssets({ 1: await getAvailableZapAssets() })
+
       // get vaults
       const fetchedVaults = (await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
       )).flat();
-      
+
       // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
@@ -187,7 +190,7 @@ const Vaults: NextPage = () => {
                 key={`sv-${vault.address}-${vault.chainId}`}
                 vaultData={vault}
                 searchString={searchString}
-                zapAssets={zapAssets[vault.chainId]}
+                zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
                 deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
               />
             )
