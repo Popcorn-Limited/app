@@ -1,6 +1,6 @@
 import StatusWithLabel from "@/components/common/StatusWithLabel";
-import { Networth, getTotalNetworth } from "@/lib/getNetworth";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
+import { Networth, getTotalNetworth } from "@/lib/utils/getNetworth";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 

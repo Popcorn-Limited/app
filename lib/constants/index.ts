@@ -1,6 +1,6 @@
 export * from "./abi";
 import assets from "@/lib/constants/assets";
-import { Token } from "../types";
+import { Token } from "@/lib/types";
 import { Address } from "viem";
 
 export function getAssetsByChain(chainId: number): Token[] {
@@ -11,6 +11,8 @@ export function getAssetsByChain(chainId: number): Token[] {
       symbol: asset.symbol,
       decimals: asset.decimals,
       logoURI: asset.logoURI,
+      balance: 0,
+      price: 0
     }
   });
 }

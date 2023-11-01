@@ -4,13 +4,17 @@ import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
 import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 import TabSelector from "@/components/common/TabSelector";
-import { Token } from "@/lib/types";
-import { handleAllowance } from "@/lib/approve";
+import { handleAllowance } from "@/lib/utils/approve";
 import { WalletClient } from "viem";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
 import { ADDRESS_ZERO } from "@/lib/constants";
+//import { OrderBookApi, SupportedChainId, OrderSigningUtils, OrderKind, OrderQuoteSideKindSell, SubgraphApi } from '@cowprotocol/cow-sdk'
+import { Token } from "@/lib/types";
+
+//const orderBookApi = new OrderBookApi({ chainId: SupportedChainId.MAINNET })
 
 const { VaultRouter: VAULT_ROUTER } = { VaultRouter: ADDRESS_ZERO as Address }
+const COWSWAP_TOKEN_MANAGER = "0xF2F02200aEd0028fbB9F183420D3fE6dFd2d3EcD"
 
 interface VaultInputsProps {
   vault: Token;
@@ -173,6 +177,39 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
           // wrong output token
           return
         }
+        default:
+          console.log("in zap asset")
+          if (outputToken?.address === vault.address) {
+            console.log("out vault")
+            // handle cow router allowance
+            await handleAllowance({
+              token: inputToken,
+              inputAmount: (inputBalance * (10 ** vault?.decimals)),
+              account: account as Address,
+              spender: VAULT_ROUTER,
+              publicClient,
+              walletClient: walletClient as WalletClient
+            })
+            // handle vault allowance, zap and deposit
+          }
+          else if (outputToken?.address === gauge?.address) {
+            console.log("out gauge")
+            // handle cow router allowance
+            await handleAllowance({
+              token: inputToken,
+              inputAmount: (inputBalance * (10 ** vault?.decimals)),
+              account: account as Address,
+              spender: VAULT_ROUTER,
+              publicClient,
+              walletClient: walletClient as WalletClient
+            })
+            // handle router allowance, zap and depositAndStake
+          }
+          else {
+            console.log("out error")
+            // wrong output token
+            return
+          }
         break;
     }
   }
@@ -194,8 +231,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={""}
-      tokenList={[]}
-      allowSelection={false}
+      tokenList={tokenOptions}
+      allowSelection={true}
       allowInput
     />
     <div className="relative py-4">

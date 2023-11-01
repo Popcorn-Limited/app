@@ -22,10 +22,12 @@ function getBaseToken(vaultData: VaultData): Token[] {
 export default function SmartVault({
   vaultData,
   searchString,
+  zapAssets,
   deployer,
 }: {
   vaultData: VaultData,
   searchString: string,
+  zapAssets: Token[],
   deployer?: Address
 }) {
   const [yieldOptions] = useAtom(yieldOptionsAtom);
@@ -109,7 +111,7 @@ export default function SmartVault({
             vault={vault}
             asset={asset}
             gauge={gauge}
-            tokenOptions={[vaultData.vault, vaultData.asset]}
+            tokenOptions={[vaultData.vault, vaultData.asset, ...zapAssets]}
             chainId={vaultData.chainId}
           />
         </div>

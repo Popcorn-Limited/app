@@ -1,6 +1,6 @@
 import React from "react";
 import Product from "@/components/landing/Product";
-import usetVaultTvl from "@/lib/useVaultTvl";
+import usetVaultTvl from "@/lib/vault/useVaultTvl";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import PopSmileyIcon from "@/components/svg/popcorn/PopSmileyIcon";
 import SmileyIcon from "@/components/svg/popcorn/SmileyIcon";

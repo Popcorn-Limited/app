@@ -164,3 +164,50 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
     return false;
   }
 }
+
+
+// export async function zapIntoVault(){
+//   async function sendOrder() {
+//     const getQuote = async () => {
+//       try {
+//           const quoteResponse = await orderBookApi.getQuote({
+//               kind: OrderQuoteSideKindSell.SELL,
+//               sellToken: inputToken,
+//               buyToken: outputToken,
+//               sellAmountBeforeFee: utils.parseUnits(inputBalance.toString(), 18).toString(),
+//               receiver: account,
+//               from: account,
+//               validTo: Math.floor(Date.now() / 1000) + 3600,
+//           });
+//           setCowSwapQuoteResponse(quoteResponse);
+//           setOutputPreview(Number(parseFloat(utils.formatEther(quoteResponse.quote.buyAmount.toString())).toFixed(3)));
+//       } catch (error) {
+//           toast.error("Error fetching quote - Try inputing different amount", {
+//               position: "top-center",
+//           });
+//       }
+//   };
+//       const { sellToken, buyToken, validTo, buyAmount, sellAmount, receiver, feeAmount } = cowSwapQuoteResponse.quote
+//       const order = {
+//           kind: OrderKind.SELL,
+//           receiver: account,
+//           sellToken: inputToken,
+//           buyToken: outputToken,
+//           partiallyFillable: false,
+//           validTo: Math.floor(Date.now() / 1000) + 3600,
+//           sellAmount: sellAmount,
+//           buyAmount: buyAmount,
+//           feeAmount: feeAmount,
+//           // The appData allows you to attach arbitrary information (meta-data) to the order.
+//           appData: '0x0000000000000000000000000000000000000000000000000000000000000000'
+//       }
+
+//       const signedOrder = await OrderSigningUtils.signOrder(order, SupportedChainId.MAINNET, signer) as any
+
+//       console.log("signedOrder", signedOrder);
+//       const orderId = await orderBookApi.sendOrder({ ...order, ...signedOrder });
+
+//       console.log("orderId", orderId);
+//       return orderId;
+//   }
+// }
