@@ -10,7 +10,7 @@ import useNetworkFilter from "@/lib/useNetworkFilter";
 import getVaultNetworth from "@/lib/vault/getVaultNetworth";
 import useVaultTvl from "@/lib/useVaultTvl";
 import { getVaultsByChain } from "@/lib/vault/getVault";
-import { VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
 import MainActionButton from "@/components/button/MainActionButton";
@@ -18,6 +18,7 @@ import getGaugeRewards, { GaugeRewards } from "@/lib/gauges/getGaugeRewards";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
+import getZapAssets from "@/lib/utils/getZapAssets";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -40,6 +41,8 @@ const Vaults: NextPage = () => {
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
   const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
+
   const vaultTvl = useVaultTvl();
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
@@ -51,10 +54,17 @@ const Vaults: NextPage = () => {
     async function getVaults() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
+      // get zap assets
+      const newZapAssets: { [key: number]: Token[] } = {}
+      SUPPORTED_NETWORKS.forEach(async (chain) => newZapAssets[chain.id] = await getZapAssets({ chain, account }))
+      setZapAssets(newZapAssets);
+
+      // get vaults
       const fetchedVaults = (await Promise.all(
         SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
       )).flat();
-
+      
+      // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
           gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
@@ -63,6 +73,7 @@ const Vaults: NextPage = () => {
         })
         setGaugeRewards(rewards)
       }
+
       setVaults(fetchedVaults);
     }
     if (!account && !initalLoad) getVaults();
@@ -168,16 +179,19 @@ const Vaults: NextPage = () => {
       </section>
 
       <section className="flex flex-col gap-4">
-        {vaults.length > 0 ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
-          return (
-            <SmartVault
-              key={`sv-${vault.address}-${vault.chainId}`}
-              vaultData={vault}
-              searchString={searchString}
-              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
-            />
-          )
-        })
+        {vaults.length > 0 &&
+          Object.keys(zapAssets).length > 0
+          ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+            return (
+              <SmartVault
+                key={`sv-${vault.address}-${vault.chainId}`}
+                vaultData={vault}
+                searchString={searchString}
+                zapAssets={zapAssets[vault.chainId]}
+                deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+              />
+            )
+          })
           : <p>Loading Vaults...</p>
         }
       </section>

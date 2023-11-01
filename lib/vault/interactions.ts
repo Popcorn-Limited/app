@@ -3,6 +3,9 @@ import { SimulationResponse } from "@/lib/types";
 import { VaultAbi } from "@/lib/constants";
 import { Address, PublicClient, WalletClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
+import zap from "./zap";
+import { handleAllowance } from "../approve";
+import axios from "axios";
 
 interface VaultWriteProps {
   address: Address;
@@ -40,7 +43,20 @@ interface VaultRouterSimulateProps {
   publicClient: PublicClient;
 }
 
+interface ZapIntoVaultProps {
+  sellToken: Address;
+  asset: Address;
+  vault: Address;
+  account: Address;
+  amount: number;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
+}
 
+interface ZapIntoGaugeProps extends ZapIntoVaultProps {
+  router: Address;
+  gauge: Address;
+}
 
 async function simulateVaultCall({ address, account, amount, functionName, publicClient }: VaultSimulateProps): Promise<SimulationResponse> {
   try {
@@ -163,4 +179,50 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
     showErrorToast(simulationError)
     return false;
   }
+}
+
+// TODO -- error handling
+// TODO -- adjust timeout
+export async function zapIntoVault({ sellToken, asset, vault, account, amount, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+  showLoadingToast("Zapping into asset...")
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient })
+
+  // await fullfillment
+  let depositAmount = 0;
+  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, 3600)
+
+  // approve vault
+  await handleAllowance({
+    token: asset,
+    inputAmount: depositAmount,
+    account,
+    spender: vault,
+    publicClient,
+    walletClient
+  })
+
+  return vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+}
+
+// TODO -- error handling
+// TODO -- adjust timeout
+export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
+  showLoadingToast("Zapping into asset...")
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient })
+
+  // await fullfillment
+  let depositAmount = 0;
+  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, 3600)
+
+  // approve vault
+  await handleAllowance({
+    token: asset,
+    inputAmount: depositAmount,
+    account,
+    spender: vault,
+    publicClient,
+    walletClient
+  })
+
+  return vaultDepositAndStake({ address: router, account, vault, gauge, amount: depositAmount, publicClient, walletClient })
 }

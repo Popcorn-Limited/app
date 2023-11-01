@@ -41,7 +41,7 @@ export default function OPopModal({ show }: { show: [boolean, Dispatch<SetStateA
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
     await handleAllowance({
-      token: { address: WETH } as Token,
+      token: WETH,
       inputAmount: (Number(amount) * (10 ** 18) || 0),
       account: account as Address,
       spender: OPOP,

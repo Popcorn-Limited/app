@@ -66,7 +66,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
     if (mangementOption === ManagementOption.IncreaseLock) {
       if ((val || 0) == 0) return;
       await handleAllowance({
-        token: { address: POP_LP } as Token,
+        token: POP_LP,
         inputAmount: (val * (10 ** 18) || 0),
         account: account as Address,
         spender: VOTING_ESCROW,

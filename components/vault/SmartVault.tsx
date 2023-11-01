@@ -14,19 +14,22 @@ import { Token, VaultData } from "@/lib/types";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
 
 
-function getBaseToken(vaultData: VaultData): Token[] {
-  const baseToken = [vaultData.vault, vaultData.asset]
-  if (!!vaultData.gauge) baseToken.push(vaultData.gauge)
-  return baseToken;
+function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
+  const tokenOptions = [vaultData.vault, vaultData.asset]
+  if (!!vaultData.gauge) tokenOptions.push(vaultData.gauge)
+  if (zapAssets) tokenOptions.push(...zapAssets.filter(asset => getAddress(asset.address) !== getAddress(vaultData.asset.address)))
+  return tokenOptions;
 }
 
 export default function SmartVault({
   vaultData,
   searchString,
+  zapAssets,
   deployer,
 }: {
   vaultData: VaultData,
   searchString: string,
+  zapAssets?: Token[],
   deployer?: Address
 }) {
   const publicClient = usePublicClient();
@@ -35,7 +38,7 @@ export default function SmartVault({
   const vault = vaultData.vault;
   const asset = vaultData.asset;
   const gauge = vaultData.gauge;
-  const baseToken = getBaseToken(vaultData);
+  const tokenOptions = getTokenOptions(vaultData, zapAssets);
 
   const [apy, setApy] = useState<number | undefined>(0);
 
@@ -55,7 +58,7 @@ export default function SmartVault({
   }, [vault, gaugeApr])
 
   // Is loading / error
-  if (!vaultData || baseToken.length === 0) return <></>
+  if (!vaultData || tokenOptions.length === 0) return <></>
   // Dont show if we filter by deployer
   if (!!deployer && getAddress(deployer) !== getAddress(vaultData?.metadata?.creator)) return <></>
   // Vault is not in search term
@@ -120,7 +123,7 @@ export default function SmartVault({
             vault={vault}
             asset={asset}
             gauge={gauge}
-            tokenOptions={[vaultData.vault, vaultData.asset]}
+            tokenOptions={tokenOptions}
             chainId={vaultData.chainId}
           />
         </div>

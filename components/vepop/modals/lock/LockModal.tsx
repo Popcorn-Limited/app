@@ -48,7 +48,7 @@ export default function LockModal({ show }: { show: [boolean, Dispatch<SetStateA
     if (chain?.id as number !== Number(1)) switchNetwork?.(Number(1));
 
     await handleAllowance({
-      token: { address: POP_LP } as Token,
+      token: POP_LP,
       inputAmount: (val * (10 ** 18) || 0),
       account: account as Address,
       spender: VOTING_ESCROW,

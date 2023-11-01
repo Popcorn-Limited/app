@@ -7,11 +7,13 @@ import TabSelector from "@/components/common/TabSelector";
 import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
 import { WalletClient } from "viem";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw } from "@/lib/vault/interactions";
+import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw, zapIntoGauge, zapIntoVault } from "@/lib/vault/interactions";
 import { validateInput } from "@/lib/utils/helpers";
 import { getVeAddresses } from "@/lib/utils/addresses";
+import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
+const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
 
 interface VaultInputsProps {
   vault: Token;
@@ -64,49 +66,49 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
   async function handleMainAction() {
     const val = Number(inputBalance)
-    if (val === 0) return;
+    if (val === 0 || !inputToken || !outputToken || !account || !walletClient) return;
 
     if (chain?.id !== Number(chainId)) switchNetwork?.(Number(chainId));
 
-    switch (inputToken?.address) {
+    switch (inputToken.address) {
       case asset.address:
         console.log("in asset")
-        if (outputToken?.address === vault.address) {
+        if (outputToken.address === vault.address) {
           console.log("out vault")
           await handleAllowance({
-            token: inputToken,
-            inputAmount: (val * (10 ** inputToken?.decimals)),
-            account: account as Address,
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
             spender: vault.address,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
           vaultDeposit({
             address: vault.address,
-            account: account as Address,
-            amount: (val * (10 ** inputToken?.decimals)),
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
         }
-        else if (outputToken?.address === gauge?.address) {
+        else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
           await handleAllowance({
-            token: inputToken,
-            inputAmount: (val * (10 ** inputToken?.decimals)),
-            account: account as Address,
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
             spender: VAULT_ROUTER,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
           vaultDepositAndStake({
             address: VAULT_ROUTER,
-            account: account as Address,
-            amount: (val * (10 ** inputToken?.decimals)),
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
             vault: vault?.address as Address,
             gauge: gauge?.address as Address,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
         }
         else {
@@ -117,59 +119,166 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         break;
       case vault.address:
         console.log("in vault")
-        if (outputToken?.address === asset.address) {
+        if (outputToken.address === asset.address) {
           console.log("out asset")
           vaultRedeem({
             address: vault.address,
-            account: account as Address,
-            amount: (val * (10 ** inputToken?.decimals)),
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
         }
-        else if (outputToken?.address === gauge?.address) {
+        else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
           await handleAllowance({
-            token: vault,
-            inputAmount: (val * (10 ** vault?.decimals)),
-            account: account as Address,
-            spender: gauge?.address as Address,
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
+            spender: gauge.address,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
-          //gaugeDeposit()
+          gaugeDeposit({
+            address: gauge.address,
+            amount: (val * (10 ** inputToken.decimals)),
+            account,
+            clients: {
+              publicClient,
+              walletClient
+            }
+          })
         }
-        else {
+        else if (outputToken.address === vault.address) {
           console.log("out error")
           // wrong output token
+          return
+        }
+        else {
+          console.log("out zap")
+          // TODO - check asset pre balance
+          vaultRedeem({
+            address: vault.address,
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
+            publicClient,
+            walletClient
+          })
+          // TODO -- wait for transaction to resolve
+          // TODO -- check asset past balance
+          // TODO -- zap
           return
         }
         break;
       case gauge?.address:
         console.log("in gauge")
-        if (outputToken?.address === asset.address) {
+        if (outputToken.address === asset.address) {
           console.log("out asset")
           await handleAllowance({
-            token: inputToken,
-            inputAmount: (val * (10 ** vault?.decimals)),
-            account: account as Address,
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
             spender: VAULT_ROUTER,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
           vaultUnstakeAndWithdraw({
             address: VAULT_ROUTER,
-            account: account as Address,
-            amount: (val * (10 ** inputToken?.decimals)),
-            vault: vault?.address as Address,
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
+            vault: vault.address,
             gauge: gauge?.address as Address,
             publicClient,
-            walletClient: walletClient as WalletClient
+            walletClient
           })
         }
-        else if (outputToken?.address === vault.address) {
+        else if (outputToken.address === vault.address) {
           console.log("out vault")
-          //gaugeWithdraw()
+          gaugeWithdraw({
+            address: gauge?.address as Address,
+            amount: (val * (10 ** inputToken.decimals)),
+            account,
+            clients: {
+              publicClient,
+              walletClient
+            }
+          })
+        }
+        else if (outputToken.address === gauge?.address) {
+          console.log("out error")
+          // wrong output token
+          return
+        }
+        else {
+          console.log("out zap")
+          // TODO - check asset pre balance
+          await handleAllowance({
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
+            spender: VAULT_ROUTER,
+            publicClient,
+            walletClient
+          })
+          await vaultUnstakeAndWithdraw({
+            address: VAULT_ROUTER,
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
+            vault: vault.address,
+            gauge: gauge?.address as Address,
+            publicClient,
+            walletClient
+          })
+          // TODO -- wait for transaction to resolve
+          // TODO -- check asset past balance
+          // TODO -- zap
+          return
+        }
+        break;
+      default:
+        console.log("in zap asset")
+        if (outputToken.address === vault.address) {
+          console.log("out vault")
+          // handle cow router allowance
+          await handleAllowance({
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
+            spender: COWSWAP_RELAYER,
+            publicClient,
+            walletClient
+          })
+          zapIntoVault({
+            sellToken: inputToken.address,
+            asset: asset.address,
+            vault: vault.address,
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
+            publicClient,
+            walletClient
+          })
+        }
+        else if (outputToken.address === gauge?.address) {
+          console.log("out gauge")
+          await handleAllowance({
+            token: inputToken.address,
+            inputAmount: (val * (10 ** inputToken.decimals)),
+            account,
+            spender: COWSWAP_RELAYER,
+            publicClient,
+            walletClient
+          })
+          zapIntoGauge({
+            sellToken: inputToken.address,
+            router: VAULT_ROUTER,
+            asset: asset.address,
+            vault: vault.address,
+            gauge: gauge.address,
+            account,
+            amount: (val * (10 ** inputToken.decimals)),
+            publicClient,
+            walletClient
+          })
         }
         else {
           console.log("out error")

@@ -11,6 +11,8 @@ export function getAssetsByChain(chainId: number): Token[] {
       symbol: asset.symbol,
       decimals: asset.decimals,
       logoURI: asset.logoURI,
+      balance: 0,
+      price: 0
     }
   });
 }

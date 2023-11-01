@@ -1,9 +1,9 @@
 import { Abi, Address, PublicClient, WalletClient, parseEther, zeroAddress } from "viem";
 import { VaultData } from "@/lib/types";
-import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/utils/addresses";
-import { GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
+import { GaugeAbi, GaugeControllerAbi, VotingEscrowAbi } from "@/lib/constants";
 
 type SimulationContract = {
   address: Address;
@@ -49,6 +49,8 @@ interface SendVotesProps {
 }
 
 export async function sendVotes({ vaults, votes, account, clients }: SendVotesProps) {
+  showLoadingToast("Sending votes...")
+
   let addr = new Array<string>(8);
   let v = new Array<number>(8);
 
@@ -96,6 +98,8 @@ interface CreateLockProps {
 }
 
 export async function createLock({ amount, days, account, clients }: CreateLockProps) {
+  showLoadingToast("Creating lock...")
+
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
@@ -127,6 +131,8 @@ interface IncreaseLockAmountProps {
 }
 
 export async function increaseLockAmount({ amount, account, clients }: IncreaseLockAmountProps) {
+  showLoadingToast("Increasing lock amount...")
+
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
@@ -158,6 +164,8 @@ interface IncreaseLockTimeProps {
 }
 
 export async function increaseLockTime({ unlockTime, account, clients }: IncreaseLockTimeProps) {
+  showLoadingToast("Increasing lock time...")
+
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
@@ -188,6 +196,8 @@ interface WithdrawLockProps {
 }
 
 export async function withdrawLock({ account, clients }: WithdrawLockProps) {
+  showLoadingToast("Withdrawing lock...")
+
   const { request, success, error: simulationError } = await simulateCall({
     account,
     contract: {
@@ -203,6 +213,67 @@ export async function withdrawLock({ account, clients }: WithdrawLockProps) {
       const hash = await clients.walletClient.writeContract(request)
       const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
       showSuccessToast("Withdrawal successful!")
+    } catch (error: any) {
+      showErrorToast(error.shortMessage)
+    }
+  } else {
+    showErrorToast(simulationError)
+  }
+}
+
+interface GaugeInteractionProps {
+  address: Address;
+  amount: number;
+  account: Address;
+  clients: Clients;
+}
+
+export async function gaugeDeposit({ address, amount, account, clients }: GaugeInteractionProps) {
+  showLoadingToast("Staking into Gauge...")
+
+  const { request, success, error: simulationError } = await simulateCall({
+    account,
+    contract: {
+      address,
+      abi: GaugeAbi,
+    },
+    functionName: "deposit",
+    publicClient: clients.publicClient,
+    args: [amount]
+  })
+
+  if (success) {
+    try {
+      const hash = await clients.walletClient.writeContract(request)
+      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
+      showSuccessToast("Staked into Gauge successful!")
+    } catch (error: any) {
+      showErrorToast(error.shortMessage)
+    }
+  } else {
+    showErrorToast(simulationError)
+  }
+}
+
+export async function gaugeWithdraw({ address, amount, account, clients }: GaugeInteractionProps) {
+  showLoadingToast("Unstaking from Gauge...")
+
+  const { request, success, error: simulationError } = await simulateCall({
+    account,
+    contract: {
+      address,
+      abi: GaugeAbi,
+    },
+    functionName: "withdraw",
+    publicClient: clients.publicClient,
+    args: [amount]
+  })
+
+  if (success) {
+    try {
+      const hash = await clients.walletClient.writeContract(request)
+      const receipt = await clients.publicClient.waitForTransactionReceipt({ hash })
+      showSuccessToast("Unstaked from Gauge successful!")
     } catch (error: any) {
       showErrorToast(error.shortMessage)
     }
