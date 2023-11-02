@@ -302,6 +302,7 @@ interface ZapProps {
 }
 
 export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, timeout = 60 }: ZapProps): Promise<string> {
+  console.log("getting quote")
   const quote = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/quote",
     JSON.stringify({
@@ -316,6 +317,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     }),
     { headers: { 'Content-Type': 'application/json' } }
   )).data.quote
+  console.log({quote})
   const order: Order = {
     sellToken: quote.sellToken,
     buyToken: quote.buyToken,
@@ -330,13 +332,14 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     buyTokenBalance: quote.buyTokenBalance,
     appData: "0x0000000000000000000000000000000000000000000000000000000000000000"
   }
-
+  console.log({order})
+  console.log("signing order")
   const signedOrder = await signOrder(
     order,
     1,
     account,
     signer)
-
+  console.log("posting order")
   const orderId = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/orders",
     JSON.stringify({

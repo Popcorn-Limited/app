@@ -256,7 +256,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
   const vaultName = await getVaultName({ address: getAddress(vault), cid: registryMetadata[3] })
 
   const price = await resolvePrice({ chainId: client.chain.id, client: client, address: results[3] as Address, resolver: 'llama' })
-  const assetsPerShare = Number(results[6]) > 0 ? Number(results[5]) / Number(results[6]) : Number(1)
+  const assetsPerShare = Number(results[6]) > 0 ? Number(results[5]) / Number(results[6]) : Number(1e-9)
   const pricePerShare = assetsPerShare * price
   const fees = results[7] as [BigInt, BigInt, BigInt, BigInt]
 

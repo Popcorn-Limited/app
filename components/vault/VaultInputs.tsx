@@ -1,4 +1,4 @@
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import MainActionButton from "@/components/button/MainActionButton";
 import { useEffect, useState } from "react";
@@ -13,6 +13,8 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
 import { ERC20Abi } from "@/lib/constants";
 import zap from "@/lib/vault/zap";
+import Modal from "../modal/Modal";
+import InputNumber from "../input/InputNumber";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
@@ -38,6 +40,11 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
   const [inputBalance, setInputBalance] = useState<string>("0");
 
   const [isDeposit, setIsDeposit] = useState<boolean>(true);
+
+  // Zap Settings
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [timeout, setTimeout] = useState<number>(60); // number of seconds a cow order is valid for
+  const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
   useEffect(() => {
     // set default input/output tokens
@@ -168,7 +175,15 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             walletClient
           })
           const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-          zap({ account, signer: walletClient, sellToken: asset.address, buyToken: outputToken.address, amount: postBal - preBal })
+          zap({
+            account,
+            signer: walletClient,
+            sellToken: asset.address,
+            buyToken: outputToken.address,
+            amount: postBal - preBal,
+            slippage,
+            timeout
+          })
         }
         break;
       case gauge?.address:
@@ -232,7 +247,15 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             walletClient
           })
           const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-          zap({ account, signer: walletClient, sellToken: asset.address, buyToken: outputToken.address, amount: postBal - preBal })
+          zap({
+            account,
+            signer: walletClient,
+            sellToken: asset.address,
+            buyToken: outputToken.address,
+            amount: postBal - preBal,
+            slippage,
+            timeout
+          })
         }
         break;
       default:
@@ -240,6 +263,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         if (outputToken.address === vault.address) {
           console.log("out vault")
           // handle cow router allowance
+          console.log("approve cow router")
           await handleAllowance({
             token: inputToken.address,
             inputAmount: (val * (10 ** inputToken.decimals)),
@@ -254,6 +278,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             vault: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
+            slippage,
+            timeout,
             publicClient,
             walletClient
           })
@@ -276,6 +302,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             gauge: gauge.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
+            slippage,
+            timeout,
             publicClient,
             walletClient
           })
@@ -291,6 +319,26 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
   if (!inputToken || !outputToken) return <></>
   return <>
+    <Modal visibility={[showModal, setShowModal]}>
+      <div className="text-start">
+        <p>Slippage (in BPS)</p>
+        <div className="w-full rounded-lg border border-primary p-2">
+          <InputNumber
+            value={slippage}
+            onChange={(e) => setSlippage(Number(e.currentTarget.value))}
+          />
+        </div>
+      </div>
+      <div className="text-start">
+        <p>Timeout (in seconds)</p>
+        <div className="w-full rounded-lg border border-primary p-2">
+          <InputNumber
+            value={timeout}
+            onChange={(e) => setTimeout(Number(e.currentTarget.value))}
+          />
+        </div>
+      </div>
+    </Modal>
     <TabSelector
       className="mb-6"
       availableTabs={["Deposit", "Withdraw"]}
@@ -345,6 +393,13 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       allowSelection={!isDeposit}
       allowInput={false}
     />
+    {((isDeposit && ![asset.address, vault.address].includes(inputToken.address)) ||
+      (!isDeposit && ![asset.address, vault.address].includes(outputToken.address))) &&
+      <div className="group/zap flex flex-row items-center cursor-pointer" onClick={() => setShowModal(true)}>
+        <Cog6ToothIcon className="h-5 w-5 mb-1 mr-2 text-primary group-hover/zap:text-primaryLight" aria-hidden="true" />
+        <p className="text-primary group-hover/zap:text-primaryLight">Zap Settings</p>
+      </div >
+    }
     <div className="mt-8">
       <MainActionButton label={isDeposit ? "Deposit" : "Withdraw"} handleClick={handleMainAction} />
     </div>

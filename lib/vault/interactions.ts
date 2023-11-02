@@ -186,14 +186,26 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
 // TODO -- error handling
 export async function zapIntoVault({ sellToken, asset, vault, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
+  console.log("zap")
   const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
-
+  console.log({ orderId })
   // await fullfillment
+  console.log("waiting for order fulfillment")
   let depositAmount = 0;
-  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, timeout)
+  setTimeout(async () => {
+    console.log("getting order receipt")
+    const orderData = (await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data
+    console.log({ orderData })
+    depositAmount = Number(orderData.executedBuyAmount)
+  }, timeout)
+  console.log({ depositAmount })
+  if (depositAmount === 0) {
+    // error happened
+    showErrorToast("Zap Order failed")
+    return false 
+  }
 
-  if (depositAmount === 0) return false // error happened
-
+  console.log("approving vault")
   // approve vault
   await handleAllowance({
     token: asset,
@@ -203,7 +215,7 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, s
     publicClient,
     walletClient
   })
-
+  console.log("vault deposit")
   return vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
 }
 
