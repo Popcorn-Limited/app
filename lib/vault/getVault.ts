@@ -231,7 +231,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
         decimals: foundGauge.decimals,
         logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
         balance: foundGauge.balance,
-        price: entry.pricePerShare,
+        price: entry.pricePerShare * 1e9,
       } : undefined
 
       return {
@@ -333,7 +333,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
       decimals: foundGauge.decimals,
       logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
       balance: foundGauge.balance,
-      price: result.pricePerShare,
+      price: result.pricePerShare * 1e9,
     } : undefined
   }
   return result;

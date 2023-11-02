@@ -46,7 +46,7 @@ export interface Order {
    * amount represents the maximum sell amount that can be executed. For partial
    * fill orders, this represents a component of the limit price fraction.
    */
-  sellAmount: bigint | string;
+  sellAmount: string;
   /**
    * The order buy amount.
    *
@@ -55,7 +55,7 @@ export interface Order {
    * represents the exact buy amount that will be executed. For partial fill
    * orders, this represents a component of the limit price fraction.
    */
-  buyAmount: bigint;
+  buyAmount: string;
   /**
    * The timestamp this order is valid until
    */
@@ -69,7 +69,7 @@ export interface Order {
   /**
    * Fee to give to the protocol.
    */
-  feeAmount: bigint;
+  feeAmount: string;
   /**
    * The order kind.
    */
@@ -313,17 +313,17 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
       validTo: Math.floor(Date.now() / 1000) + timeout,
       partiallyFillable: false,
       kind: "sell",
-      sellAmountBeforeFee: String(amount)
+      sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
     }),
     { headers: { 'Content-Type': 'application/json' } }
   )).data.quote
-  console.log({quote})
+  console.log({ quote })
   const order: Order = {
     sellToken: quote.sellToken,
     buyToken: quote.buyToken,
     receiver: quote.receiver,
     sellAmount: quote.sellAmount,
-    buyAmount: BigInt((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000), // @dev we might need to format the number to cast it into a bigint
+    buyAmount: ((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000).toLocaleString("fullwide", { useGrouping: false }), // @dev we might need to format the number to cast it into a bigint
     validTo: Math.floor(Date.now() / 1000) + timeout,
     feeAmount: quote.feeAmount,
     kind: quote.kind,
@@ -332,7 +332,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     buyTokenBalance: quote.buyTokenBalance,
     appData: "0x0000000000000000000000000000000000000000000000000000000000000000"
   }
-  console.log({order})
+  console.log({ order })
   console.log("signing order")
   const signedOrder = await signOrder(
     order,
@@ -340,6 +340,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     account,
     signer)
   console.log("posting order")
+  console.log({ signedOrder })
   const orderId = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/orders",
     JSON.stringify({

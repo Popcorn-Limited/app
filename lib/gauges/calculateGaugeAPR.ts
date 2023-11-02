@@ -87,8 +87,5 @@ export default async function calculateAPR({ vaultPrice, gauge, publicClient }: 
     return [];
   }
 
-  console.log(`lowerAPR: ${Number(lowerAPR).toFixed(2)}%`);
-  console.log(`upperAPR: ${Number(upperAPR).toFixed(2)}%`);
-
   return [lowerAPR, upperAPR];
 }
