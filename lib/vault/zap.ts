@@ -291,9 +291,17 @@ export async function signOrder(
   }
 }
 
-// TODO - add slippage control
-// TODO -- adjust timeout
-export default async function zap({ account, signer, sellToken, buyToken, amount }: { account: Address, signer: WalletClient, sellToken: Address, buyToken: Address, amount: number }): Promise<string> {
+interface ZapProps {
+  sellToken: Address;
+  buyToken: Address;
+  amount: number;
+  account: Address;
+  signer: WalletClient;
+  slippage?: number; // slippage allowance in BPS 
+  timeout?: number; // in s
+}
+
+export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, timeout = 60 }: ZapProps): Promise<string> {
   const quote = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/quote",
     JSON.stringify({
@@ -301,7 +309,7 @@ export default async function zap({ account, signer, sellToken, buyToken, amount
       buyToken,
       from: account,
       receiver: account,
-      validTo: Math.floor(Date.now() / 1000) + 3600,
+      validTo: Math.floor(Date.now() / 1000) + timeout,
       partiallyFillable: false,
       kind: "sell",
       sellAmountBeforeFee: String(amount)
@@ -313,8 +321,8 @@ export default async function zap({ account, signer, sellToken, buyToken, amount
     buyToken: quote.buyToken,
     receiver: quote.receiver,
     sellAmount: quote.sellAmount,
-    buyAmount: quote.buyAmount,
-    validTo: Math.floor(Date.now() / 1000) + 3600,
+    buyAmount: BigInt((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000), // @dev we might need to format the number to cast it into a bigint
+    validTo: Math.floor(Date.now() / 1000) + timeout,
     feeAmount: quote.feeAmount,
     kind: quote.kind,
     partiallyFillable: false,

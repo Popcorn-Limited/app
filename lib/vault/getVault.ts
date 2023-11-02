@@ -168,7 +168,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
       name: String(assetAndAdapterMeta[i + 3]),
       symbol: String(assetAndAdapterMeta[i + 4]),
       decimals: entry.vault.decimals,
-      logoURI: "",  // wont be used, just here for consistency
+      logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
       balance: 0,
       price: 0,
     }
@@ -229,7 +229,7 @@ export async function getVaults({ vaults, account = ADDRESS_ZERO, client }: { va
         name: `${entry.vault.name}-gauge`,
         symbol: `st-${entry.vault.name}`,
         decimals: foundGauge.decimals,
-        logoURI: "",  // wont be used, just here for consistency
+        logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
         balance: foundGauge.balance,
         price: entry.pricePerShare,
       } : undefined
@@ -279,7 +279,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
     name: String(assetAndAdapterMeta[3]),
     symbol: String(assetAndAdapterMeta[4]),
     decimals: Number(results[2]),
-    logoURI: "", // wont be used, just here for consistency,
+    logoURI: "/images/tokens/pop.svg", // wont be used, just here for consistency,
     balance: 0, // wont be used, just here for consistency,
     price: 0, // wont be used, just here for consistency,
   }
@@ -331,7 +331,7 @@ export async function getVault({ vault, account = ADDRESS_ZERO, client }: { vaul
       name: `${result.vault.name}-gauge`,
       symbol: `st-${result.vault.name}`,
       decimals: foundGauge.decimals,
-      logoURI: "",  // wont be used, just here for consistency
+      logoURI: "/images/tokens/pop.svg",  // wont be used, just here for consistency
       balance: foundGauge.balance,
       price: result.pricePerShare,
     } : undefined

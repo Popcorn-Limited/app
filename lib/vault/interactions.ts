@@ -49,6 +49,8 @@ interface ZapIntoVaultProps {
   vault: Address;
   account: Address;
   amount: number;
+  slippage?: number;
+  timeout?: number;
   publicClient: PublicClient;
   walletClient: WalletClient;
 }
@@ -182,14 +184,15 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
 }
 
 // TODO -- error handling
-// TODO -- adjust timeout
-export async function zapIntoVault({ sellToken, asset, vault, account, amount, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+export async function zapIntoVault({ sellToken, asset, vault, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient })
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
 
   // await fullfillment
   let depositAmount = 0;
-  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, 3600)
+  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, timeout)
+
+  if (depositAmount === 0) return false // error happened
 
   // approve vault
   await handleAllowance({
@@ -205,14 +208,15 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, p
 }
 
 // TODO -- error handling
-// TODO -- adjust timeout
-export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
+export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient })
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
 
   // await fullfillment
   let depositAmount = 0;
-  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, 3600)
+  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, timeout)
+
+  if (depositAmount === 0) return false // error happened
 
   // approve vault
   await handleAllowance({

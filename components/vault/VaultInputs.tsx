@@ -11,6 +11,8 @@ import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdra
 import { validateInput } from "@/lib/utils/helpers";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
+import { ERC20Abi } from "@/lib/constants";
+import zap from "@/lib/vault/zap";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
@@ -156,18 +158,17 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
-          // TODO - check asset pre balance
-          vaultRedeem({
+
+          const preBal = asset.balance
+          await vaultRedeem({
             address: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
             publicClient,
             walletClient
           })
-          // TODO -- wait for transaction to resolve
-          // TODO -- check asset past balance
-          // TODO -- zap
-          return
+          const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
+          zap({ account, signer: walletClient, sellToken: asset.address, buyToken: outputToken.address, amount: postBal - preBal })
         }
         break;
       case gauge?.address:
@@ -211,7 +212,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
-          // TODO - check asset pre balance
+
+          const preBal = asset.balance
           await handleAllowance({
             token: inputToken.address,
             inputAmount: (val * (10 ** inputToken.decimals)),
@@ -229,10 +231,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          // TODO -- wait for transaction to resolve
-          // TODO -- check asset past balance
-          // TODO -- zap
-          return
+          const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
+          zap({ account, signer: walletClient, sellToken: asset.address, buyToken: outputToken.address, amount: postBal - preBal })
         }
         break;
       default:
@@ -306,7 +306,11 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={handleChangeInput}
       selectedToken={inputToken}
       errorMessage={""}
-      tokenList={tokenOptions}
+      tokenList={tokenOptions.filter(token =>
+        gauge?.address
+          ? token.address !== gauge?.address
+          : token.address !== vault.address
+      )}
       allowSelection={isDeposit}
       allowInput
     />
@@ -333,7 +337,11 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       onChange={() => { }}
       selectedToken={outputToken}
       errorMessage={""}
-      tokenList={tokenOptions}
+      tokenList={tokenOptions.filter(token =>
+        gauge?.address
+          ? token.address !== gauge?.address
+          : token.address !== vault.address
+      )}
       allowSelection={!isDeposit}
       allowInput={false}
     />
