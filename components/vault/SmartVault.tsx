@@ -12,6 +12,7 @@ import TokenIcon from "@/components/common/TokenIcon";
 import Title from "@/components/common/Title";
 import { Token, VaultData } from "@/lib/types";
 import calculateAPR from "@/lib/gauges/calculateGaugeAPR";
+import { MutateTokenBalanceProps } from "pages/vaults";
 
 
 function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
@@ -24,11 +25,13 @@ function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
 export default function SmartVault({
   vaultData,
   searchString,
+  mutateTokenBalance,
   zapAssets,
   deployer,
 }: {
   vaultData: VaultData,
   searchString: string,
+  mutateTokenBalance: (props: MutateTokenBalanceProps) => void
   zapAssets?: Token[],
   deployer?: Address
 }) {
@@ -134,6 +137,7 @@ export default function SmartVault({
             gauge={gauge}
             tokenOptions={tokenOptions}
             chainId={vaultData.chainId}
+            mutateTokenBalance={mutateTokenBalance}
           />
         </div>
       </section>
@@ -157,6 +161,7 @@ export default function SmartVault({
         {/* <div className="mt-8">
           <MarkdownRenderer content={`# Addresses \nVault: ${vault.address} \nAsset: ${asset.address}`} />
         </div> */}
+        <p>{vault.address}</p>
       </section>
 
     </div>

@@ -19,6 +19,7 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
+import { ERC20Abi, VaultAbi } from "@/lib/constants";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -31,6 +32,15 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
 
 const { oPOP: OPOP } = getVeAddresses();
 
+const NETWORKS_SUPPORTING_ZAP = [1]
+
+export interface MutateTokenBalanceProps {
+  inputToken: Address;
+  outputToken: Address;
+  vault: Address;
+  chainId: number;
+  account: Address;
+}
 
 const Vaults: NextPage = () => {
   const { address: account } = useAccount();
@@ -96,6 +106,79 @@ const Vaults: NextPage = () => {
         setLoading(false);
       });
   }, [account]);
+
+
+  async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
+    const data = await publicClient.multicall({
+      contracts: [
+        {
+          address: inputToken,
+          abi: ERC20Abi,
+          functionName: "balanceOf",
+          args: [account]
+        },
+        {
+          address: outputToken,
+          abi: ERC20Abi,
+          functionName: "balanceOf",
+          args: [account]
+        },
+        {
+          address: vault,
+          abi: VaultAbi,
+          functionName: 'totalAssets'
+        },
+        {
+          address: vault,
+          abi: VaultAbi,
+          functionName: 'totalSupply'
+        }],
+      allowFailure: false
+    })
+
+    // Modify zap assets
+    if (NETWORKS_SUPPORTING_ZAP.includes(chainId)) {
+      const zapAssetFound = zapAssets[chainId].find(asset => asset.address === inputToken || asset.address === outputToken) // @dev -- might need to copy the state here already to avoid modifing a pointer
+      if (zapAssetFound) {
+        zapAssetFound.balance = zapAssetFound.address === inputToken ? Number(data[0]) : Number(data[1])
+        setZapAssets({ ...zapAssets, [chainId]: [...zapAssets[chainId], zapAssetFound] })
+      }
+    }
+
+    // Modify vaults, assets and gauges
+    const newVaultState: VaultData[] = [...vaults]
+    newVaultState.forEach(vaultData => {
+      if (vaultData.chainId === chainId) {
+        // Modify vault pricing and tvl
+        if (vaultData.address === vault) {
+          const assetsPerShare = Number(data[3]) > 0 ? Number(data[2]) / Number(data[3]) : Number(1e-9)
+          const pricePerShare = assetsPerShare * vaultData.assetPrice
+
+          vaultData.totalAssets = Number(data[2])
+          vaultData.totalSupply = Number(data[3])
+          vaultData.assetsPerShare = assetsPerShare
+          vaultData.pricePerShare = pricePerShare
+          vaultData.tvl = (Number(data[3]) * pricePerShare) / (10 ** vaultData.asset.decimals)
+          vaultData.vault.price = pricePerShare * 1e9
+
+          if (vaultData.gauge) vaultData.gauge.price = pricePerShare * 1e9
+        }
+        // Adjust vault balance
+        if (vaultData.vault.address === inputToken || vaultData.vault.address === outputToken) {
+          vaultData.vault.balance = vaultData.vault.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+        // Adjust asset balance
+        if (vaultData.asset.address === inputToken || vaultData.asset.address === outputToken) {
+          vaultData.asset.balance = vaultData.asset.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+        // Adjust gauge balance
+        if (vaultData.gauge?.address === inputToken || vaultData.gauge?.address === outputToken) {
+          vaultData.gauge.balance = vaultData.gauge.address === inputToken ? Number(data[0]) : Number(data[1])
+        }
+      }
+    })
+    setVaults(newVaultState)
+  }
 
   return (
     <NoSSR>
@@ -190,6 +273,7 @@ const Vaults: NextPage = () => {
               <SmartVault
                 key={`sv-${vault.address}-${vault.chainId}`}
                 vaultData={vault}
+                mutateTokenBalance={mutateTokenBalance}
                 searchString={searchString}
                 zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
                 deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}

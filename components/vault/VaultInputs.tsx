@@ -16,6 +16,7 @@ import zap from "@/lib/vault/zap";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
+import { MutateTokenBalanceProps } from "pages/vaults";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
@@ -25,10 +26,11 @@ interface VaultInputsProps {
   asset: Token;
   gauge?: Token;
   tokenOptions: Token[];
-  chainId: number
+  chainId: number;
+  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
 }
 
-export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId }: VaultInputsProps): JSX.Element {
+export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId, mutateTokenBalance }: VaultInputsProps): JSX.Element {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
   const { address: account } = useAccount();
@@ -93,13 +95,14 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          vaultDeposit({
+          const success = await vaultDeposit({
             address: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
@@ -111,7 +114,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          vaultDepositAndStake({
+          const success = await vaultDepositAndStake({
             address: VAULT_ROUTER,
             account,
             amount: (val * (10 ** inputToken.decimals)),
@@ -120,6 +123,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else {
           console.log("out error")
@@ -131,13 +135,14 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         console.log("in vault")
         if (outputToken.address === asset.address) {
           console.log("out asset")
-          vaultRedeem({
+          const success = await vaultRedeem({
             address: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
@@ -149,7 +154,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          gaugeDeposit({
+          const success = await gaugeDeposit({
             address: gauge.address,
             amount: (val * (10 ** inputToken.decimals)),
             account,
@@ -158,6 +163,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
               walletClient
             }
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === vault.address) {
           console.log("out error")
@@ -228,7 +234,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          vaultUnstakeAndWithdraw({
+          const success = await vaultUnstakeAndWithdraw({
             address: VAULT_ROUTER,
             account,
             amount: (val * (10 ** inputToken.decimals)),
@@ -237,10 +243,11 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === vault.address) {
           console.log("out vault")
-          gaugeWithdraw({
+          const success = await gaugeWithdraw({
             address: gauge?.address as Address,
             amount: (val * (10 ** inputToken.decimals)),
             account,
@@ -249,6 +256,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
               walletClient
             }
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === gauge?.address) {
           console.log("out error")
