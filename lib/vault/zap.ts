@@ -298,10 +298,10 @@ interface ZapProps {
   account: Address;
   signer: WalletClient;
   slippage?: number; // slippage allowance in BPS 
-  timeout?: number; // in s
+  tradeTimeout?: number; // in s
 }
 
-export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, timeout = 60 }: ZapProps): Promise<string> {
+export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<string> {
   console.log("getting quote")
   const quote = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/quote",
@@ -310,7 +310,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
       buyToken,
       from: account,
       receiver: account,
-      validTo: Math.ceil(Date.now() / 1000) + timeout,
+      validTo: Math.ceil(Date.now() / 1000) + tradeTimeout,
       partiallyFillable: false,
       kind: "sell",
       sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
@@ -324,7 +324,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     receiver: quote.receiver,
     sellAmount: quote.sellAmount,
     buyAmount: ((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000).toLocaleString("fullwide", { useGrouping: false }), // @dev we might need to format the number to cast it into a bigint
-    validTo: Math.ceil(Date.now() / 1000) + timeout,
+    validTo: Math.ceil(Date.now() / 1000) + tradeTimeout,
     feeAmount: quote.feeAmount,
     kind: quote.kind,
     partiallyFillable: false,

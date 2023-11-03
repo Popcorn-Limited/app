@@ -50,7 +50,7 @@ interface ZapIntoVaultProps {
   account: Address;
   amount: number;
   slippage?: number;
-  timeout?: number;
+  tradeTimeout?: number;
   publicClient: PublicClient;
   walletClient: WalletClient;
 }
@@ -184,10 +184,10 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
 }
 
 // TODO -- error handling
-export async function zapIntoVault({ sellToken, asset, vault, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+export async function zapIntoVault({ sellToken, asset, vault, account, amount, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
   console.log("zap")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, tradeTimeout })
   console.log({ orderId })
   // await fullfillment
   console.log("waiting for order fulfillment")
@@ -234,17 +234,17 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, s
       console.log("ERROR")
       showErrorToast("Zap Order failed")
     }
-  }, timeout * 1000)
+  }, tradeTimeout * 1000)
 
   return success
 }
 
 // TODO -- error handling
-export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
+export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
 
   console.log("zap")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
+  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, tradeTimeout })
   console.log({ orderId })
   // await fullfillment
   console.log("waiting for order fulfillment")
@@ -291,7 +291,7 @@ export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, acc
       console.log("ERROR")
       showErrorToast("Zap Order failed")
     }
-  }, timeout * 1000)
+  }, tradeTimeout * 1000)
 
   return success
 }

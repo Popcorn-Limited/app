@@ -15,6 +15,7 @@ import { ERC20Abi } from "@/lib/constants";
 import zap from "@/lib/vault/zap";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
+import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
@@ -43,7 +44,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
   // Zap Settings
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [timeout, setTimeout] = useState<number>(300); // number of seconds a cow order is valid for
+  const [tradeTimeout, setTradeTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
   useEffect(() => {
@@ -175,15 +176,44 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             walletClient
           })
           const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-          zap({
+          const orderId = await zap({
             account,
             signer: walletClient,
             sellToken: asset.address,
             buyToken: outputToken.address,
             amount: postBal - preBal,
             slippage,
-            timeout
+            tradeTimeout
           })
+          console.log("waiting for order fulfillment")
+
+          let traded = false;
+
+          let secondsPassed = 0;
+          setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
+
+          publicClient.watchEvent({
+            address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
+            event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
+            onLogs: async (logs) => {
+              console.log(logs)
+              traded = true;
+              console.log("do stuff")
+              const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
+              if (found) {
+                console.log("MATCHED ORDER")
+                showSuccessToast("Zapped out!")
+              }
+            }
+          })
+
+          setTimeout(() => {
+            if (!traded) {
+              console.log("ERROR")
+              showErrorToast("Zap Order failed")
+            }
+          }, tradeTimeout * 1000)
+
         }
         break;
       case gauge?.address:
@@ -254,7 +284,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             buyToken: outputToken.address,
             amount: postBal - preBal,
             slippage,
-            timeout
+            tradeTimeout
           })
         }
         break;
@@ -279,7 +309,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             account,
             amount: (val * (10 ** inputToken.decimals)),
             slippage,
-            timeout,
+            tradeTimeout,
             publicClient,
             walletClient
           })
@@ -303,7 +333,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             account,
             amount: (val * (10 ** inputToken.decimals)),
             slippage,
-            timeout,
+            tradeTimeout,
             publicClient,
             walletClient
           })
@@ -333,8 +363,8 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         <p>Timeout (in seconds)</p>
         <div className="w-full rounded-lg border border-primary p-2">
           <InputNumber
-            value={timeout}
-            onChange={(e) => setTimeout(Number(e.currentTarget.value))}
+            value={tradeTimeout}
+            onChange={(e) => setTradeTimeout(Number(e.currentTarget.value))}
           />
         </div>
       </div>
