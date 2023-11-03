@@ -43,7 +43,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
 
   // Zap Settings
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [timeout, setTimeout] = useState<number>(60); // number of seconds a cow order is valid for
+  const [timeout, setTimeout] = useState<number>(300); // number of seconds a cow order is valid for
   const [slippage, setSlippage] = useState<number>(100); // In BPS 0 - 10_000
 
   useEffect(() => {
@@ -165,7 +165,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
-
+          // TODO -- await fulfillment
           const preBal = asset.balance
           await vaultRedeem({
             address: vault.address,

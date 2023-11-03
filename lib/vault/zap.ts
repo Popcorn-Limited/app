@@ -310,7 +310,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
       buyToken,
       from: account,
       receiver: account,
-      validTo: Math.floor(Date.now() / 1000) + timeout,
+      validTo: Math.ceil(Date.now() / 1000) + timeout,
       partiallyFillable: false,
       kind: "sell",
       sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
@@ -324,7 +324,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     receiver: quote.receiver,
     sellAmount: quote.sellAmount,
     buyAmount: ((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000).toLocaleString("fullwide", { useGrouping: false }), // @dev we might need to format the number to cast it into a bigint
-    validTo: Math.floor(Date.now() / 1000) + timeout,
+    validTo: Math.ceil(Date.now() / 1000) + timeout,
     feeAmount: quote.feeAmount,
     kind: quote.kind,
     partiallyFillable: false,
@@ -341,6 +341,15 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     signer)
   console.log("posting order")
   console.log({ signedOrder })
+  console.log({
+    orderReq: {
+      ...order,
+      signature: signedOrder.data,
+      from: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
+      signingScheme: quote.signingScheme,
+      appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+    }
+  })
   const orderId = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/orders",
     JSON.stringify({

@@ -191,54 +191,107 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, s
   console.log({ orderId })
   // await fullfillment
   console.log("waiting for order fulfillment")
-  let depositAmount = 0;
-  setTimeout(async () => {
-    console.log("getting order receipt")
-    const orderData = (await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data
-    console.log({ orderData })
-    depositAmount = Number(orderData.executedBuyAmount)
-  }, timeout)
-  console.log({ depositAmount })
-  if (depositAmount === 0) {
-    // error happened
-    showErrorToast("Zap Order failed")
-    return false 
-  }
 
-  console.log("approving vault")
-  // approve vault
-  await handleAllowance({
-    token: asset,
-    inputAmount: depositAmount,
-    account,
-    spender: vault,
-    publicClient,
-    walletClient
+  let traded = false;
+
+  let secondsPassed = 0;
+  setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
+
+  let success = false;
+
+  publicClient.watchEvent({
+    address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
+    event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
+    onLogs: async (logs) => {
+      console.log(logs)
+      traded = true;
+      console.log("do stuff")
+      const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
+      if (found) {
+        console.log("MATCHED ORDER")
+
+        let depositAmount = Number(found.args.buyAmount);
+
+        console.log({ depositAmount })
+        console.log("approving vault")
+        // approve vault
+        await handleAllowance({
+          token: asset,
+          inputAmount: depositAmount,
+          account,
+          spender: vault,
+          publicClient,
+          walletClient
+        })
+        console.log("vault deposit")
+        success = await vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+      }
+    }
   })
-  console.log("vault deposit")
-  return vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+
+  setTimeout(() => {
+    if (!traded) {
+      console.log("ERROR")
+      showErrorToast("Zap Order failed")
+    }
+  }, timeout * 1000)
+
+  return success
 }
 
 // TODO -- error handling
 export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, slippage = 100, timeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
+
+  console.log("zap")
   const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, timeout })
-
+  console.log({ orderId })
   // await fullfillment
-  let depositAmount = 0;
-  setTimeout(async () => { depositAmount = Number((await axios.get(`https://api.cow.fi/mainnet/api/v1/orders/${orderId}`)).data.executedBuyAmount) }, timeout)
+  console.log("waiting for order fulfillment")
 
-  if (depositAmount === 0) return false // error happened
+  let traded = false;
 
-  // approve vault
-  await handleAllowance({
-    token: asset,
-    inputAmount: depositAmount,
-    account,
-    spender: vault,
-    publicClient,
-    walletClient
+  let secondsPassed = 0;
+  setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
+
+  let success = false;
+
+  publicClient.watchEvent({
+    address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
+    event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
+    onLogs: async (logs) => {
+      console.log(logs)
+      traded = true;
+      console.log("do stuff")
+      const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
+      if (found) {
+        console.log("MATCHED ORDER")
+
+        let depositAmount = Number(found.args.buyAmount);
+
+        console.log({ depositAmount })
+        console.log("approving vault")
+        // approve router
+        await handleAllowance({
+          token: asset,
+          inputAmount: depositAmount,
+          account,
+          spender: router,
+          publicClient,
+          walletClient
+        })
+        console.log("vault deposit and stake")
+        success = await vaultDepositAndStake({ address: router, account, vault, gauge, amount: depositAmount, publicClient, walletClient })
+      }
+    }
   })
 
-  return vaultDepositAndStake({ address: router, account, vault, gauge, amount: depositAmount, publicClient, walletClient })
+  setTimeout(() => {
+    if (!traded) {
+      console.log("ERROR")
+      showErrorToast("Zap Order failed")
+    }
+  }, timeout * 1000)
+
+  return success
 }
