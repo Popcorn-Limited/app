@@ -345,7 +345,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     orderReq: {
       ...order,
       signature: signedOrder.data,
-      from: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
+      from: quote.receiver,
       signingScheme: quote.signingScheme,
       appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
     }
@@ -355,7 +355,7 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     JSON.stringify({
       ...order,
       signature: signedOrder.data,
-      from: "0x22f5413C075Ccd56D575A54763831C4c27A37Bdb",
+      from: quote.receiver,
       signingScheme: quote.signingScheme,
       appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
     }),
