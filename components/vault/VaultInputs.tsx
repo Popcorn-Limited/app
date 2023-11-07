@@ -310,7 +310,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          zapIntoVault({
+          const success = zapIntoVault({
             sellToken: inputToken.address,
             asset: asset.address,
             vault: vault.address,
@@ -332,7 +332,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             publicClient,
             walletClient
           })
-          zapIntoGauge({
+          const success = zapIntoGauge({
             sellToken: inputToken.address,
             router: VAULT_ROUTER,
             asset: asset.address,

@@ -133,5 +133,3 @@ function VePopContainer() {
 export default function VePOP() {
   return <NoSSR><VePopContainer /></NoSSR>
 }
-
-function noOp() { }

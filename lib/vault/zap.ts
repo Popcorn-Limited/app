@@ -303,6 +303,16 @@ interface ZapProps {
 
 export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<string> {
   console.log("getting quote")
+  console.log({
+    sellToken,
+    buyToken,
+    from: account,
+    receiver: account,
+    validTo: Math.ceil(Date.now() / 1000) + tradeTimeout,
+    partiallyFillable: false,
+    kind: "sell",
+    sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
+  })
   const quote = (await axios.post(
     "https://api.cow.fi/mainnet/api/v1/quote",
     JSON.stringify({
@@ -350,16 +360,16 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
       appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
     }
   })
-  const orderId = (await axios.post(
-    "https://api.cow.fi/mainnet/api/v1/orders",
-    JSON.stringify({
-      ...order,
-      signature: signedOrder.data,
-      from: quote.receiver,
-      signingScheme: quote.signingScheme,
-      appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-    }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )).data
-  return orderId
+  // const orderId = (await axios.post(
+  //   "https://api.cow.fi/mainnet/api/v1/orders",
+  //   JSON.stringify({
+  //     ...order,
+  //     signature: signedOrder.data,
+  //     from: quote.receiver,
+  //     signingScheme: quote.signingScheme,
+  //     appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  //   }),
+  //   { headers: { 'Content-Type': 'application/json' } }
+  // )).data
+  return "orderId"
 }

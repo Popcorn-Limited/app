@@ -32,7 +32,7 @@ export default function Page({ children }: { children: JSX.Element }): JSX.Eleme
   return (
     <>
       <TermsCheck />
-      <div className="w-full  mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
+      <div className="w-full mx-auto min-h-screen h-full font-khTeka flex flex-col justify-between">
         <NoSSR>
           <Navbar />
         </NoSSR>

@@ -188,55 +188,55 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, s
   showLoadingToast("Zapping into asset...")
   console.log("zap")
   const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, tradeTimeout })
-  console.log({ orderId })
-  // await fullfillment
-  console.log("waiting for order fulfillment")
+  // console.log({ orderId })
+  // // await fullfillment
+  // console.log("waiting for order fulfillment")
 
-  let traded = false;
+  // let traded = false;
 
-  let secondsPassed = 0;
-  setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
+  // let secondsPassed = 0;
+  // setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
 
-  let success = false;
+  // let success = false;
 
-  publicClient.watchEvent({
-    address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
-    event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
-    onLogs: async (logs) => {
-      console.log(logs)
-      traded = true;
-      console.log("do stuff")
-      const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
-      if (found) {
-        console.log("MATCHED ORDER")
+  // publicClient.watchEvent({
+  //   address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
+  //   event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
+  //   onLogs: async (logs) => {
+  //     console.log(logs)
+  //     traded = true;
+  //     console.log("do stuff")
+  //     const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
+  //     if (found) {
+  //       console.log("MATCHED ORDER")
 
-        let depositAmount = Number(found.args.buyAmount);
+  //       let depositAmount = Number(found.args.buyAmount);
 
-        console.log({ depositAmount })
-        console.log("approving vault")
-        // approve vault
-        await handleAllowance({
-          token: asset,
-          inputAmount: depositAmount,
-          account,
-          spender: vault,
-          publicClient,
-          walletClient
-        })
-        console.log("vault deposit")
-        success = await vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
-      }
-    }
-  })
+  //       console.log({ depositAmount })
+  //       console.log("approving vault")
+  //       // approve vault
+  //       await handleAllowance({
+  //         token: asset,
+  //         inputAmount: depositAmount,
+  //         account,
+  //         spender: vault,
+  //         publicClient,
+  //         walletClient
+  //       })
+  //       console.log("vault deposit")
+  //       success = await vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+  //     }
+  //   }
+  // })
 
-  setTimeout(() => {
-    if (!traded) {
-      console.log("ERROR")
-      showErrorToast("Zap Order failed")
-    }
-  }, tradeTimeout * 1000)
+  // setTimeout(() => {
+  //   if (!traded) {
+  //     console.log("ERROR")
+  //     showErrorToast("Zap Order failed")
+  //   }
+  // }, tradeTimeout * 1000)
 
-  return success
+  return false
 }
 
 // TODO -- error handling
