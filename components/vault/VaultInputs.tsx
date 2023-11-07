@@ -20,6 +20,8 @@ interface VaultInputsProps {
   chainId: number
 }
 
+const ROUNDING_VALUE = 10_000;
+
 export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId }: VaultInputsProps): JSX.Element {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -188,7 +190,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
       onSelectToken={option => setInputToken(option)}
-      onMaxClick={() => handleChangeInput({ currentTarget: { value: inputToken.balance / (10 ** inputToken.decimals) } })}
+      onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round((inputToken.balance / (10 ** inputToken.decimals)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
       chainId={chainId}
       value={inputBalance}
       onChange={handleChangeInput}
