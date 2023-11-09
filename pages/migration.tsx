@@ -1,7 +1,7 @@
 import MainActionButton from "@/components/button/MainActionButton";
 import InputTokenWithError from "@/components/input/InputTokenWithError";
 import { handleAllowance } from "@/lib/approve";
-import { VCXAbi } from "@/lib/constants";
+import { ROUNDING_VALUE, VCXAbi } from "@/lib/constants";
 import { showErrorToast, showLoadingToast, showSuccessToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
 import { getVeAddresses } from "@/lib/utils/addresses";
@@ -121,7 +121,7 @@ export default function Migration(): JSX.Element {
           <InputTokenWithError
             captionText={"Pop Amount"}
             onSelectToken={() => { }}
-            onMaxClick={() => handleChangeInput({ currentTarget: { value: formatEther(popBal.value) } })}
+            onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal.value)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
             chainId={1}
             value={inputBalance}
             onChange={handleChangeInput}

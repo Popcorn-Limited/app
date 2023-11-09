@@ -11,7 +11,7 @@ import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdra
 import { validateInput } from "@/lib/utils/helpers";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
-import { ERC20Abi } from "@/lib/constants";
+import { ERC20Abi, ROUNDING_VALUE } from "@/lib/constants";
 import zap from "@/lib/vault/zap";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
@@ -386,7 +386,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
       onSelectToken={option => setInputToken(option)}
-      onMaxClick={() => handleChangeInput({ currentTarget: { value: inputToken.balance / (10 ** inputToken.decimals) } })}
+      onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round((inputToken.balance / (10 ** inputToken.decimals)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
       chainId={chainId}
       value={inputBalance}
       onChange={handleChangeInput}
