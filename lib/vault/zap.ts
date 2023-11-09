@@ -1,5 +1,8 @@
 import axios from "axios"
-import { Address, ByteArray, Hex, WalletClient, hashTypedData, pad, zeroAddress } from "viem";
+import { Address, ByteArray, Hex, PublicClient, WalletClient, getAddress, hashTypedData, pad, zeroAddress } from "viem";
+import { mainnet } from "wagmi";
+import { showErrorToast, showSuccessToast } from "../toasts";
+import { handleAllowance } from "../approve";
 
 const GPv2Settlement = "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
 
@@ -296,13 +299,13 @@ interface ZapProps {
   buyToken: Address;
   amount: number;
   account: Address;
-  signer: WalletClient;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
   slippage?: number; // slippage allowance in BPS 
   tradeTimeout?: number; // in s
 }
 
-export default async function zap({ sellToken, buyToken, amount, account, signer, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<string> {
-  console.log("getting quote")
+export default async function zap({ sellToken, buyToken, amount, account, publicClient, walletClient, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<boolean> {
   console.log({
     sellToken,
     buyToken,
@@ -313,63 +316,35 @@ export default async function zap({ sellToken, buyToken, amount, account, signer
     kind: "sell",
     sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
   })
-  const quote = (await axios.post(
-    "https://api.cow.fi/mainnet/api/v1/quote",
-    JSON.stringify({
-      sellToken,
-      buyToken,
-      from: account,
-      receiver: account,
-      validTo: Math.ceil(Date.now() / 1000) + tradeTimeout,
-      partiallyFillable: false,
-      kind: "sell",
-      sellAmountBeforeFee: amount.toLocaleString("fullwide", { useGrouping: false })
-    }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )).data.quote
+  const quote = (await axios.get(
+    `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
+    { headers: { Authorization: `Bearer ee722f6b-8d53-463b-8440-71ba67df0cf4` } }
+  )).data
   console.log({ quote })
-  const order: Order = {
-    sellToken: quote.sellToken,
-    buyToken: quote.buyToken,
-    receiver: quote.receiver,
-    sellAmount: quote.sellAmount,
-    buyAmount: ((Number(quote.buyAmount) * (10_000 - slippage)) / 10_000).toLocaleString("fullwide", { useGrouping: false }), // @dev we might need to format the number to cast it into a bigint
-    validTo: Math.ceil(Date.now() / 1000) + tradeTimeout,
-    feeAmount: quote.feeAmount,
-    kind: quote.kind,
-    partiallyFillable: false,
-    sellTokenBalance: quote.sellTokenBalance,
-    buyTokenBalance: quote.buyTokenBalance,
-    appData: "0x0000000000000000000000000000000000000000000000000000000000000000"
-  }
-  console.log({ order })
-  console.log("signing order")
-  const signedOrder = await signOrder(
-    order,
-    1,
+  await handleAllowance({
+    token: sellToken,
+    inputAmount: amount,
     account,
-    signer)
-  console.log("posting order")
-  console.log({ signedOrder })
-  console.log({
-    orderReq: {
-      ...order,
-      signature: signedOrder.data,
-      from: quote.receiver,
-      signingScheme: quote.signingScheme,
-      appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-    }
+    spender: getAddress("0xC3347AECd3C8049b64C6476e9CF05B6BEc00a9Ee"),
+    publicClient,
+    walletClient
   })
-  // const orderId = (await axios.post(
-  //   "https://api.cow.fi/mainnet/api/v1/orders",
-  //   JSON.stringify({
-  //     ...order,
-  //     signature: signedOrder.data,
-  //     from: quote.receiver,
-  //     signingScheme: quote.signingScheme,
-  //     appData: "0x0000000000000000000000000000000000000000000000000000000000000000",
-  //   }),
-  //   { headers: { 'Content-Type': 'application/json' } }
-  // )).data
-  return "orderId"
+
+  try {
+    //const request = await walletClient.prepareTransactionRequest({ account, to: getAddress(quote.tx.to), data: quote.tx.data, chain: mainnet })
+    //console.log({request})
+    // const signature = await walletClient.signTransaction(request)
+    // console.log({signature})
+    // const hash = await walletClient.sendRawTransaction(signature as any)
+    const hash = await walletClient.sendTransaction({ account, data: quote.tx.data, chain: mainnet })
+    console.log({ hash })
+    const receipt = await publicClient.waitForTransactionReceipt({ hash })
+    console.log({ receipt })
+
+    showSuccessToast("Zapped successfully")
+    return true;
+  } catch (error: any) {
+    showErrorToast(error.shortMessage)
+    return false;
+  }
 }
