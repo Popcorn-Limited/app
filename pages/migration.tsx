@@ -8,7 +8,7 @@ import { getVeAddresses } from "@/lib/utils/addresses";
 import { validateInput } from "@/lib/utils/helpers";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { Address, WalletClient, formatEther } from "viem";
+import { Address, WalletClient, formatEther, zeroAddress } from "viem";
 import { PublicClient, useAccount, useBalance, useNetwork, usePublicClient, useSwitchNetwork, useWalletClient } from "wagmi";
 
 const { VCX, POP } = getVeAddresses();
@@ -73,8 +73,8 @@ export default function Migration(): JSX.Element {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
-  const { data: vcxBal } = useBalance({ chainId: 1, address: account, token: VCX, watch: true })
-  const { data: popBal } = useBalance({ chainId: 1, address: account, token: POP, watch: true })
+  const { data: vcxBal } = useBalance({ chainId: 1, address: account || zeroAddress, token: VCX, watch: true })
+  const { data: popBal } = useBalance({ chainId: 1, address: account || zeroAddress, token: POP, watch: true })
 
   const [inputBalance, setInputBalance] = useState<string>("0");
 
