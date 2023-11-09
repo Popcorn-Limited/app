@@ -6,8 +6,8 @@ import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, use
 import TabSelector from "@/components/common/TabSelector";
 import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
-import { WalletClient } from "viem";
-import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw, zapIntoGauge, zapIntoVault } from "@/lib/vault/interactions";
+import { WalletClient, parseUnits } from "viem";
+import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw, zapIntoGauge, zapIntoVault, zapOutOfGauge, zapOutOfVault } from "@/lib/vault/interactions";
 import { validateInput } from "@/lib/utils/helpers";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
@@ -17,6 +17,7 @@ import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
 import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { MutateTokenBalanceProps } from "pages/vaults";
+// import { useExecutePosition, usePositions } from "@ensofinance/use-defi";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
@@ -75,6 +76,42 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     }
   }
 
+
+  // function isZap() {
+  //   // @dev - temp -> only for first testing
+  //   if (Number(inputBalance) === 0 || !inputToken || !outputToken || !account || !walletClient || chainId !== 1) return false
+
+  //   if (isDeposit) {
+  //     return ![vault.address, asset.address].includes(inputToken.address)
+  //   } else {
+  //     return ![vault.address, asset.address].includes(outputToken.address)
+  //   }
+  // }
+
+  // function getZapParams() {
+  //   if (isDeposit) {
+  //     return {
+  //       position: { chainId: 1, address: asset.address },
+  //       tokenIn: inputToken?.address,
+  //       amountIn: parseUnits(inputBalance, inputToken?.decimals)
+  //     }
+  //   } else {
+  //     return {
+  //       position: { chainId: 1, address: outputToken.address },
+  //       tokenIn: vault.address,
+  //       amountIn: parseUnits(inputBalance, inputToken?.decimals)
+  //     }
+  //   }
+  // }
+
+
+  // const {
+  //   executionDetails
+  // } = useExecutePosition({
+  //   position: isZap() ? { chainId: 1, address: inputToken?.address } as any : undefined,
+  //   tokenIn: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  //   amountIn: parseUnits(0.1, 18) // from viem
+  // })
 
   async function handleMainAction() {
     const val = Number(inputBalance)
@@ -172,54 +209,19 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
-          // TODO -- await fulfillment
-          const preBal = asset.balance
-          await vaultRedeem({
-            address: vault.address,
+          const success = await zapOutOfVault({
+            buyToken: outputToken.address,
+            asset: asset.address,
+            vault: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
-            publicClient,
-            walletClient
-          })
-          const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-          const orderId = await zap({
-            account,
-            signer: walletClient,
-            sellToken: asset.address,
-            buyToken: outputToken.address,
-            amount: postBal - preBal,
+            assetBal: asset.balance,
+            walletClient: walletClient,
+            publicClient: publicClient,
             slippage,
             tradeTimeout
           })
-          console.log("waiting for order fulfillment")
-
-          let traded = false;
-
-          let secondsPassed = 0;
-          setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
-
-          publicClient.watchEvent({
-            address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
-            event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
-            onLogs: async (logs) => {
-              console.log(logs)
-              traded = true;
-              console.log("do stuff")
-              const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
-              if (found) {
-                console.log("MATCHED ORDER")
-                showSuccessToast("Zapped out!")
-              }
-            }
-          })
-
-          setTimeout(() => {
-            if (!traded) {
-              console.log("ERROR")
-              showErrorToast("Zap Order failed")
-            }
-          }, tradeTimeout * 1000)
-
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         break;
       case gauge?.address:
@@ -265,74 +267,44 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
-
-          const preBal = asset.balance
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: VAULT_ROUTER,
-            publicClient,
-            walletClient
-          })
-          await vaultUnstakeAndWithdraw({
-            address: VAULT_ROUTER,
-            account,
-            amount: (val * (10 ** inputToken.decimals)),
+          const success = await zapOutOfGauge({
+            buyToken: outputToken.address,
+            asset: asset.address,
+            router: VAULT_ROUTER,
             vault: vault.address,
             gauge: gauge?.address as Address,
-            publicClient,
-            walletClient
-          })
-          const postBal = Number(await publicClient.readContract({ address: asset.address, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-          zap({
             account,
-            signer: walletClient,
-            sellToken: asset.address,
-            buyToken: outputToken.address,
-            amount: postBal - preBal,
+            amount: (val * (10 ** inputToken.decimals)),
+            assetBal: asset.balance,
+            walletClient: walletClient,
+            publicClient: publicClient,
             slippage,
             tradeTimeout
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         break;
       default:
         console.log("in zap asset")
         if (outputToken.address === vault.address) {
           console.log("out vault")
-          // handle cow router allowance
-          console.log("approve cow router")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: COWSWAP_RELAYER,
-            publicClient,
-            walletClient
-          })
-          const success = zapIntoVault({
+          const success = await zapIntoVault({
             sellToken: inputToken.address,
             asset: asset.address,
             vault: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
+            assetBal: inputToken.balance,
             slippage,
             tradeTimeout,
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
-          await handleAllowance({
-            token: inputToken.address,
-            inputAmount: (val * (10 ** inputToken.decimals)),
-            account,
-            spender: COWSWAP_RELAYER,
-            publicClient,
-            walletClient
-          })
-          const success = zapIntoGauge({
+          const success = await zapIntoGauge({
             sellToken: inputToken.address,
             router: VAULT_ROUTER,
             asset: asset.address,
@@ -340,11 +312,13 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             gauge: gauge.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
+            assetBal: inputToken.balance,
             slippage,
             tradeTimeout,
             publicClient,
             walletClient
           })
+          if (success) mutateTokenBalance({ inputToken: inputToken.address, outputToken: outputToken.address, vault: vault.address, chainId, account })
         }
         else {
           console.log("out error")

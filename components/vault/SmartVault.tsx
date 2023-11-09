@@ -22,19 +22,21 @@ function getTokenOptions(vaultData: VaultData, zapAssets?: Token[]): Token[] {
   return tokenOptions;
 }
 
+interface SmartVaultsProps {
+  vaultData: VaultData;
+  searchString: string;
+  mutateTokenBalance: (props: MutateTokenBalanceProps) => void;
+  zapAssets?: Token[];
+  deployer?: Address;
+}
+
 export default function SmartVault({
   vaultData,
   searchString,
   mutateTokenBalance,
   zapAssets,
   deployer,
-}: {
-  vaultData: VaultData,
-  searchString: string,
-  mutateTokenBalance: (props: MutateTokenBalanceProps) => void
-  zapAssets?: Token[],
-  deployer?: Address
-}) {
+}: SmartVaultsProps) {
   const publicClient = usePublicClient();
   const [yieldOptions] = useAtom(yieldOptionsAtom);
   const { address: account } = useAccount();

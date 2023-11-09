@@ -1,6 +1,6 @@
 import { showSuccessToast, showErrorToast, showLoadingToast } from "@/lib/toasts";
 import { SimulationResponse } from "@/lib/types";
-import { VaultAbi } from "@/lib/constants";
+import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import { Address, PublicClient, WalletClient } from "viem";
 import { VaultRouterAbi } from "@/lib/constants/abi/VaultRouter";
 import zap from "./zap";
@@ -49,6 +49,7 @@ interface ZapIntoVaultProps {
   vault: Address;
   account: Address;
   amount: number;
+  assetBal: number;
   slippage?: number;
   tradeTimeout?: number;
   publicClient: PublicClient;
@@ -56,6 +57,24 @@ interface ZapIntoVaultProps {
 }
 
 interface ZapIntoGaugeProps extends ZapIntoVaultProps {
+  router: Address;
+  gauge: Address;
+}
+
+interface ZapOutOfVaultProps {
+  buyToken: Address;
+  asset: Address;
+  vault: Address;
+  account: Address;
+  amount: number;
+  assetBal: number;
+  slippage?: number;
+  tradeTimeout?: number;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
+}
+
+interface ZapOutOfGaugeProps extends ZapOutOfVaultProps {
   router: Address;
   gauge: Address;
 }
@@ -183,115 +202,100 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
   }
 }
 
-// TODO -- error handling
-export async function zapIntoVault({ sellToken, asset, vault, account, amount, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+export async function zapIntoVault({ sellToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
-  console.log("zap")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, tradeTimeout })
-  // console.log({ orderId })
-  // // await fullfillment
-  // console.log("waiting for order fulfillment")
+  const successZap = await zap({ sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
+  const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
 
-  // let traded = false;
-
-  // let secondsPassed = 0;
-  // setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
-
-  // let success = false;
-
-  // publicClient.watchEvent({
-  //   address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
-  //   event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
-  //   onLogs: async (logs) => {
-  //     console.log(logs)
-  //     traded = true;
-  //     console.log("do stuff")
-  //     const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
-  //     if (found) {
-  //       console.log("MATCHED ORDER")
-
-  //       let depositAmount = Number(found.args.buyAmount);
-
-  //       console.log({ depositAmount })
-  //       console.log("approving vault")
-  //       // approve vault
-  //       await handleAllowance({
-  //         token: asset,
-  //         inputAmount: depositAmount,
-  //         account,
-  //         spender: vault,
-  //         publicClient,
-  //         walletClient
-  //       })
-  //       console.log("vault deposit")
-  //       success = await vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
-  //     }
-  //   }
-  // })
-
-  // setTimeout(() => {
-  //   if (!traded) {
-  //     console.log("ERROR")
-  //     showErrorToast("Zap Order failed")
-  //   }
-  // }, tradeTimeout * 1000)
-
-  return false
+  if (successZap) {
+    const depositAmount = postBal - assetBal
+    await handleAllowance({
+      token: asset,
+      inputAmount: depositAmount,
+      account,
+      spender: vault,
+      publicClient,
+      walletClient
+    })
+    return await vaultDeposit({ address: vault, account, amount: depositAmount, publicClient, walletClient })
+  } else {
+    return false
+  }
 }
 
-// TODO -- error handling
-export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
+export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
+  const successZap = await zap({ sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
+  const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
 
-  console.log("zap")
-  const orderId = await zap({ sellToken, buyToken: asset, amount, account, signer: walletClient, slippage, tradeTimeout })
-  console.log({ orderId })
-  // await fullfillment
-  console.log("waiting for order fulfillment")
+  if (successZap) {
+    const depositAmount = postBal - assetBal
+    await handleAllowance({
+      token: asset,
+      inputAmount: depositAmount,
+      account,
+      spender: router,
+      publicClient,
+      walletClient
+    })
+    return await vaultDepositAndStake({ address: router, account, vault, gauge, amount: depositAmount, publicClient, walletClient })
+  } else {
+    return false
+  }
+}
 
-  let traded = false;
-
-  let secondsPassed = 0;
-  setInterval(() => { console.log(secondsPassed); secondsPassed += 1 }, 1000)
-
-  let success = false;
-
-  publicClient.watchEvent({
-    address: '0x9008D19f58AAbD9eD0D60971565AA8510560ab41',
-    event: { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "sellToken", "type": "address" }, { "indexed": false, "internalType": "contract IERC20", "name": "buyToken", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "sellAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "buyAmount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }, { "indexed": false, "internalType": "bytes", "name": "orderUid", "type": "bytes" }], "name": "Trade", "type": "event" },
-    onLogs: async (logs) => {
-      console.log(logs)
-      traded = true;
-      console.log("do stuff")
-      const found = logs.find(log => log.args.orderUid?.toLowerCase() === orderId.toLowerCase())
-      if (found) {
-        console.log("MATCHED ORDER")
-
-        let depositAmount = Number(found.args.buyAmount);
-
-        console.log({ depositAmount })
-        console.log("approving vault")
-        // approve router
-        await handleAllowance({
-          token: asset,
-          inputAmount: depositAmount,
-          account,
-          spender: router,
-          publicClient,
-          walletClient
-        })
-        console.log("vault deposit and stake")
-        success = await vaultDepositAndStake({ address: router, account, vault, gauge, amount: depositAmount, publicClient, walletClient })
-      }
-    }
+export async function zapOutOfVault({ buyToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfVaultProps): Promise<boolean> {
+  const success = await vaultRedeem({
+    address: vault,
+    account,
+    amount,
+    publicClient,
+    walletClient
   })
+  const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
 
-  setTimeout(() => {
-    if (!traded) {
-      console.log("ERROR")
-      showErrorToast("Zap Order failed")
-    }
-  }, tradeTimeout * 1000)
+  if (success) {
+    showLoadingToast("Zapping into asset...")
+    return await zap({
+      account,
+      walletClient,
+      publicClient,
+      sellToken: asset,
+      buyToken,
+      amount: postBal - assetBal,
+      slippage,
+      tradeTimeout
+    })
+  } else {
+    return false
+  }
+}
 
-  return success
+export async function zapOutOfGauge({ buyToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfGaugeProps): Promise<boolean> {
+  const success = await vaultUnstakeAndWithdraw({
+    address: router,
+    account,
+    amount,
+    vault,
+    gauge,
+    publicClient,
+    walletClient
+  })
+  const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
+
+  if (success) {
+    showLoadingToast("Zapping into asset...")
+    return await zap({
+      account,
+      walletClient,
+      publicClient,
+      sellToken: asset,
+      buyToken,
+      amount:  postBal - assetBal,
+      slippage,
+      tradeTimeout
+    })
+  } else {
+    return false
+  }
 }
