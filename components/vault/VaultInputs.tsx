@@ -6,21 +6,16 @@ import { Address, useAccount, useNetwork, usePublicClient, useSwitchNetwork, use
 import TabSelector from "@/components/common/TabSelector";
 import { Token } from "@/lib/types";
 import { handleAllowance } from "@/lib/approve";
-import { WalletClient, parseUnits } from "viem";
 import { vaultDeposit, vaultDepositAndStake, vaultRedeem, vaultUnstakeAndWithdraw, zapIntoGauge, zapIntoVault, zapOutOfGauge, zapOutOfVault } from "@/lib/vault/interactions";
 import { validateInput } from "@/lib/utils/helpers";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { gaugeDeposit, gaugeWithdraw } from "@/lib/gauges/interactions";
-import { ERC20Abi, ROUNDING_VALUE } from "@/lib/constants";
-import zap from "@/lib/vault/zap";
+import { ROUNDING_VALUE } from "@/lib/constants";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
-import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { MutateTokenBalanceProps } from "pages/vaults";
-// import { useExecutePosition, usePositions } from "@ensofinance/use-defi";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
-const COWSWAP_RELAYER = "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110"
 
 interface VaultInputsProps {
   vault: Token;
@@ -75,43 +70,6 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
       setIsDeposit(true)
     }
   }
-
-
-  // function isZap() {
-  //   // @dev - temp -> only for first testing
-  //   if (Number(inputBalance) === 0 || !inputToken || !outputToken || !account || !walletClient || chainId !== 1) return false
-
-  //   if (isDeposit) {
-  //     return ![vault.address, asset.address].includes(inputToken.address)
-  //   } else {
-  //     return ![vault.address, asset.address].includes(outputToken.address)
-  //   }
-  // }
-
-  // function getZapParams() {
-  //   if (isDeposit) {
-  //     return {
-  //       position: { chainId: 1, address: asset.address },
-  //       tokenIn: inputToken?.address,
-  //       amountIn: parseUnits(inputBalance, inputToken?.decimals)
-  //     }
-  //   } else {
-  //     return {
-  //       position: { chainId: 1, address: outputToken.address },
-  //       tokenIn: vault.address,
-  //       amountIn: parseUnits(inputBalance, inputToken?.decimals)
-  //     }
-  //   }
-  // }
-
-
-  // const {
-  //   executionDetails
-  // } = useExecutePosition({
-  //   position: isZap() ? { chainId: 1, address: inputToken?.address } as any : undefined,
-  //   tokenIn: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-  //   amountIn: parseUnits(0.1, 18) // from viem
-  // })
 
   async function handleMainAction() {
     const val = Number(inputBalance)
