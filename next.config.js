@@ -14,6 +14,7 @@ module.exports = {
     IPFS_URL: process.env.IPFS_URL,
     DUNE_API_KEY: process.env.DUNE_API_KEY,
     NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+    ENSO_API_KEY:process.env.ENSO_API_KEY,
   },
   images: {
     domains: ["rawcdn.githack.com"],

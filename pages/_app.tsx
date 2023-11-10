@@ -36,17 +36,17 @@ const connectors = connectorsForWallets([
     groupName: 'Suggested',
     wallets: [
       injectedWallet({ chains }),
-      rainbowWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
-      metaMaskWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+      rainbowWallet({ projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+      metaMaskWallet({ projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
     ],
   },
   {
     groupName: 'Others',
     wallets: [
       coinbaseWallet({ chains, appName: 'Popcorn' }),
-      walletConnectWallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
-      coin98Wallet({ projectId:'b2f883ab9ae2fbb812cb8e0d83efea7b', chains })
-    ]      
+      walletConnectWallet({ projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', chains }),
+      coin98Wallet({ projectId: 'b2f883ab9ae2fbb812cb8e0d83efea7b', chains })
+    ]
 
   }
 ]);
@@ -100,9 +100,9 @@ export default function MyApp(props: any) {
       </Head>
       <WagmiConfig config={config}>
         <RainbowKitProvider chains={chains} modalSize="compact">
-          <NoSSR>
-            {getLayout(<Component {...pageProps} />)}
-          </NoSSR>
+            <NoSSR>
+              {getLayout(<Component {...pageProps} />)}
+            </NoSSR>
         </RainbowKitProvider>
       </WagmiConfig >
     </React.Fragment>
