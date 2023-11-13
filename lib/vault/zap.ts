@@ -15,13 +15,6 @@ interface ZapProps {
 }
 
 export default async function zap({ sellToken, buyToken, amount, account, publicClient, walletClient, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<boolean> {
-  console.log({ qouteUrl: `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}` })
-  const quote = (await axios.get(
-    `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
-    { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
-  )).data
-  console.log({ quote })
-  console.log({ ensoWalletUrl: `https://api.enso.finance/api/v1/wallet?chainId=1&fromAddress=${account}` })
   const ensoWallet = (await axios.get(
     `https://api.enso.finance/api/v1/wallet?chainId=1&fromAddress=${account}`,
     { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
@@ -37,12 +30,20 @@ export default async function zap({ sellToken, buyToken, amount, account, public
   })
   if (!success) return false
 
+  console.log({ qouteUrl: `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}` })
+  const quote = (await axios.get(
+    `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
+    { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
+  )).data
+  console.log({ quote })
+  
   try {
     const hash = await walletClient.sendTransaction(quote.tx)
     const receipt = await publicClient.waitForTransactionReceipt({ hash })
     showSuccessToast("Zapped successfully")
     return true;
   } catch (error: any) {
+    console.log(error)
     showErrorToast(error.shortMessage)
     return false;
   }
