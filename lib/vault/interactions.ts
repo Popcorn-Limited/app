@@ -114,6 +114,7 @@ async function simulateVaultRouterCall({ address, account, amount, vault, gauge,
 }
 
 export async function vaultDeposit({ address, account, amount, publicClient, walletClient }: VaultWriteProps): Promise<boolean> {
+  console.log({ address, account, amount, publicClient, walletClient })
   showLoadingToast("Depositing into the vault...")
 
   const { request, success, error: simulationError } = await simulateVaultCall({ address, account, amount, functionName: "deposit", publicClient })
@@ -208,7 +209,11 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, a
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
 
   if (successZap) {
+    console.log({ postBal, assetBal })
+
     const depositAmount = postBal - assetBal
+    console.log({ depositAmount })
+
     await handleAllowance({
       token: asset,
       inputAmount: depositAmount,
@@ -227,9 +232,10 @@ export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, acc
   showLoadingToast("Zapping into asset...")
   const successZap = await zap({ sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
-
+  console.log({ postBal, assetBal })
   if (successZap) {
     const depositAmount = postBal - assetBal
+    console.log({ depositAmount })
     await handleAllowance({
       token: asset,
       inputAmount: depositAmount,
@@ -253,6 +259,7 @@ export async function zapOutOfVault({ buyToken, asset, vault, account, amount, a
     walletClient
   })
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
+  console.log({ postBal, assetBal, amount: postBal - assetBal })
 
   if (success) {
     showLoadingToast("Zapping into asset...")
@@ -282,6 +289,7 @@ export async function zapOutOfGauge({ buyToken, asset, router, vault, gauge, acc
     walletClient
   })
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
+  console.log({ postBal, assetBal, amount: postBal - assetBal })
 
   if (success) {
     showLoadingToast("Zapping into asset...")
@@ -291,7 +299,7 @@ export async function zapOutOfGauge({ buyToken, asset, router, vault, gauge, acc
       publicClient,
       sellToken: asset,
       buyToken,
-      amount:  postBal - assetBal,
+      amount: postBal - assetBal,
       slippage,
       tradeTimeout
     })

@@ -14,6 +14,8 @@ import { ROUNDING_VALUE } from "@/lib/constants";
 import Modal from "../modal/Modal";
 import InputNumber from "../input/InputNumber";
 import { MutateTokenBalanceProps } from "pages/vaults";
+import { safeRound } from "@/lib/utils/formatBigNumber";
+import { formatUnits, parseUnits } from "viem";
 
 const { VaultRouter: VAULT_ROUTER } = getVeAddresses()
 
@@ -225,6 +227,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         }
         else {
           console.log("out zap")
+          console.log({ gaugeBal: gauge?.balance, amount: (val * (10 ** inputToken.decimals)) })
           const success = await zapOutOfGauge({
             buyToken: outputToken.address,
             asset: asset.address,
@@ -252,7 +255,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             vault: vault.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
-            assetBal: inputToken.balance,
+            assetBal: asset.balance,
             slippage,
             tradeTimeout,
             publicClient,
@@ -270,7 +273,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
             gauge: gauge.address,
             account,
             amount: (val * (10 ** inputToken.decimals)),
-            assetBal: inputToken.balance,
+            assetBal: asset.balance,
             slippage,
             tradeTimeout,
             publicClient,
@@ -318,7 +321,14 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
     <InputTokenWithError
       captionText={isDeposit ? "Deposit Amount" : "Withdraw Amount"}
       onSelectToken={option => setInputToken(option)}
-      onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round((inputToken.balance / (10 ** inputToken.decimals)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
+      onMaxClick={() => handleChangeInput(
+        {
+          currentTarget: {
+            value: formatUnits(safeRound(
+              BigInt(inputToken.balance.toLocaleString("fullwide", { useGrouping: false })),
+              inputToken.decimals), inputToken.decimals)
+          }
+        })}
       chainId={chainId}
       value={inputBalance}
       onChange={handleChangeInput}

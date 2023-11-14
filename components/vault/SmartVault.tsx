@@ -118,7 +118,7 @@ export default function SmartVault({
         <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">
           <p className="leading-6 text-primaryLight">TVL</p>
           <Title as="span" level={2} fontWeight="font-normal" className="text-primary">
-            $ {NumberFormatter.format(vaultData.tvl)}
+            $ {vaultData.tvl < 1 ? "0" : NumberFormatter.format(vaultData.tvl)}
           </Title>
         </div>
 

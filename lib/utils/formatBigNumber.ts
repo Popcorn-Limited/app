@@ -66,6 +66,7 @@ export function numberToBigNumber(value: number | string, decimals: number): Big
 export const NumberFormatter = Intl.NumberFormat("en", {
   //@ts-ignore
   notation: "compact",
+  maximumSignificantDigits: 3
 });
 
 export function safeRound(bn: bigint, decimals = 18): bigint {
