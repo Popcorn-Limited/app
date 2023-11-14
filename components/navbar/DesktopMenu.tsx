@@ -105,7 +105,7 @@ export default function DesktopMenu(): JSX.Element {
                       <img src="/images/icons/popLogo.svg" alt="Logo" className="w-10 h-10" />
                     </Link>
                   </div>
-                  <div className="flex flex-col space-y-6 pb-12">
+                  <div className="flex flex-col space-y-6 pb-12" onClick={() => toggleMenu(false)}>
                     <NavbarLinks />
                   </div>
                   <div>
