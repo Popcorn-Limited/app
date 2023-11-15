@@ -4,6 +4,7 @@ import { showErrorToast, showSuccessToast } from "@/lib/toasts";
 import { handleAllowance } from "@/lib/approve";
 
 interface ZapProps {
+  chainId: number;
   sellToken: Address;
   buyToken: Address;
   amount: number;
@@ -14,9 +15,9 @@ interface ZapProps {
   tradeTimeout?: number; // in s
 }
 
-export default async function zap({ sellToken, buyToken, amount, account, publicClient, walletClient, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<boolean> {
+export default async function zap({ chainId, sellToken, buyToken, amount, account, publicClient, walletClient, slippage = 100, tradeTimeout = 60 }: ZapProps): Promise<boolean> {
   const ensoWallet = (await axios.get(
-    `https://api.enso.finance/api/v1/wallet?chainId=1&fromAddress=${account}`,
+    `https://api.enso.finance/api/v1/wallet?chainId=${chainId}&fromAddress=${account}`,
     { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } })
   ).data
   console.log({ ensoWallet: ensoWallet })
@@ -30,13 +31,13 @@ export default async function zap({ sellToken, buyToken, amount, account, public
   })
   if (!success) return false
 
-  console.log({ qouteUrl: `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}` })
+  console.log({ qouteUrl: `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}` })
   const quote = (await axios.get(
-    `https://api.enso.finance/api/v1/shortcuts/route?chainId=1&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
+    `https://api.enso.finance/api/v1/shortcuts/route?chainId=${chainId}&fromAddress=${account}&spender=${account}&receiver=${account}&amountIn=${amount.toLocaleString("fullwide", { useGrouping: false })}&slippage=${slippage}&tokenIn=${sellToken}&tokenOut=${buyToken}`,
     { headers: { Authorization: `Bearer ${process.env.ENSO_API_KEY}` } }
   )).data
   console.log({ quote })
-  
+
   try {
     const hash = await walletClient.sendTransaction(quote.tx)
     const receipt = await publicClient.waitForTransactionReceipt({ hash })

@@ -72,7 +72,12 @@ const Vaults: NextPage = () => {
       setZapAssets(newZapAssets);
 
       // get available zapAddresses
-      setAvailableZapAssets({ 1: await getAvailableZapAssets(1) })
+      setAvailableZapAssets({ 
+        1: await getAvailableZapAssets(1),
+        137: await getAvailableZapAssets(137),
+        10: await getAvailableZapAssets(10),
+        42161: await getAvailableZapAssets(42161)
+       })
 
       // get vaults
       const fetchedVaults = (await Promise.all(
@@ -276,7 +281,7 @@ const Vaults: NextPage = () => {
                 vaultData={vault}
                 mutateTokenBalance={mutateTokenBalance}
                 searchString={searchString}
-                zapAssets={vault.chainId === 1 && availableZapAssets[1].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+                zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
                 deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
               />
             )

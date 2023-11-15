@@ -170,6 +170,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         else {
           console.log("out zap")
           const success = await zapOutOfVault({
+            chainId,
             buyToken: outputToken.address,
             asset: asset.address,
             vault: vault.address,
@@ -229,6 +230,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
           console.log("out zap")
           console.log({ gaugeBal: gauge?.balance, amount: (val * (10 ** inputToken.decimals)) })
           const success = await zapOutOfGauge({
+            chainId,
             buyToken: outputToken.address,
             asset: asset.address,
             router: VAULT_ROUTER,
@@ -250,6 +252,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         if (outputToken.address === vault.address) {
           console.log("out vault")
           const success = await zapIntoVault({
+            chainId,
             sellToken: inputToken.address,
             asset: asset.address,
             vault: vault.address,
@@ -266,6 +269,7 @@ export default function VaultInputs({ vault, asset, gauge, tokenOptions, chainId
         else if (outputToken.address === gauge?.address) {
           console.log("out gauge")
           const success = await zapIntoGauge({
+            chainId,
             sellToken: inputToken.address,
             router: VAULT_ROUTER,
             asset: asset.address,

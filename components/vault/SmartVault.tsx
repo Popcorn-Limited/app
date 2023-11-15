@@ -160,10 +160,6 @@ export default function SmartVault({
         <div className="mt-8">
           <MarkdownRenderer content={`# Strategies \n${vaultData.metadata.optionalMetadata?.strategy?.description}`} />
         </div>
-        {/* <div className="mt-8">
-          <MarkdownRenderer content={`# Addresses \nVault: ${vault.address} \nAsset: ${asset.address}`} />
-        </div> */}
-        <p>{vault.address}</p>
       </section>
 
     </div>

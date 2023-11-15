@@ -44,6 +44,7 @@ interface VaultRouterSimulateProps {
 }
 
 interface ZapIntoVaultProps {
+  chainId: number;
   sellToken: Address;
   asset: Address;
   vault: Address;
@@ -62,6 +63,7 @@ interface ZapIntoGaugeProps extends ZapIntoVaultProps {
 }
 
 interface ZapOutOfVaultProps {
+  chainId: number;
   buyToken: Address;
   asset: Address;
   vault: Address;
@@ -203,9 +205,9 @@ export async function vaultUnstakeAndWithdraw({ address, account, amount, vault,
   }
 }
 
-export async function zapIntoVault({ sellToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
+export async function zapIntoVault({ chainId, sellToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoVaultProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
-  const successZap = await zap({ sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
+  const successZap = await zap({ chainId, sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
 
   if (successZap) {
@@ -228,9 +230,9 @@ export async function zapIntoVault({ sellToken, asset, vault, account, amount, a
   }
 }
 
-export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
+export async function zapIntoGauge({ chainId, sellToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapIntoGaugeProps): Promise<boolean> {
   showLoadingToast("Zapping into asset...")
-  const successZap = await zap({ sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
+  const successZap = await zap({ chainId, sellToken, buyToken: asset, amount, account, publicClient, walletClient, slippage, tradeTimeout })
   const postBal = Number(await publicClient.readContract({ address: asset, abi: ERC20Abi, functionName: "balanceOf", args: [account] }))
   console.log({ postBal, assetBal })
   if (successZap) {
@@ -250,7 +252,7 @@ export async function zapIntoGauge({ sellToken, asset, router, vault, gauge, acc
   }
 }
 
-export async function zapOutOfVault({ buyToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfVaultProps): Promise<boolean> {
+export async function zapOutOfVault({ chainId, buyToken, asset, vault, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfVaultProps): Promise<boolean> {
   const success = await vaultRedeem({
     address: vault,
     account,
@@ -264,6 +266,7 @@ export async function zapOutOfVault({ buyToken, asset, vault, account, amount, a
   if (success) {
     showLoadingToast("Zapping into asset...")
     return await zap({
+      chainId,
       account,
       walletClient,
       publicClient,
@@ -278,7 +281,7 @@ export async function zapOutOfVault({ buyToken, asset, vault, account, amount, a
   }
 }
 
-export async function zapOutOfGauge({ buyToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfGaugeProps): Promise<boolean> {
+export async function zapOutOfGauge({ chainId, buyToken, asset, router, vault, gauge, account, amount, assetBal, slippage = 100, tradeTimeout = 60, publicClient, walletClient }: ZapOutOfGaugeProps): Promise<boolean> {
   const success = await vaultUnstakeAndWithdraw({
     address: router,
     account,
@@ -294,6 +297,7 @@ export async function zapOutOfGauge({ buyToken, asset, router, vault, gauge, acc
   if (success) {
     showLoadingToast("Zapping into asset...")
     return await zap({
+      chainId,
       account,
       walletClient,
       publicClient,
