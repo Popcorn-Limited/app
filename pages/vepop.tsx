@@ -5,7 +5,7 @@ import { Address, WalletClient } from "viem";
 import { useEffect, useState } from "react";
 import { getVeAddresses } from "@/lib/utils/addresses";
 import { hasAlreadyVoted } from "@/lib/gauges/hasAlreadyVoted";
-import { VaultData } from "@/lib/types";
+import { Token, VaultData } from "@/lib/types";
 import { getVaultsByChain } from "@/lib/vault/getVault";
 import StakingInterface from "@/components/vepop/StakingInterface";
 import { sendVotes } from "@/lib/gauges/interactions";
@@ -14,6 +14,8 @@ import LockModal from "@/components/vepop/modals/lock/LockModal";
 import ManageLockModal from "@/components/vepop/modals/manage/ManageLockModal";
 import OPopModal from "@/components/vepop/modals/oPop/OPopModal";
 import OPopInterface from "@/components/vepop/OPopInterface";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { useAtom } from "jotai";
 
 const { VotingEscrow: VOTING_ESCROW } = getVeAddresses();
 
@@ -27,7 +29,7 @@ function VePopContainer() {
   const [initalLoad, setInitalLoad] = useState<boolean>(false);
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
-  const [vaults, setVaults] = useState<VaultData[]>([]);
+  const [vaults, setVaults] = useAtom(vaultsAtom)
   const [votes, setVotes] = useState<number[]>([]);
   const [canVote, setCanVote] = useState<boolean>(false);
 
@@ -39,8 +41,8 @@ function VePopContainer() {
     async function initialSetup() {
       setInitalLoad(true)
       if (account) setAccountLoad(true)
-      const allVaults = await getVaultsByChain({ chain: mainnet, account })
-      const vaultsWithGauges = allVaults.filter(vault => !!vault.gauge)
+
+      const vaultsWithGauges = vaults.filter(vault => !!vault.gauge)
       setVaults(vaultsWithGauges);
       if (vaultsWithGauges.length > 0 && votes.length === 0 && publicClient.chain.id === 1) {
         setVotes(vaultsWithGauges.map(gauge => 0));
@@ -53,9 +55,9 @@ function VePopContainer() {
         setCanVote(!!account && Number(veBal?.value) > 0 && !hasVoted)
       }
     }
-    if (!account && !initalLoad) initialSetup();
-    if (account && !accountLoad) initialSetup()
-  }, [account])
+    if (!account && !initalLoad && vaults.length > 0) initialSetup();
+    if (account && !accountLoad && vaults.length > 0) initialSetup()
+  }, [account, initalLoad, accountLoad, vaults])
 
   function handleVotes(val: number, index: number) {
     const updatedVotes = [...votes];
@@ -88,11 +90,14 @@ function VePopContainer() {
 
         <section className="py-10 lg:flex lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:space-x-8">
           <StakingInterface setShowLockModal={setShowLockModal} setShowMangementModal={setShowMangementModal} />
-          <OPopInterface setShowOPopModal={setShowOPopModal} />
+          <OPopInterface
+            gauges={vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData) => vault.gauge as Token) : []}
+            setShowOPopModal={setShowOPopModal}
+          />
         </section >
 
         <section className="hidden md:block space-y-4">
-          {vaults?.length > 0 ? vaults.map((vault: VaultData, index: number) =>
+          {vaults?.length > 0 ? vaults.filter(vault => !!vault.gauge?.address).map((vault: VaultData, index: number) =>
             <Gauge key={vault.address} vault={vault} index={index} votes={votes} handleVotes={handleVotes} canVote={canVote} />
           )
             : <p>Loading Gauges...</p>

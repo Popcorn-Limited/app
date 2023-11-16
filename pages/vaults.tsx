@@ -7,9 +7,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
 import { NumberFormatter } from "@/lib/utils/formatBigNumber";
 import useNetworkFilter from "@/lib/useNetworkFilter";
-import getVaultNetworth from "@/lib/vault/getVaultNetworth";
 import useVaultTvl from "@/lib/useVaultTvl";
-import { getVaultsByChain } from "@/lib/vault/getVault";
 import { Token, VaultData } from "@/lib/types";
 import SmartVault from "@/components/vault/SmartVault";
 import NetworkFilter from "@/components/network/NetworkFilter";
@@ -20,13 +18,16 @@ import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
 import getZapAssets, { getAvailableZapAssets } from "@/lib/utils/getZapAssets";
 import { ERC20Abi, VaultAbi } from "@/lib/constants";
+import { getVaultNetworthByChain } from "@/lib/getNetworth";
+import { useAtom } from "jotai";
+import { vaultsAtom } from "@/lib/atoms/vaults";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
   "0x8bd3D95Ec173380AD546a4Bd936B9e8eCb642de1", // Sample Stargate Vault
   "0xcBb5A4a829bC086d062e4af8Eba69138aa61d567", // yOhmFrax factory
   "0x9E237F8A3319b47934468e0b74F0D5219a967aB8", // yABoosted Balancer
-  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai 
+  "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
   "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
   "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
 ]
@@ -52,10 +53,14 @@ const Vaults: NextPage = () => {
   const [accountLoad, setAccountLoad] = useState<boolean>(false);
 
   const [selectedNetworks, selectNetwork] = useNetworkFilter(SUPPORTED_NETWORKS.map(network => network.id));
-  const [vaults, setVaults] = useState<VaultData[]>([]);
+
+  const [vaults, setVaults] = useAtom(vaultsAtom)
+
   const [zapAssets, setZapAssets] = useState<{ [key: number]: Token[] }>({});
   const [availableZapAssets, setAvailableZapAssets] = useState<{ [key: number]: Address[] }>({})
+
   const vaultTvl = useVaultTvl();
+  const [networth, setNetworth] = useState<number>(0);
 
   const [gaugeRewards, setGaugeRewards] = useState<GaugeRewards>()
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: OPOP, watch: true })
@@ -72,46 +77,28 @@ const Vaults: NextPage = () => {
       setZapAssets(newZapAssets);
 
       // get available zapAddresses
-      setAvailableZapAssets({ 
+      setAvailableZapAssets({
         1: await getAvailableZapAssets(1),
         137: await getAvailableZapAssets(137),
         10: await getAvailableZapAssets(10),
-        42161: await getAvailableZapAssets(42161)
-       })
-
-      // get vaults
-      const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
-      )).flat();
+        42161: await getAvailableZapAssets(42161),
+        56: await getAvailableZapAssets(56)
+      })
 
       // get gauge rewards
       if (account) {
         const rewards = await getGaugeRewards({
-          gauges: fetchedVaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
+          gauges: vaults.filter(vault => vault.gauge && vault.chainId === 1).map(vault => vault.gauge?.address) as Address[],
           account: account as Address,
           publicClient
         })
         setGaugeRewards(rewards)
       }
-
-      setVaults(fetchedVaults);
+      setNetworth(SUPPORTED_NETWORKS.map(chain => getVaultNetworthByChain({ vaults, chainId: chain.id })).reduce((a, b) => a + b, 0));
     }
-    if (!account && !initalLoad) getVaults();
-    if (account && !accountLoad) getVaults()
-  }, [account])
-
-  const [networth, setNetworth] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-
-
-  useEffect(() => {
-    if (account && loading)
-      // fetch and set networth
-      getVaultNetworth({ account }).then(res => {
-        setNetworth(res.total);
-        setLoading(false);
-      });
-  }, [account]);
+    if (!account && !initalLoad && vaults.length > 0) getVaults();
+    if (account && !accountLoad && vaults.length > 0) getVaults()
+  }, [account, initalLoad, accountLoad, vaults])
 
 
   async function mutateTokenBalance({ inputToken, outputToken, vault, chainId, account }: MutateTokenBalanceProps) {
@@ -211,7 +198,7 @@ const Vaults: NextPage = () => {
             <div className="w-1/2">
               <p className="leading-6 text-base text-primaryDark">Deposits</p>
               <div className="text-3xl font-bold whitespace-nowrap">
-                {`$${loading ? "..." : NumberFormatter.format(networth)}`}
+                {`$${NumberFormatter.format(networth)}`}
               </div>
             </div>
           </div>
@@ -272,21 +259,19 @@ const Vaults: NextPage = () => {
       </section>
 
       <section className="flex flex-col gap-4">
-        {vaults.length > 0 &&
-          Object.keys(zapAssets).length > 0
-          ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
-            return (
-              <SmartVault
-                key={`sv-${vault.address}-${vault.chainId}`}
-                vaultData={vault}
-                mutateTokenBalance={mutateTokenBalance}
-                searchString={searchString}
-                zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
-                deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
-              />
-            )
-          })
-          : <p>Loading Vaults...</p>
+        {(vaults.length > 0 && Object.keys(availableZapAssets).length > 0) ? vaults.filter(vault => selectedNetworks.includes(vault.chainId)).filter(vault => !HIDDEN_VAULTS.includes(vault.address)).map((vault) => {
+          return (
+            <SmartVault
+              key={`sv-${vault.address}-${vault.chainId}`}
+              vaultData={vault}
+              mutateTokenBalance={mutateTokenBalance}
+              searchString={searchString}
+              zapAssets={availableZapAssets[vault.chainId].includes(vault.asset.address) ? zapAssets[vault.chainId] : undefined}
+              deployer={"0x22f5413C075Ccd56D575A54763831C4c27A37Bdb"}
+            />
+          )
+        })
+          : <p className="">Loading Vaults...</p>
         }
       </section>
     </NoSSR >

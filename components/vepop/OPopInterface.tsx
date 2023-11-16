@@ -8,6 +8,7 @@ import MainActionButton from "../button/MainActionButton";
 import SecondaryActionButton from "../button/SecondaryActionButton";
 import { claimOPop } from "@/lib/oPop/interactions";
 import { WalletClient } from "viem";
+import { Token } from "@/lib/types";
 
 const {
   GaugeController: GAUGE_CONTROLLER,
@@ -17,10 +18,11 @@ const {
 } = getVeAddresses();
 
 interface OPopInterfaceProps {
+  gauges: Token[];
   setShowOPopModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps): JSX.Element {
+export default function OPopInterface({ gauges, setShowOPopModal }: OPopInterfaceProps): JSX.Element {
   const { address: account } = useAccount()
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient()
@@ -35,17 +37,15 @@ export default function OPopInterface({ setShowOPopModal }: OPopInterfaceProps):
   useEffect(() => {
     async function getValues() {
       setInitalLoad(true)
-      const gauges = await getGauges({ address: GAUGE_CONTROLLER, account: account, publicClient })
-
       const rewards = await getGaugeRewards({
-        gauges: gauges.filter(gauge => gauge.chainId === 1).map(gauge => gauge.address) as Address[],
+        gauges: gauges.map(gauge => gauge.address) as Address[],
         account: account as Address,
         publicClient
       })
       setGaugeRewards(rewards)
     }
-    if (account && !initalLoad) getValues()
-  }, [account])
+    if (account && gauges.length > 0 && !initalLoad) getValues()
+  }, [gauges, account])
 
   return (
     <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">

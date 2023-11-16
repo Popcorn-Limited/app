@@ -9,6 +9,10 @@ import Navbar from "@/components/navbar/NavBar";
 import { useAtom } from "jotai";
 import { yieldOptionsAtom } from "@/lib/atoms/sdk";
 import { CachedProvider, YieldOptions } from "vaultcraft-sdk";
+import { SUPPORTED_NETWORKS } from "@/lib/utils/connectors";
+import { getVaultsByChain } from "@/lib/vault/getVault";
+import { vaultsAtom } from "@/lib/atoms/vaults";
+import { useAccount } from "wagmi";
 
 async function setUpYieldOptions() {
   const ttl = 360_000;
@@ -20,14 +24,27 @@ async function setUpYieldOptions() {
 
 export default function Page({ children }: { children: JSX.Element }): JSX.Element {
   const { pathname } = useRouter();
+  const { address: account } = useAccount()
 
   const [yieldOptions, setYieldOptions] = useAtom(yieldOptionsAtom)
+  const [, setVaults] = useAtom(vaultsAtom)
 
   useEffect(() => {
     if (!yieldOptions) {
       setUpYieldOptions().then((res: any) => setYieldOptions(res))
     }
   }, [])
+
+  useEffect(() => {
+    async function getVaults() {
+      // get vaults
+      const fetchedVaults = (await Promise.all(
+        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
+      )).flat();
+      setVaults(fetchedVaults)
+    }
+    getVaults()
+  }, [account])
 
   return (
     <>

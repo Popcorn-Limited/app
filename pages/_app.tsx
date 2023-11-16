@@ -22,7 +22,7 @@ import {
 
 const { chains, publicClient } = configureChains(SUPPORTED_NETWORKS, [
   alchemyProvider({
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
+    apiKey: process.env.ALCHEMY_API_KEY as string,
   }),
   jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }) })],
   {
