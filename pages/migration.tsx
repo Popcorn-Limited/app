@@ -91,11 +91,13 @@ export default function Migration(): JSX.Element {
 
     await handleAllowance({
       token: POP,
-      inputAmount: (val * (10 ** 18)),
+      amount: (val * (10 ** 18)),
       account,
       spender: VCX,
-      publicClient,
-      walletClient
+      clients: {
+        publicClient,
+        walletClient
+      }
     })
     migrate({
       address: VCX,
@@ -108,75 +110,76 @@ export default function Migration(): JSX.Element {
 
   return (
     <>
-      <div className="w-full md:w-10/12 mb-8">
-        <h1 className="text-5xl md:text-3xl font-normal m-0 mb-4 md:mb-2 leading-0">
+      <div className="w-full pt-6 px-6 md:pt-0 border-t border-warmGray md:border-none md:mt-10">
+        <h1 className="text-[32px] leading-none md:text-center md:text-[56px] font-normal m-0 mb-2 md:mb-6 leading-0 text-primary">
           POP Migration
         </h1>
-        <p className="text-base text-primaryDark">
+        <p className="leading-none md:text-4 text-left md:text-center text-xl text-primary">
           Migrate your POP to VCX
         </p>
       </div>
-      {(vcxBal && popBal) ?
-        <div className="md:w-1/3 px-8 pt-6 pb-5 md:pl-11 md:rounded-3xl border border-[#F0EEE0] [&_summary::-webkit-details-marker]:hidden">
-          <InputTokenWithError
-            captionText={"Pop Amount"}
-            onSelectToken={() => { }}
-            onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal.value)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
-            chainId={1}
-            value={inputBalance}
-            onChange={handleChangeInput}
-            selectedToken={{
-              address: POP,
-              name: "POP",
-              symbol: "POP",
-              decimals: 18,
-              logoURI: "",
-              balance: Number(popBal.value),
-              price: 1,
-            }}
-            errorMessage={""}
-            tokenList={[]}
-            allowInput
-          />
-          <div className="relative py-4">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-customLightGray" />
+      <div className="px-6 md:px-8 py-10 border-t border-b border-warmGray mt-6 md:mt-10 w-full">
+        {(vcxBal && popBal) ?
+          <div className="md:w-1/3 mx-auto px-8 pt-6 pb-5 md:pl-11 md:rounded-3xl border border-[#F0EEE0] [&_summary::-webkit-details-marker]:hidden">
+            <InputTokenWithError
+              captionText={"Pop Amount"}
+              onSelectToken={() => { }}
+              onMaxClick={() => handleChangeInput({ currentTarget: { value: Math.round(Number(formatEther(popBal.value)) * ROUNDING_VALUE) / ROUNDING_VALUE } })}
+              chainId={1}
+              value={inputBalance}
+              onChange={handleChangeInput}
+              selectedToken={{
+                address: POP,
+                name: "POP",
+                symbol: "POP",
+                decimals: 18,
+                logoURI: "",
+                balance: Number(popBal.value),
+                price: 1,
+              }}
+              errorMessage={""}
+              tokenList={[]}
+              allowInput
+            />
+            <div className="relative py-4">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-customLightGray" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-4">
+                  <ArrowDownIcon
+                    className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full"
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
             </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white px-4">
-                <ArrowDownIcon
-                  className="h-10 w-10 p-2 text-customLightGray border border-customLightGray rounded-full"
-                  aria-hidden="true"
-                />
-              </span>
-            </div>
+            <InputTokenWithError
+              captionText={"VCX Amount"}
+              onSelectToken={() => { }}
+              onMaxClick={() => { }}
+              chainId={1}
+              value={(Number(inputBalance) * 10) || 0}
+              onChange={() => { }}
+              selectedToken={{
+                address: VCX,
+                name: "VCX",
+                symbol: "VCX",
+                decimals: 18,
+                logoURI: "/images/tokens/vcx.svg",
+                balance: 0,
+                price: 1,
+              }}
+              errorMessage={""}
+              tokenList={[]}
+              allowSelection={false}
+              allowInput={false}
+            />
+            <MainActionButton label="Convert POP" handleClick={handleMainAction} />
           </div>
-          <InputTokenWithError
-            captionText={"VCX Amount"}
-            onSelectToken={() => { }}
-            onMaxClick={() => { }}
-            chainId={1}
-            value={(Number(inputBalance) * 10) || 0}
-            onChange={() => { }}
-            selectedToken={{
-              address: VCX,
-              name: "VCX",
-              symbol: "VCX",
-              decimals: 18,
-              logoURI: "/images/tokens/vcx.svg",
-              balance: 0,
-              price: 1,
-            }}
-            errorMessage={""}
-            tokenList={[]}
-            allowSelection={false}
-            allowInput={false}
-          />
-          <MainActionButton label="Convert POP" handleClick={handleMainAction} />
-        </div>
-        : <p>Loading...</p>
-      }
+          : <p>Loading...</p>
+        }
+      </div>
     </>
   )
-
 }
