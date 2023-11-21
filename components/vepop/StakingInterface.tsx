@@ -24,7 +24,7 @@ function votingPeriodEnd(): number[] {
 }
 
 const {
-  BalancerPool: POP_LP,
+  WETH_VCX_LP,
   VotingEscrow: VOTING_ESCROW,
 } = getVeAddresses();
 
@@ -38,18 +38,18 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
 
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address })
   const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW, watch: true })
-  const { data: popLpBal } = useBalance({ chainId: 1, address: account, token: POP_LP, watch: true })
+  const { data: lpBal } = useBalance({ chainId: 1, address: account, token: WETH_VCX_LP, watch: true })
 
   return (
     <>
       <div className="w-full lg:w-1/2 bg-[#FAF9F4] border border-[#F0EEE0] rounded-3xl p-8 text-primary">
-        <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">vePOP</h3>
+        <h3 className="text-2xl pb-6 border-b border-[#F0EEE0]">veVCX</h3>
         <span className="flex flex-row items-center justify-between mt-6">
-          <p className="">My POP LP</p>
-          <p className="font-bold">{NumberFormatter.format(Number(formatEther(popLpBal?.value || ZERO))) || "0"}</p>
+          <p className="">My VCX LP</p>
+          <p className="font-bold">{NumberFormatter.format(Number(formatEther(lpBal?.value || ZERO))) || "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between">
-          <p className="">My Locked POP LP</p>
+          <p className="">My Locked VCX LP</p>
           <p className="font-bold">{lockedBal ? NumberFormatter.format(Number(formatEther(lockedBal?.amount))) : "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between">
@@ -57,7 +57,7 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
           <p className="font-bold">{lockedBal && lockedBal?.end.toString() !== "0" ? new Date(Number(lockedBal?.end) * 1000).toLocaleDateString() : "-"}</p>
         </span>
         <span className="flex flex-row items-center justify-between">
-          <p className="">My vePOP</p>
+          <p className="">My veVCX</p>
           <p className="font-bold">{NumberFormatter.format(Number(formatEther(veBal?.value || ZERO))) || "0"}</p>
         </span>
         <span className="flex flex-row items-center justify-between pb-6 border-b border-[#F0EEE0]">
@@ -65,7 +65,7 @@ export default function StakingInterface({ setShowLockModal, setShowMangementMod
           <p className="font-bold">{votingPeriodEnd()[0]}d : {votingPeriodEnd()[1]}h<span className="hidden lg:inline">: {votingPeriodEnd()[2]}m</span></p>
         </span>
         <div className="lg:flex lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-8 mt-6">
-          <MainActionButton label="Lock POP LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
+          <MainActionButton label="Lock VCX LP" handleClick={() => setShowLockModal(true)} disabled={Number(veBal?.value) > 0} />
           <SecondaryActionButton label="Manage Stake" handleClick={() => setShowMangementModal(true)} disabled={Number(veBal?.value) === 0} />
         </div>
       </div>

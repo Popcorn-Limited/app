@@ -10,7 +10,7 @@ export default function LockPreview({ amount, days }: { amount: string, days: nu
       <div className="space-y-2">
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Lock Amount</p>
-          <p className="text-[#141416]">{val > 0 ? val.toFixed(2) : "0"} POP</p>
+          <p className="text-[#141416]">{val > 0 ? val.toFixed(2) : "0"} VCX</p>
         </div>
         <div className="flex flex-row items-center justify-between text-secondaryLight">
           <p>Unlock Date</p>
@@ -23,7 +23,7 @@ export default function LockPreview({ amount, days }: { amount: string, days: nu
       </div>
 
       <div className="w-full bg-customLightGray border border-customLightGray rounded-lg p-4">
-        <p className="text-primaryDark">Important: vePOP is not transferrable and unlocking POP LP early results in a penalty of up to 75% of your POP LP</p>
+        <p className="text-primaryDark">Important: veVCX is not transferrable and unlocking VCX LP early results in a penalty of up to 75% of your VCX LP</p>
       </div>
 
     </div >

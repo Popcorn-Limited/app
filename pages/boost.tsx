@@ -80,10 +80,10 @@ function VePopContainer() {
         <section className="pt-10 pb-10 pl-8 lg:border-b border-[#F0EEE0] lg:flex lg:flex-row items-center justify-between">
           <div className="lg:w-[1050px]">
             <h1 className="text-3xl">
-              Lock <span className="text-customPurple">20WETH-80POP</span> for <b>vePOP</b>, voting Power & <b>oPOP</b>
+              Lock <span className="text-customPurple">20WETH-80VCX</span> for <b>veVCX</b>, voting Power & <b>oVCX</b>
             </h1>
             <p className="text-base text-primaryDark mt-6 lg:w-[750px]">
-              Vote with your vePOP below to influence how much $oPOP each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
+              Vote with your veVCX below to influence how much $oVCX each pool will receive. Your vote will persist until you change it and editing a pool can only be done once every 10 days.
             </p>
           </div>
         </section>
@@ -135,6 +135,6 @@ function VePopContainer() {
   )
 }
 
-export default function VePOP() {
+export default function VeVCX() {
   return <NoSSR><VePopContainer /></NoSSR>
 }

@@ -49,7 +49,7 @@ export default function Hero(): JSX.Element {
               content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.stake)}</p>}
             />
             <StatusWithLabel
-              label={"POP in Wallet"}
+              label={"VCX in Wallet"}
               content={<p className="text-3xl font-bold text-black">$ {loading ? "..." : NumberFormatter.format(networth.pop)}</p>}
             />
           </div>

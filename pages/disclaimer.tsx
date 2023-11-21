@@ -32,7 +32,7 @@ export default function DisclaimerPage(): JSX.Element {
         factual relationship with any User of the Popcorn Software. Consequently, pop.network is not liable to
         any user for damages, including any general, special, incidental, or consequential damages arising out of the
         use, in connection with the use or inability to use the Popcorn Software (including but not limited to loss of
-        POP, USDC, USDT, DAI, 3CRV, XEN, 3X, BTR, Arrakis USDC/POP LP, loss of data, business interruption, data being
+        POP, VCX, USDC, USDT, DAI, 3CRV, XEN, 3X, BTR, Arrakis USDC/POP LP, VCX LP, loss of data, business interruption, data being
         rendered inaccurate or losses sustained by a user or third parties.
       </p>
       <p>

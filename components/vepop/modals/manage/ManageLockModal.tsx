@@ -18,7 +18,7 @@ import IncreaseTimePreview from "./IncreaseTimePreview";
 import UnstakePreview from "./UnstakePreview";
 
 const {
-  BalancerPool: POP_LP,
+  BalancerPool: VCX_LP,
   VotingEscrow: VOTING_ESCROW,
 } = getVeAddresses();
 
@@ -40,7 +40,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
   const [step, setStep] = useState(0);
   const [mangementOption, setMangementOption] = useState();
 
-  const { data: vePopBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
+  const { data: veBal } = useBalance({ chainId: 1, address: account, token: VOTING_ESCROW })
   const { data: lockedBal } = useLockedBalanceOf({ chainId: 1, address: VOTING_ESCROW, account: account as Address }) as { data: { amount: bigint, end: bigint } }
 
   const [amount, setAmount] = useState<string>("0");
@@ -66,7 +66,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
     if (mangementOption === ManagementOption.IncreaseLock) {
       if ((val || 0) == 0) return;
       await handleAllowance({
-        token: POP_LP,
+        token: VCX_LP,
         amount: (val * (10 ** 18) || 0),
         account: account as Address,
         spender: VOTING_ESCROW,
@@ -126,7 +126,7 @@ export default function ManageLockModal({ show }: { show: [boolean, Dispatch<Set
         }
         {mangementOption === ManagementOption.Unlock &&
           <>
-            <UnstakePreview amount={Number(vePopBal?.value) / 1e18} />
+            <UnstakePreview amount={Number(veBal?.value) / 1e18} />
             <MainActionButton label="Unlock" handleClick={handleMainAction} />
           </>
         }
