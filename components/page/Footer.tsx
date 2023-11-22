@@ -29,7 +29,7 @@ const GeneralLinks = [
   },
   {
     label: "Gitbook",
-    href: "https://popcorn-dao.gitbook.io/popcorndao-gitbook/about-popcorn/welcome-to-popcorn",
+    href: "https://docs.vaultcraft.io/welcome-to-vaultcraft/introduction",
   },
   {
     label: "Disclaimer",
