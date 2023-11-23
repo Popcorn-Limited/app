@@ -19,7 +19,7 @@ async function setUpYieldOptions() {
   const provider = new CachedProvider();
   await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/apy-data/main/apy-data.json");
 
-  return new YieldOptions(provider, ttl);
+  return new YieldOptions({ provider, ttl });
 }
 
 export default function Page({ children }: { children: JSX.Element }): JSX.Element {
@@ -39,12 +39,12 @@ export default function Page({ children }: { children: JSX.Element }): JSX.Eleme
     async function getVaults() {
       // get vaults
       const fetchedVaults = (await Promise.all(
-        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account }))
+        SUPPORTED_NETWORKS.map(async (chain) => getVaultsByChain({ chain, account, yieldOptions: yieldOptions as YieldOptions }))
       )).flat();
       setVaults(fetchedVaults)
     }
-    getVaults()
-  }, [account])
+    if (yieldOptions) getVaults()
+  }, [account, yieldOptions])
 
   return (
     <>

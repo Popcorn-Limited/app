@@ -37,30 +37,11 @@ export default function SmartVault({
   zapAssets,
   deployer,
 }: SmartVaultsProps) {
-  const publicClient = usePublicClient();
-  const [yieldOptions] = useAtom(yieldOptionsAtom);
   const { address: account } = useAccount();
   const vault = vaultData.vault;
   const asset = vaultData.asset;
   const gauge = vaultData.gauge;
   const tokenOptions = getTokenOptions(vaultData, zapAssets);
-
-  const [apy, setApy] = useState<number | undefined>(0);
-
-  useEffect(() => {
-    if (!apy) {
-      // @ts-ignore
-      yieldOptions?.getApy(vaultData.chainId, vaultData.metadata.optionalMetadata.resolver, vaultData.asset.address).then(res => setApy(!!res ? res.total : 0))
-    }
-  }, [apy])
-
-  const [gaugeApr, setGaugeApr] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (vault?.price && gaugeApr.length === 0 && !!gauge) {
-      calculateAPR({ vaultPrice: vault?.price, gauge: gauge?.address, publicClient }).then(res => setGaugeApr(res))
-    }
-  }, [vault, gaugeApr])
 
   // Is loading / error
   if (!vaultData || tokenOptions.length === 0) return <></>
@@ -110,9 +91,13 @@ export default function SmartVault({
         <div className="w-1/2 md:w-2/12 mt-6 md:mt-0">
           <p className="font-normal text-primaryLight">vAPY</p>
           <Title as="span" level={2} fontWeight="font-normal">
-            {apy ? `${NumberFormatter.format(apy)} %` : "0 %"}
+            {vaultData.apy ? `${NumberFormatter.format(vaultData.apy)} %` : "0 %"}
           </Title>
-          {gaugeApr.length > 0 && <span className="text-secondaryLight text-base inline">{`+ (${formatNumber(gaugeApr[0])} % - ${formatNumber(gaugeApr[1])} %)`}</span>}
+          {!!vaultData.gaugeMinApy && !!vaultData.gaugeMaxApy &&
+            <span className="text-secondaryLight text-base inline">
+              {`+ (${formatNumber(vaultData.gaugeMinApy)} % - ${formatNumber(vaultData.gaugeMaxApy)} %)`}
+            </span>
+          }
         </div>
 
         <div className="w-1/2 md:w-1/12 mt-6 md:mt-0">

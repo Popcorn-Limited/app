@@ -21,6 +21,7 @@ import { ERC20Abi, VaultAbi } from "@/lib/constants";
 import { getVaultNetworthByChain } from "@/lib/getNetworth";
 import { useAtom } from "jotai";
 import { vaultsAtom } from "@/lib/atoms/vaults";
+import VaultsSorting, { VAULT_SORTING_TYPE } from "@/components/vault/VaultsSorting";
 
 export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2fD2C18f79F93eF299B20B681Ab2a61f5F28A6fF",
   "0xDFf04Efb38465369fd1A2E8B40C364c22FfEA340", "0xd4D442AC311d918272911691021E6073F620eb07", //@dev for some reason the live 3Crypto yVault isnt picked up by the yearnAdapter nor the yearnFactoryAdapter
@@ -30,11 +31,12 @@ export const HIDDEN_VAULTS = ["0xb6cED1C0e5d26B815c3881038B88C829f39CE949", "0x2
   "0x860b717B360378E44A241b23d8e8e171E0120fF0", // R/Dai
   "0xBae30fBD558A35f147FDBaeDbFF011557d3C8bd2", // 50OHM - 50 DAI
   "0x759281a408A48bfe2029D259c23D7E848A7EA1bC", // yCRV
+  "0xa6fcC7813d9D394775601aD99874c9f8e95BAd78", // Automated Pool Token - Oracle Vault 3
 ]
 
 const { oVCX } = getVeAddresses();
 
-const NETWORKS_SUPPORTING_ZAP = [1]
+const NETWORKS_SUPPORTING_ZAP = [1, 137, 10, 42161, 56]
 
 export interface MutateTokenBalanceProps {
   inputToken: Address;
@@ -66,6 +68,7 @@ const Vaults: NextPage = () => {
   const { data: oBal } = useBalance({ chainId: 1, address: account, token: oVCX, watch: true })
 
   const [searchString, handleSearch] = useState("");
+  const [sortingType, setSortingType] = useState(VAULT_SORTING_TYPE.none)
 
   useEffect(() => {
     async function getVaults() {
@@ -173,6 +176,30 @@ const Vaults: NextPage = () => {
     setVaults(newVaultState)
   }
 
+  const sortByAscendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.tvl - a.tvl);
+    setSortingType(VAULT_SORTING_TYPE.mostTvl)
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingTvl = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.tvl - b.tvl);
+    setSortingType(VAULT_SORTING_TYPE.lessTvl)
+    setVaults(sortedVaults)
+  }
+
+  const sortByAscendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => b.apy - a.apy);
+    setSortingType(VAULT_SORTING_TYPE.mostvAPR)
+    setVaults(sortedVaults)
+  }
+
+  const sortByDescendingApy = () => {
+    const sortedVaults = [...vaults].sort((a, b) => a.apy - b.apy);
+    setSortingType(VAULT_SORTING_TYPE.lessvAPR)
+    setVaults(sortedVaults)
+  }
+
   return (
     <NoSSR>
       <section className="md:pb-10 md:border-b border-[#EFECDD] md:flex md:flex-row items-center justify-between">
@@ -244,17 +271,20 @@ const Vaults: NextPage = () => {
         </div>
       </section>
 
-      <section className="mt-8 mb-10 md:flex flex-row items-center justify-between">
+      <section className="mt-8 mb-10 md:mb-6 md:my-10 md:flex flex-row items-center justify-between">
         <NetworkFilter supportedNetworks={SUPPORTED_NETWORKS.map(chain => chain.id)} selectNetwork={selectNetwork} />
-        <div className="md:w-96 flex px-5 py-1 items-center rounded-lg border border-customLightGray">
-          <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
-          <input
-            className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500 leading-none mt-1"
-            type="text"
-            placeholder="Search..."
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
-            defaultValue={searchString}
-          />
+        <div className="flex gap-4 justify-between md:justify-end">
+          <div className="md:w-96 flex px-6 py-3 items-center rounded-lg border border-customLightGray group/search hover:border-opacity-80 gap-2 md:mt-6 mt-12 mb-6 md:my-0">
+            <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
+            <input
+              className="w-10/12 md:w-80 focus:outline-none border-0 text-gray-500"
+              type="text"
+              placeholder="Search..."
+              onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+              defaultValue={searchString}
+            />
+          </div>
+          <VaultsSorting className="md:mt-6 mt-12 mb-6 md:my-0" currentSortingType={sortingType} sortByLessTvl={sortByDescendingTvl} sortByMostTvl={sortByAscendingTvl} sortByLessApy={sortByDescendingApy} sortByMostApy={sortByAscendingApy} />
         </div>
       </section>
 

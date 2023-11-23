@@ -65,6 +65,10 @@ export type VaultData = {
   depositLimit: number;
   metadata: VaultMetadata;
   chainId: number;
+  apy: number;
+  gaugeMinApy?: number;
+  gaugeMaxApy?: number;
+  totalApy:number;
 }
 
 export type VaultMetadata = {
