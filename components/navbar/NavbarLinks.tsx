@@ -15,6 +15,10 @@ const links: { label: string, url: string, onClick?: Function }[] = [
     url: "/stats"
   },
   {
+    label: "Pop to VCX Migration",
+    url: "/migration"
+  },
+  {
     label: "VaultCraft",
     url: "https://vaultcraft.io/",
   },
