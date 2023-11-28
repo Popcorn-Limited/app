@@ -1,4 +1,4 @@
-import { Asset } from "../types";
+import { Asset } from "@/lib/types";
 
 const assets: Asset[] = [
   {
@@ -25,6 +25,16 @@ const assets: Asset[] = [
     },
     "name": "USD Coin",
     "symbol": "USDC",
+    "decimals": 6,
+    "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
+  },
+  {
+    "chains": [10],
+    "address": {
+      "10": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+    },
+    "name": "USD Coin Bridged",
+    "symbol": "USDC.e",
     "decimals": 6,
     "logoURI": "https://cdn.furucombo.app/assets/img/token/USDC.png"
   },

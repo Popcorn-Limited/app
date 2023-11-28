@@ -33,7 +33,15 @@ export type veAddresses = {
   FeeDistributor: Address;
 };
 
-
+export type Asset = {
+  chains: number[];
+  address: { [key: string]: Address };
+  name: string;
+  symbol: string;
+  decimals: number;
+  logoURI: string;
+  apy?: number;
+};
 
 export type TokenConstant = {
   chains: number[];
