@@ -17,11 +17,10 @@ import { useAccount } from "wagmi";
 async function setUpYieldOptions() {
   const ttl = 360_000;
   const provider = new CachedProvider();
-  await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/apy-data/main/apy-data.json");
+  await provider.initialize("https://raw.githubusercontent.com/Popcorn-Limited/defi-db/main/apy-data.json");
 
   return new YieldOptions({ provider, ttl });
 }
-
 export default function Page({ children }: { children: JSX.Element }): JSX.Element {
   const { pathname } = useRouter();
   const { address: account } = useAccount()
